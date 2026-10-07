@@ -178,3 +178,17 @@ as an HDR multiplier before bloom and exposure. The M1 irradiance/color-space
 contract remains unchanged. M2 fixtures make alpha sorting/masking, fog camera
 translation, sky exclusion, roughness reflections, HDR bloom and app-color
 preservation independently observable.
+
+The optional `com.hyprune.lumen-reach.routes` version 1 adapter accepts at most
+64 `nodes:{id,position}` and 256 `edges:{from,to,width}`. Node positions are
+capsule feet in metres; runtime places and path points add the 1.7 m eye offset.
+Edges are bidirectional, reference distinct declared nodes, and have width
+0.6–100 m. Repeated undirected edges are invalid. Core does not infer stairs;
+authored ramp vertices and landings must remain explicit in the graph.
+A one-destination `route.set` pointing at a declared node expands through the
+shortest graph path from the nearest node to the current camera. Multi-point
+routes retain caller-specified paths. The connector to the first node and every
+path segment still use the capsule solver: an obstruction stops autodrive.
+Disconnected declared destinations are rejected. Arbitrary off-graph targets
+retain explicit direct-route behavior. The legacy route namespace keeps its
+existing place-only behavior.

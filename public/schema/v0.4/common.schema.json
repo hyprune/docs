@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hyprune.com/schema/v0.3/common.schema.json",
+  "$id": "https://hyprune.com/schema/v0.4/common.schema.json",
   "title": "Hyprune 0.3 common",
   "$defs": {
     "id": {

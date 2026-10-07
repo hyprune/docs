@@ -45,3 +45,14 @@ Only a verified binding can accept exclusive overlays. The Director maps after t
 `spatial.projection` supplies at most 64 normalized screen markers for the selected world output. Origin is top-left, x/y in [0,1], world metres for distance, monotonic milliseconds per sample. Core uses the same perspective/view as the world renderer, rejects behind-camera/offscreen markers and reports static-collision occlusion. Shell filters occluded markers, resets on world/output changes and drops samples after 500 ms without delivery. This avoids making the shell duplicate camera/FOV/viewport and collision knowledge. It describes the current SDR, untransformed output profile; unsupported transforms must stay unavailable. Snapshot/delta recovery remains authoritative.
 
 `spatial.world` supplies current world name and bounded eye-position places. `spatial.map` supplies a validated inline SVG (at most 64 KiB), SHA-256 of its exact bytes, bounds and normalized affine `worldToMap:[a,b,c,d,e,f]`: u=a*x+c*z+e, v=b*x+d*z+f. The shell renders the SVG as an image, never a document or executable, preserving aspect ratio and applying the same fitted rectangle to markers. There is no filesystem path or network resource in IPC. Core rejects DTD/entities, processing instructions, scripts, foreign objects, image/use/link elements, event handlers, CSS/style and URL/href attributes. Allowed elements are svg/g/rect/path/circle/ellipse/line/polyline/polygon/text/tspan with bounded geometric and plain presentation attributes. Invalid optional maps are rejected at package load, retaining the old world.
+
+## M2 Director integration
+
+IPC 0.4 shells use `mounts.bindings` for workspace homes, `workspace.activate`
+for travel/warp, and `workspace.focus/unfocus` for stock Hyprland entry/return.
+Surface cards can pull a live window, list free tool anchors in its home and place
+or return it. Expose **Recall all windows** through `surfaces.recall`, including
+when a saved target has disappeared. Render data-object source values against
+identity/pose metadata if desired. Method discovery gates every action; older
+clients continue working. Camera lens controls use `camera.fov`; the projection
+markers already reflect core's lens, so shells do not duplicate projection math.

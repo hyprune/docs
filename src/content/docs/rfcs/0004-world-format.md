@@ -96,3 +96,80 @@ M1 bounds exported zone metadata to 128 entries and 64 KiB serialized JSON so th
 World 0.1/0.2 remain unchanged. The optional extension `com.hyprune.map` version `0.1` contains `{version,path,projection:"xz",north:[0,0,-1],bounds:[minX,minZ,maxX,maxZ],worldToMap:[a,b,c,d,e,f]}`. The local safe SVG path and normalized affine map follow RFC-0008. No extension is required to load a world. The reference integration also recognizes the existing `com.hyprune.switchyard.map` 0.1 authoring proposal, translating its documented 900×1000 blueprint transform (u=(450+19*x)/900, v=(200-18*z)/1000) into the wire descriptor. This explicit compatibility adapter does not alter the package or infer an undocumented transform from bounds. Its route-node metadata supplies named navigable Map places; nodes are feet positions, converted to eye positions by core. It is static data and establishes no executable movement provider or pathfinding promise. Future packages should use the shared affine profile.
 
 Window capture uses eligible `com.hyprune.window` anchors in manifest order for the developer default docking layout, with anchor pose/size authoritative. It preserves aspect ratio within the anchor. No anchor launches an application; the trusted developer harness supplies live apps. User-managed persistent bindings remain future work.
+
+## Amendment M2: workspace homes and rendering, world format 0.3
+
+World `0.3` uses `schema/v0.3/world.schema.json`; 0.1/0.2 remain accepted.
+An **area is one workspace's home**. `areas` declares up to 32
+`{id,workspaceSlot,primaryAnchor,toolAnchors,dataAnchors,theme,spawnId?,freePlacementZones?}`.
+`workspaceSlot` is a two-to-four-digit authoring string (e.g. `"01"`), never a
+compositor workspace ID. Primary and tool/data IDs have exactly one area owner.
+The primary anchor has role `mounted-workspace`. Tools belong to this same home;
+additional workspace homes repeat a thematic kit under new stable IDs. `spawnId`
+selects a feet-position arrival; absent it, core derives a collision-checked
+standback point facing the primary wall. Actual workspace IDs are user bindings,
+not instructions in immutable world data.
+
+Anchors gain `mount:{type,role,interaction,frameNode?,limits?}`. Types are
+`facade-wall`, `hanging-wall`, `wall-inset-console`, `banner`, `lectern`,
+`operator-desk`, `field-rig`, `kiosk-pillar`, `globe`, `crate`,
+`blast-door-screen`, `terminal-bench`, `radar-dish`. Roles are
+`mounted-workspace|tool-mount|data-object`; interaction is respectively
+`focus-in|in-place|none`. `frameNode` identifies the physical frame/bezel in the
+scene, never an input plane transform. The anchor's exact quaternion and size
+remain authoritative, including tilted lecterns. Optional `limits` contains
+`minAspect,maxAspect,minSize,maxSize`: reject incompatible sources rather than
+stretching pixels. World-space surface front remains local +Z.
+
+`placementZones` declares `{id,bounds:{min,max},windowSizes,clearance}`; area
+`freePlacementZones` lists its reserved volumes. Bounds are metre AABBs;
+clearance is 0.04–1 m. These are validated opportunities for placement, not a
+permission to intersect collision. Lumen Reach reserves 4 m tool approaches,
+16 m primary-wall standback, 1.6×0.9 and 3.2×1.8 m rectangles, and 0.15 m
+clearance. World authoring must audit visible geometry as well as collision.
+
+The explicit compatibility adapter for optional
+`com.hyprune.lumen-reach.mounts` version 1 accepts `areas`, `mounts`, `objects`.
+Areas retain the fields above; authoring `name` and approach annotations are
+ignored. Mounts contain `{anchorId,areaId,workspaceSlot,mountType,role,frameNode?,limits?}`;
+roles `tool` and `data` normalize to `tool-mount` and `data-object`. Objects
+`{id,pose,mountType,areaId,workspaceSlot,node?}` remain separate from planar
+windows. `com.hyprune.lumen-reach.placement` version 1 supplies `zones`.
+Unknown optional namespaces retain the old ignore behavior. Base Lumen Reach
+packages can stay format 0.2 with `com.hyprune.window` screen anchors; adapters
+validate normalized 0.3 metadata, ownership, slot matching, poses and references.
+Installed packages are never rewritten.
+
+Optional `atmosphere` contains `fog:{color,density,heightFalloff,baseHeight,excludeUnlit}`,
+`sky:{zenith,horizon,ground,sun:{direction,color,intensity,angularRadius}}`,
+`exposure`, `toneMapping:aces|reinhard|linear`, and
+`bloom:{strength,threshold,radius}`. Colors and radiance are linear RGB; exposure
+is a positive linear multiplier; FOV is a runtime control in degrees. Fog is
+camera-relative with integrated exponential height density along the view ray;
+`excludeUnlit` protects authored unlit sky art. Sun direction is world-space,
+angular radius in radians. Bloom extracts HDR world radiance above threshold,
+downsamples and applies a normalized separable Gaussian kernel. Live app pixels
+bypass world exposure, fog, tone mapping and bloom.
+
+Optional `atmosphere.environment` contains six local PNG/JPEG square `faces`
+in OpenGL +X,-X,+Y,-Y,+Z,-Z order, `encoding:srgb|linear`, linear `intensity`,
+Y-axis `rotation` radians and `maxResolution` 16–512. Each face must be ≤2048²;
+core resamples and GGX-prefilters a complete linear HDR mip pyramid on a CPU
+worker, then uploads RGBA16F. A procedural gradient/sun cubemap is the default.
+Reflection roughness selects a filtered mip; baked diffuse irradiance remains
+separate. This is static environment IBL, with no SSR or geometry reflection
+claims. Capture original environment faces near wet floors/practicals to retain
+architecture and warm light details. Core's high tier currently uses 128² faces;
+Intel uses 64², half-resolution bloom and no SSR. Texture/mip storage counts
+against the world budget. Reflection probes may follow under a versioned contract.
+
+Honor glTF OPAQUE, MASK (factor × texture alpha versus cutoff) and BLEND.
+Opaque/masked geometry writes depth; blend geometry sorts back-to-front per
+primitive and does not write depth. Interpenetrating transparent geometry may
+need author splitting; exact order-independent transparency is not promised.
+Honor doubleSided with reversed back-face lighting normals, and
+[KHR_materials_emissive_strength](https://github.com/KhronosGroup/glTF/tree/main/extensions/2.0/Khronos/KHR_materials_emissive_strength)
+as an HDR multiplier before bloom and exposure. The M1 irradiance/color-space
+contract remains unchanged. M2 fixtures make alpha sorting/masking, fog camera
+translation, sky exclusion, roughness reflections, HDR bloom and app-color
+preservation independently observable.

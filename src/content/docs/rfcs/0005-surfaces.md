@@ -49,3 +49,48 @@ Pointer hover and keyboard focus are separate. Never use a focus call that impli
 Button down captures the target and its geometry generation until all buttons release, even when the ray leaves the plane. Motion during a drag intersects the captured plane and may produce coordinates outside its bounds; this is the explicit exception to outside-hit rejection. A close, lease loss, lock or output removal synthesizes the necessary releases/cancel through the seat, clears pressed-state bookkeeping and returns to navigation or desktop. Keep held modifiers balanced during all transitions. Touch, tablets, IME remapping and relative-pointer games are not part of the v0 embedded contract; users can exit to ordinary desktop mode for them.
 
 Before M1: test transformed/scaled windows, popups, multi-output coordinates, natural scrolling, drag off-plane, close mid-drag, keyboard focus refusal, and emergency exit while a client holds pointer lock. A readable desktop escape is always available.
+
+## Amendment M2: workspace homes, pulled tools and recovery
+
+The mounted wall represents the owning area's **whole workspace** using actual
+compositor window rectangles. Core composites approved texture leases outside
+Hyprland rendering; the world and shell layers are excluded. Focus in activates
+stock Hyprland presentation/input for that workspace. Focus out returns to the
+same world's camera. Core preserves the compositor's cursor lifecycle.
+
+User bindings map real workspace IDs to `{worldId,areaId}`. Switching workspace
+via a compositor keybind or Director travels to its area within the same world.
+A different world uses the existing asynchronous load/warp events; failure keeps
+the previous scene. Same-world travel does not reload the package. Ordinary
+0.1/0.2/0.3 IPC clients keep their frozen state projections and method sets.
+
+Pulling a window preserves its owning workspace. A carried plane follows the
+player; placing defaults to a free compatible tool mount in that workspace's
+area. Explicit cross-area tool placement is rejected. In-place mouse interaction
+projects a virtual pointer onto the rendered surface; click, scroll, button grabs,
+drag off-plane and text route through the compositor seat. Navigation mouse
+motion turns the camera; focused-tool motion moves the virtual pointer. Escape
+returns to navigation. Hidden-workspace keyboard focus retains its explicit
+unsupported result; no internal compositor focus bypass is introduced.
+
+Persist exact app-class/title rules, or an explicit empty-title class rule,
+keyed by world ID and area ID, independent of package version and runtime window
+addresses. Restore only to a compatible, free mount; ambiguous concurrent matches
+occupy different free targets. Closing a client retains the rule for relaunch.
+Bindings/rules live in daemon-owned user state; changes use atomic replacement.
+
+Collision tests use the complete surface rectangle as an oriented box with a
+margin against the world triangle mesh. Carry uses swept support rays from the
+player and shrinks/clamps in front of geometry. Placement pushes along the
+surface front normal to find a collision-free pose; never accept an intersecting
+result. A removed, occupied or newly obstructed saved target relocates to its
+area's free mount or reserved placement volume and publishes a runtime notice.
+If neither exists, recall safely in front of the player or refuse the operation.
+`surfaces.recall` brings all live pulled tools in front of the player without
+changing their durable mount rules. Director must expose this action.
+
+Data objects publish stable identity, owning area, mount type and pose separately
+from window capture. `data.object.bind` associates an authenticated publisher's
+source ID; source values use the existing bounded `data.publish`/TTL mechanism.
+This hook gives shell/extensions display metadata without executable world hooks,
+window launch commands, raw input injection or new pixel transports.

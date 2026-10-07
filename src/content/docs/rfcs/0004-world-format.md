@@ -121,8 +121,13 @@ remain authoritative, including tilted lecterns. Optional `limits` contains
 `minAspect,maxAspect,minSize,maxSize`: reject incompatible sources rather than
 stretching pixels. World-space surface front remains local +Z.
 
+Non-planar `dataObjects` declare `{id,areaId,pose,mount,node?}`. Their mount
+role is `data-object`, interaction `none`; area `dataAnchors` owns each ID.
+Core publishes identity and pose, plus a publisher source binding; the shell or
+extension provides its presentation.
+
 `placementZones` declares `{id,bounds:{min,max},windowSizes,clearance}`; area
-`freePlacementZones` lists its reserved volumes. Bounds are metre AABBs;
+`freePlacementZones` lists the string IDs of its reserved volumes. Bounds are metre AABBs;
 clearance is 0.04–1 m. These are validated opportunities for placement, not a
 permission to intersect collision. Lumen Reach reserves 4 m tool approaches,
 16 m primary-wall standback, 1.6×0.9 and 3.2×1.8 m rectangles, and 0.15 m
@@ -160,7 +165,7 @@ Reflection roughness selects a filtered mip; baked diffuse irradiance remains
 separate. This is static environment IBL, with no SSR or geometry reflection
 claims. Capture original environment faces near wet floors/practicals to retain
 architecture and warm light details. Core's high tier currently uses 128² faces;
-Intel uses 64², half-resolution bloom and no SSR. Texture/mip storage counts
+Intel uses 64² probes, 2× MSAA, at most 2× anisotropy, half-resolution bloom and no SSR. Texture/mip storage counts
 against the world budget. Reflection probes may follow under a versioned contract.
 
 Honor glTF OPAQUE, MASK (factor × texture alpha versus cutoff) and BLEND.

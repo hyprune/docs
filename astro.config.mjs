@@ -14,7 +14,7 @@ export default defineConfig({
     sidebar: [
       { label: 'Start here', items: [{ label: 'The idea', link: '/' }, { label: 'Concepts', slug: 'concepts' }, { label: 'Architecture', slug: 'architecture' }, { label: 'Roadmap', slug: 'roadmap' }] },
       { label: 'RFCs · v0', items: [{ autogenerate: { directory: 'rfcs' } }] },
-      { label: 'Build with us', items: [{ slug: 'contributing' }, { slug: 'governance' }, { slug: 'lessons' }] },
+      { label: 'Build with us', items: [{ slug: 'first-session' }, { slug: 'contributing' }, { slug: 'governance' }, { slug: 'lessons' }] },
     ],
   })],
 });

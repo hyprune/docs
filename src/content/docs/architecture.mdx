@@ -1,0 +1,53 @@
+---
+title: Architecture
+description: A small compositor boundary, a supervised control plane, and independent worlds and shells.
+---
+
+The compositor owns the desktop. Core provides the world runtime and brokers its authority. Everything else connects through explicit contracts.
+
+<svg className="diagram" viewBox="0 0 800 550" role="img" aria-labelledby="arch-title arch-desc">
+  <title id="arch-title">Hyprune process and repository boundaries</title>
+  <desc id="arch-desc">Shell and extension processes connect over public Unix IPC to hypruned. The daemon uses a private bridge to the Hyprland plugin. World packages supply validated scene data. Schemas and SDK define the public boundary.</desc>
+  <rect className="box" x="28" y="28" width="220" height="85" rx="12"/><text x="52" y="62" font-size="20">Shell</text><text x="52" y="88" font-size="14">Quickshell or your own UI</text>
+  <rect className="box" x="290" y="28" width="220" height="85" rx="12"/><text x="314" y="62" font-size="20">Extensions</text><text x="314" y="88" font-size="14">Supervised processes</text>
+  <rect className="box" x="552" y="28" width="220" height="85" rx="12"/><text x="576" y="62" font-size="20">Worlds</text><text x="576" y="88" font-size="14">Data, glTF, provenance</text>
+  <path className="line" d="M138 113v49h262v42M400 113v91M662 113v135h-82"/>
+  <text x="42" y="149" font-size="13">Public IPC · JSON-RPC</text><text x="611" y="196" font-size="13">Validate</text>
+  <rect className="accent" x="220" y="204" width="360" height="88" rx="12"/><text x="248" y="240" font-size="22">hypruned · core</text><text x="248" y="267" font-size="14">Grants / packages / IPC / supervision</text>
+  <path className="line" d="M400 292v73"/><text x="420" y="334" font-size="13">Private bridge · same core build</text>
+  <rect className="accent" x="160" y="365" width="480" height="102" rx="12"/><text x="187" y="403" font-size="22">Hyprland + core plugin</text><text x="187" y="435" font-size="14">Capture / trusted input / GPU / authoritative scene</text>
+  <text x="160" y="510" font-size="15">Schema defines the contracts. SDK makes them usable.</text>
+</svg>
+
+## Keep the render pass predictable
+
+The plugin reads immutable frame state and draws prepared resources. Capture refresh, cursor changes, focus, workspace transitions and uploads run in a verified safe phase after the outer compositor frame. CPU workers decode assets; they never access compositor objects or GL.
+
+<svg className="diagram" viewBox="0 0 800 220" role="img" aria-labelledby="frame-title frame-desc">
+  <title id="frame-title">Frame ownership and deferred work</title><desc id="frame-desc">Safe after-frame preparation feeds world rendering, then surfaces, then compositor layers. Only after outer endRender does the next deferred phase begin.</desc>
+  <rect className="accent" x="20" y="35" width="170" height="100" rx="10"/><text x="40" y="72" font-size="17">Safe preparation</text><text x="40" y="99" font-size="13">Capture / upload / input</text>
+  <path className="line" d="M190 85h25m170 0h25m170 0h25"/>
+  <rect className="box" x="215" y="35" width="170" height="100" rx="10"/><text x="235" y="72" font-size="17">World pass</text><text x="235" y="99" font-size="13">Geometry / lighting</text>
+  <rect className="box" x="410" y="35" width="170" height="100" rx="10"/><text x="430" y="72" font-size="17">Surface pass</text><text x="430" y="99" font-size="13">Captured app pixels</text>
+  <rect className="box" x="605" y="35" width="175" height="100" rx="10"/><text x="625" y="72" font-size="17">Composite</text><text x="625" y="99" font-size="13">Hyprland / shell layers</text>
+  <path className="line" d="M693 135v49H105v-49"/><text x="245" y="175" font-size="13">Next preparation only after outer endRender returns</text>
+</svg>
+
+## Read the contracts
+
+| Boundary | Decision |
+| --- | --- |
+| Repositories and ownership | [RFC-0001](/rfcs/0001-umbrella/) |
+| Processes, threads and frame graph | [RFC-0002](/rfcs/0002-runtime/) |
+| IPC, state, grants and failure | [RFC-0003](/rfcs/0003-ipc/) |
+| World content and validation | [RFC-0004](/rfcs/0004-world-format/) |
+| Pixels and input | [RFC-0005](/rfcs/0005-surfaces/) |
+| Interaction and controllers | [RFC-0006](/rfcs/0006-interaction/) |
+| Extension hosts and SDK | [RFC-0007](/rfcs/0007-extensions/) |
+| Replaceable shells | [RFC-0008](/rfcs/0008-shell/) |
+
+## Honest failure boundaries
+
+A shell crash releases overlay input. An extension crash cannot execute inside the compositor. A daemon crash triggers the plugin's desktop recovery watchdog. A malformed world fails staging before activation. A plugin bug can still crash Hyprland: keeping that boundary small and testing it against an exact compositor build is essential.
+
+The schema repository owns machine-readable definitions. The [world schema](/schema/v0/world.schema.json), [IPC schema](/schema/v0/ipc.schema.json), [extension schema](/schema/v0/extension.schema.json) and [screen descriptor](/schema/v0/screen-type.schema.json) are mirrored here for authoring tools; runtime validation uses pinned local copies.

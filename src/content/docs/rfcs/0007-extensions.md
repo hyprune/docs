@@ -10,7 +10,7 @@ description: "Process-based extensions, explicit grants and reproducible package
 
 Third-party executable extensions run as supervised processes. No stable in-process ABI and no arbitrary shared libraries in Hyprland. Core's own trusted adapters can be compiled in and are reviewed as core code. Data-only worlds and screen descriptors are not executable extensions.
 
-`schema/v0/extension.schema.json` declares `manifestVersion: "0.1"`, reverse-domain ID, SemVer package version, name, license, `apiVersion: "0.1"`, `runtime: "process"`, relative entrypoint, requested capabilities, contributions and sandbox requirements. Contributions list screen descriptor paths and widget/movement/integration IDs. The manifest is registration metadata; each contribution must have a supported host contract before it is enabled. Duplicate provider IDs or attempts to claim `com.hyprune.core` fail registration.
+`schema/v0/extension.schema.json` declares `manifestVersion: "0.1"`, reverse-domain ID, SemVer package version, name, license, `apiVersion: "0.1"`, `runtime: "process"`, relative entrypoint, requested capabilities, contributions and sandbox requirements. Contributions list screen descriptor paths and widget/movement/integration IDs. Widget, movement and integration IDs MUST be beneath the extension ID (for example `org.example.clock.widget` for `org.example.clock`). The manifest is registration metadata; each contribution must have a supported host contract before it is enabled. Duplicate provider IDs or attempts to claim `com.hyprune.core` fail registration.
 
 ## Host and privilege model
 

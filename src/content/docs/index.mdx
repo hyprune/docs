@@ -1,0 +1,43 @@
+---
+title: A world you can work in.
+description: Hyprune is an explorable desktop environment for Hyprland, built to become a framework for world-driven computing.
+template: splash
+hero:
+  title: A world you can work in.
+  tagline: What if the computer itself were an explorable world? Hyprune brings your applications into places you can move through, shape, and make your own.
+  image:
+    file: ../../assets/world.svg
+  actions:
+    - text: Explore the idea
+      link: /concepts/
+      icon: right-arrow
+    - text: Read the architecture
+      link: /architecture/
+      variant: secondary
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<p class="eyebrow">Hyprland beneath. A world ahead.</p>
+
+## Your desktop becomes a place.
+
+A quiet room for deep work. An observatory for your projects. A studio with windows where you left them. Hyprune is an open foundation for desktop experiences that have space, presence, and a sense of place.
+
+Your applications stay real applications. Your world supplies the setting. Your shell supplies the controls. You choose how to move between them—and can always return to the ordinary desktop.
+
+<CardGrid stagger>
+  <Card title="Worlds with purpose" icon="rocket">Author original environments in glTF, place surface anchors, and give everyday work a spatial home.</Card>
+  <Card title="A desktop, still" icon="laptop">Bring live application windows into the world, with deliberate focus, familiar input, and a dependable exit.</Card>
+  <Card title="Make it yours" icon="puzzle">Build a world, screen type, widget, movement mode, integration, or an entirely different shell.</Card>
+  <Card title="Open at the boundaries" icon="open-book">Small repositories and explicit contracts let contributors build independently of compositor internals.</Card>
+</CardGrid>
+
+## Early. Building in the open.
+
+Hyprune is at its foundation stage. These RFCs describe the intended system; they are not a claim that the runtime or extension ecosystem is ready. We are starting with one original world, safe compositor integration, and a small, testable protocol.
+
+<CardGrid>
+  <LinkCard title="The first four milestones" description="From a safe render loop to independently built worlds and shells." href="/roadmap/" />
+  <LinkCard title="Help shape the foundation" description="Code, world art, accessible interaction, documentation and hard questions." href="/contributing/" />
+</CardGrid>

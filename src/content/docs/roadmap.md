@@ -1,6 +1,6 @@
 ---
 title: "Roadmap"
-description: "Four milestones with measurable exits, not calendar promises."
+description: "Milestones with measurable exits, not calendar promises."
 ---
 
 
@@ -12,6 +12,16 @@ These are acceptance gates, not release dates. The current work establishes cont
 | **M1 · A usable desktop** | Planar live windows, capture leases, pointer/keyboard policy, reference shell, full control IPC | Hidden-workspace video stays live; app close mid-drag recovers; shell reconnect and output removal work; real DRM/hardware-cursor tests |
 | **M2 · An authorable framework** | World tools, atomic world swaps, sandboxed process extensions, first provider contracts | A new original world validates without core edits; denied grants stay denied; extension crash/update/rollback works; licensing/provenance checked |
 | **M3 · An ecosystem** | Independent shell, outside contributors, compatibility matrix, distribution and performance discipline | Second shell passes conformance; external world/provider needs no core patch; published frame/capture budgets and accessible interaction review |
+
+## Proposed core M4: optional GPU offload
+
+[RFC-0009](/rfcs/0009-offload-renderer/) stages a supervised worker, then a minimal
+single-output SDR desktop with correct native surfaces/depth, power admission
+and local fallback. Later phases cover depth transport, dynamic scale, quality
+headroom, reprojection and more outputs. These are proposed engineering gates,
+not completion claims or a change to the existing M0–M3 scope. The default stays
+in-process; a 60 FPS world-only spike does not by itself qualify a shipping
+backend or prove an advantage over Intel Auto at dynamic resolution.
 
 ## What is deliberately later
 

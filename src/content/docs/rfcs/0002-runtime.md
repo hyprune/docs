@@ -77,3 +77,13 @@ cursor shape requests remain compositor-owned. A nested software-cursor result
 is never evidence of hardware-plane safety; core documents the supervised DRM
 transition checklist before owner testing. Unload cancels queued work and removes
 retained pass elements before resources or hooks retire.
+
+## Proposed M4 amendment: optional world renderer
+
+[RFC-0009](/rfcs/0009-offload-renderer/) proposes a `hypruned`-supervised optional
+GPU renderer. It amends scene-rendering placement only: the plugin retains
+compositor authority, input, capture, native surfaces and final composition.
+Default in-process rendering and the render-phase rule remain mandatory.
+Its private pose/buffer/fence protocol is not public IPC or an extension SDK;
+power admission and prepared local fallback are shipping gates. See its staged
+M4 plan and measured limitations before treating the spike as desktop support.

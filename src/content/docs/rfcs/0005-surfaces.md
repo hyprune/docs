@@ -184,5 +184,5 @@ are behavioural corrections; IPC 0.6 fields remain unchanged.
 World graphics settings affect internal world rendering only. Application
 surfaces, workspace screens and world-locked overlays remain native-resolution.
 The graphics discovery, persistence, supported effects and timing semantics are
-specified in [RFC-0008](./0008-shell#graphics-controls-and-input-hold-timing-ipc-07--08).
+specified in [RFC-0008](/rfcs/0008-shell/#graphics-controls-and-input-hold-timing-ipc-07--08).
 Lower quality never changes logical surface input coordinates or buffer scale.

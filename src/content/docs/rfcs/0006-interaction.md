@@ -71,3 +71,17 @@ An enabled binding steals any colliding Hyprland bind only while the world is ac
 Tools are 1 normal, 2 window (place/lock), 3 path (open/closed × line/curve/arc), 4 position (move/rotate/scale), and 5 reserved. Position handles use axis arrows, cubes with uniform centre, and rotation arcs. Shift snaps translation to 0.1 m, rotation to 15° and scale factors to 0.1. Paths and object transforms are per-world/area overlays; authored packages are read-only. Window OBB placement checks and real client configure remain required.
 
 All cursor, focus and workspace effects are deferred after the frame. Shader and geometry drawing save/restore GL state and never invoke compositor rendering. Nested software-cursor evidence cannot validate hardware-cursor transitions; those require the core's supervised live checklist.
+
+## Amendment: supervised live desktop integration
+
+While active, newly mapped toplevels on the world output join the world without
+rewriting native workspace membership. Baseline desktop windows remain desktop
+windows. Core gives new clients safe ephemeral poses in the current home's free
+zone, with oriented-rectangle clearance and collision recovery; safe camera
+placement plus a notice handles unavailable zones. Authored placements still win.
+
+The unbound typing mouse button (Back by default) in world mode enters a real
+cursor mode for the world's visible top/overlay layers and popups. Movement and
+mouse look stop. Off-layer world input remains swallowed from hidden desktop
+windows. Back/Super+Tab leaves this interactive mode; native noncolliding binds
+retain their usual behavior. All cursor/focus/workspace changes remain deferred.

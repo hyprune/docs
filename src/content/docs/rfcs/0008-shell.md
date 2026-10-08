@@ -70,3 +70,21 @@ supports 0.5 without a mock-only state channel.
 ## Amendment: M3B Settings
 
 Director adds Settings after the existing tabs. Every action in each of four modes has three capture boxes and clear controls. Settings shows internal conflicts and “steals Hyprland: description” for native collisions, plus long-hold duration and scope vignette. Capture uses the Director's verified lease; save uses `input.set` with `input.control`. Core validates/persists the file. HUD displays `editor.mode`, tool slot and submode. The Map opening intent resets the selected tab to Map.
+
+## Amendment: live desktop inventory and presentation recovery
+
+IPC 0.6 workspace surfaces include native normal workspaces even without authored
+homes. Shell merges them with workspaces.locations. A desktop-only entry requests
+surface.focus; a home requests workspace.activate. apps includes mapped native
+toplevels on all outputs, independent of world texture leases, up to 128 entries.
+The versioned 0.6 schema increases its apps bound from 16 to 128. Older 0.5
+projections retain their 16-entry bound. Existing fields and grants are unchanged;
+consumers must update the 0.6 validator pin with this amendment.
+
+The trusted launcher owns the authenticated core connection and credential
+lifetime. QML crash/restart reconnects through its private presentation socket;
+only same-UID descendants are accepted and stale peers are replaced. A new child
+must be associated by its actual Wayland PID before an exclusive overlay opens.
+Presentation has no credential pipes to replay. Core/daemon reconnect remains a
+separate authenticated concern. Director pages use concrete anchored geometry
+rather than the Qt StackLayout size-hint path implicated in the live crashes.

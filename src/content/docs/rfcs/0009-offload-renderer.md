@@ -500,3 +500,64 @@ The published-main comparison establishes world-only fidelity headroom over
 Intel Auto, with a frame-rate/power tradeoff. M4 must still demonstrate that
 benefit with native windows, correct depth/ordering and sustained admitted power;
 the quality-headroom spike does not waive any shipping gate.
+
+## Phase 1 implementation amendment: hot switching and Performance 0.10
+
+The menu writes `graphics.set({patch:{offload:"off"|"auto"|"on"}})` over exact IPC
+0.10. Default is **off**. Mutation is diff-applied and persisted independently of
+Hyprland. No restart, compositor reload, or main-world reload occurs. Local world
+resources stay resident during worker warmup and operation. Startup, allocation,
+imports, polling and teardown run outside the compositor frame. A complete
+matching-generation frame younger than 50 ms may replace opaque world colour;
+missing/stale/crashed-worker frames use the prepared local renderer immediately.
+No blend is required: switching happens at complete frame boundaries. Pointer
+picking uses the actually displayed camera. Native client buffers, glass/haze,
+world markers, prompts and the debug overlay remain on the output GPU; a native
+geometry depth pass preserves occlusion (including masked material cut-outs).
+
+Hypruned owns the child and creates its private data/control socketpairs. It sends
+the data endpoint to the plugin using SCM_RIGHTS over their inherited private
+bridge. Poses/frames travel directly between renderer and plugin. The bounded
+2-slot LINEAR transport copies GL output to Vulkan LINEAR DMA-BUF, then copies
+only completed buffers into three local presentation targets. It transfers no CPU
+pixels or client buffers. Sequence, generation, pose, dimensions, stride, modifier
+and descriptor count are checked. Fence polling never blocks the compositor.
+The renderer uses the approved installed world path, clean environment, no launch
+grants or compositor sockets, no-new-privileges, Landlock filesystem confinement
+and seccomp restrictions on new connections/process execution. Unsupported
+confinement or driver interop fails back to local. NVIDIA EGL and Vulkan identities
+must match the same discovered DRM render node; no fixed card number is assumed.
+
+The power policy follows the owner's revised profiles. USB-C, battery and limited
+AC keep **auto off**; explicit on permits at most **50 W / 45 FPS**. Qualified full
+AC (reported capacity at least 150 W, no battery discharge) permits **80 W / 60 FPS**.
+Unknown supply data fails closed. `offload_power_cap_w` defaults to 80 (20–100 input
+range), always clamped to the profile ceiling. No root power-limit/clock writes
+are made: this is a monitored software budget, not a hardware-enforced instantaneous
+power limit. NVML readings use the discovered PCI identity. AC/policy is checked
+at 100 ms; power/temperature at 500 ms; unknown/stale readings, cap breach or more
+than 75 °C withdraw admission. On AC while the battery discharges, admission is
+withdrawn. The child has an independent 500 ms renewable lease watchdog thread,
+including during driver calls and startup. Stopping releases the worker and NVML
+handle. A fault requires an explicit off/on retry; phase 1 avoids crash-restart loops.
+All hardware development runs also use the independent external 50 W / 75 °C,
+55-second maximum watchdog, under the shared nested flock. Battery/full-AC policy
+branches and AC→USB withdrawal use fake telemetry in unit tests.
+
+`graphics.get/set` adds `performance` in 0.10. It contains requested and effective
+settings, `preset` (including `custom`), active renderer, status/reason, power/profile,
+cap/FPS, and per-control costs. `gpuMs:null` means unavailable or inseparable;
+`sharedPass/passGpuMs` identifies shared work without falsely attributing the whole
+pass to one effect. MSAA resolve excludes its shared scene shading cost. Existing
+controls include quality, MSAA, sharpen, anisotropy, bloom, fog, alpha/haze, AO,
+normal maps, reflections, sky, dynamic resolution, fixed render scale and target FPS.
+New `scale_min/scale_max` bound automatic scale (0.375–1, min ≤ max); fixed render
+scale is independent of those bounds. The Performance page may poll at 4 Hz.
+Older protocols keep their frozen config shape and reject the new setting keys.
+
+Initial limitations: NVIDIA GLES/Vulkan LINEAR, Linux x86-64 with Landlock ABI≥3,
+outputs up to 3840×2160. Edited world-node transforms select local rendering until
+synchronised scene edits are implemented; carrying/resizing windows stays supported.
+Both copies and local depth reconstruction are intentional phase-1 costs. Resource
+residency doubles world GPU storage. These nested results do not qualify physical
+outputs, real-session cursor behavior, arbitrary drivers or hardware power changes.

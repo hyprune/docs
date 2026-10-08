@@ -49,6 +49,65 @@ runs and shared GPU activity do not establish sustained power efficiency.
 The old fixed-quality Intel baseline must not be compared with a newer Auto
 preset without also recording effective resolution and enabled effects.
 
+### Published-main quality headroom (2026-10-08)
+
+The follow-up merged core `origin/main` **ad81f24** into the spike as
+**6412298**, then measured the same pinned world and matched Sun Court/Rime
+Vault viewpoints. It includes presets, dynamic resolution, graphics IPC 0.7/0.8,
+BVHs and incremental uploads. The [full report and raw evidence](https://github.com/hyprune/core/blob/936d962/docs/spikes/dgpu-offload.md#quality-headroom)
+include frame intervals, GPU/copy timing, power logs, 4K stills and a separate
+recording-overhead comparison. No core main edits or owner-session tests.
+
+| Setting, 3840×2160 output | Sun Court FPS / world scale | Rime Vault FPS / world scale |
+| --- | --- | --- |
+| Intel Auto → Low, 1× MSAA | 59.99 / 0.50–0.5625 | 60.10 / 0.4375 |
+| Intel High, 2× MSAA, dynamic | 59.93 / 0.375 | 59.98 / 0.375 |
+| Intel Ultra, 4× MSAA, dynamic | 56.79 / 0.375 | 58.56 / 0.375 |
+| Intel Ultra, 4× MSAA, forced native | 15.36 / 1.0 | 17.04 / 1.0 |
+| NVIDIA Ultra, 4× MSAA, cap 45 | 45.01 / 1.0 | 45.01 / 1.0 |
+
+The successful NVIDIA runs measured pose→Intel-ready **12.08 ms median** in
+both views, **16.10 / 14.37 ms p95**, **43.73 / 45.44 W** whole-device peaks.
+First plugin submissions were **44.94 / 45.13 FPS**, with request→first-submit
+p95 **27.37 / 26.75 ms**. Render GPU medians were **4.690 / 4.804 ms**;
+NVIDIA/Intel transfer copies each cost about **1.3 ms**. Native offload shades
+3.16–5.22× as many world pixels as measured Auto, or 7.11× dynamic High/Ultra.
+Ultra also enables bloom, height fog, environment sky, normal/reflection/specular
+shading, alpha haze and higher anisotropy relative to Auto's Low preset.
+
+**60 FPS native Ultra remains unqualified within the 50 W test ceiling.**
+Sun Court at 4× MSAA was stopped at **50.56 W** (partial 59.77 FPS). Reducing
+to 2× completed Sun at **59.98 FPS / 49.34 W**, but Rime stopped at **50.41 W**
+(partial 59.94 FPS). Partial runs are failures of power qualification, even
+when their frame counters are near 60. The complete 45 FPS runs lasted only a
+few seconds; they are not sustained electrical or thermal qualification.
+
+Two tiny uncapped native-Ultra render-only bursts (12 frames, 32–35 ms) measured
+**2.489 / 2.640 ms median GPU time**, with **2.610 / 2.873 ms wall completion**.
+They exclude transport and active Intel composition. A 500 ms meter may miss
+the entire burst, so its 22.69 / 28.41 W sampled whole-run peaks do not establish
+uncapped power or a shippable high-refresh rate. AC checks, the shared nested
+flock and 50 W/75°C watchdog remained active; no hardware power cap was changed.
+
+**Revised recommendation:** optional offload adds fidelity at a power-admitted
+frame cap; it is not needed merely to reach 60 FPS on this Intel device.
+Keep Intel Auto as the default and this RFC's conservative 30 FPS / 40 W
+initial policy. Native Ultra / 45 FPS is a candidate profile for further
+qualification, not a universal safe preset. Require supply admission, adequate
+power margin and the complete native-window/depth budget before shipping.
+Neither native-4K Ultra at 60 FPS nor high-refresh offload is qualified here.
+
+The newer Intel result is native **output**, not native **world shading**.
+The stills show finer detail/material highlights and Ultra steam absent in
+Low; no application windows were captured. Each normal observation window is
+about four seconds, after eight seconds Intel settling or 0.5 seconds after
+NVIDIA availability. Shared GPU activity remains a confounder. The 30 FPS
+side-by-side video is illustrative: recording reduced NVIDIA first submissions
+to **40.08 / 41.01 FPS** and raised ready p95 to **34.19 / 39.44 ms**. Use the
+unrecorded measurements for latency, and never equate ready/submission timing
+with physical motion-to-photon latency. A 45 FPS stream on a 60 Hz output also
+has uneven presentation cadence. These limits reinforce the existing M4 gates.
+
 ## Process ownership and discovery
 
 | Owner | Responsibilities |
@@ -437,6 +496,7 @@ and move them in without controlling the gallery watcher.
 
 A phase that misses its safety, correctness or benefit gate stays experimental;
 local rendering remains a complete supported product. In particular, keeping
-Intel at roughly 60 FPS through dynamic resolution may make fidelity/headroom,
-rather than another 60 FPS counter, the useful offload benefit. That claim needs
-a new controlled quality comparison and is not established by round 2 alone.
+The published-main comparison establishes world-only fidelity headroom over
+Intel Auto, with a frame-rate/power tradeoff. M4 must still demonstrate that
+benefit with native windows, correct depth/ordering and sustained admitted power;
+the quality-headroom spike does not waive any shipping gate.

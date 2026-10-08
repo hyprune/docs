@@ -85,3 +85,21 @@ cursor mode for the world's visible top/overlay layers and popups. Movement and
 mouse look stop. Off-layer world input remains swallowed from hidden desktop
 windows. Back/Super+Tab leaves this interactive mode; native noncolliding binds
 retain their usual behavior. All cursor/focus/workspace changes remain deferred.
+
+## Amendment: live retest input conventions and diagnostics
+
+Input v2 gains optional `invert_y: boolean` (default false). Screen coordinates
+increase right/down; camera heading increases right, pitch up, in a +Y-up world
+with zero forward -Z. Quaternion +Y uses right-handed angles, so camera heading
+maps to negative quaternion Y. Carried facing and grab offset follow the camera
+quaternion delta together. Core ray tests and native reticle share screen Y.
+
+Debug and capture are scoped actions in world, interactive, focus and menu.
+Older input files inherit missing debug/capture bindings from world without an
+implicit file rewrite; explicit empty lists stay disabled. The compatible IPC
+0.6 input schema amendment permits these optional fields and preserves earlier
+protocol contracts. F3/Y draws core diagnostics. U persists a private timestamped
+JSON and PNG from core's completed world frame outside the compositor pass;
+JSON identifies frame camera, source and age. Native 2D focus therefore captures
+the last world frame, not a compositor desktop snapshot. Readback restores GL
+state, encoding runs asynchronously, and a notice reports success or failure.

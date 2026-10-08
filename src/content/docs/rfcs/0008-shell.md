@@ -250,3 +250,47 @@ input config/capture/conflict responses so their frozen schemas stay valid.
 
 World-locked overlays remain core-rendered. These pose streams support a screen
 radar, compass and zone titles; they do not move world-marker rendering to QML.
+
+## Amendment: recordings and replay (IPC 0.12)
+
+IPC 0.11 remains the climbing movement contract. IPC 0.12 inherits it and adds
+`recording.start`, `recording.stop`, `recording.mark`, `recording.status`,
+`replay.start`, `replay.stop` and `replay.status`, all gated by `input.control`.
+Observers cannot initiate recording or replay. The rebindable `record.toggle`
+action is unbound in all modes; older protocol keymaps omit it and older edits
+preserve its current binding. The input file stays version 2 with an automatic
+migration adding the empty action. Settings at 0.12 uses its existing capture
+boxes. No compositor reload is involved.
+
+`recording.start` accepts optional `includeAppKeys` (default false); mark accepts
+a 1–64 character name. `replay.start` accepts an owned recording path, `mode`
+(`input` or `camera`, default input), optional `smoothingMs` (0–1000) and optional
+assertions. Assertions can compare every recorded frame (`recorded: true`), set
+an absolute numeric tolerance, and compare camera/mode/tool fields at named
+marks. Unknown assertion fields are errors, never silently ignored.
+
+All results report `{recording, playing, path, frame, mode, failures, error}`;
+path and error may be null. The bounded failures list identifies assertion
+locations. Notices announce start/save paths and replay completion/failure.
+The fixed simulation timestep is 1/60 s. Inputs enter the same core keymap and
+action pipeline below the physical cursor. Replay does not invoke Hyprland
+keybinds or synthesize application keyboard input, including when raw keys were
+opted into a recording. Application buttons/scroll can still reach the aimed
+live surface during input replay; external client contents and timing are not
+deterministic fixtures. Camera mode sends no application input.
+
+The version-1 private JSONL format consists of a header, timestamped input,
+simulation-frame and rendered-view records, named marks, and an end record.
+The header pins world identity/geometry digest, input/player configuration,
+initial camera/tool state and a deterministic seed. Unhandled/application keys
+are masked before entering the writer queue by default. Raw opt-in keys can
+reconstruct typed text; recordings also reveal movement, world geometry identity,
+configuration and event timing. Files are created 0600 under
+`$XDG_STATE_HOME/hyprune/recordings/`; sharing is an explicit user action. The
+format is bounded to ten minutes and 64 MiB, with a 4 MiB asynchronous write
+queue. Incomplete/truncated files are rejected. See core `docs/REPLAY.md` for
+CLI usage and the exact line format.
+
+Shader cache/warmup statistics remain additive diagnostics under
+`graphics.get().timings.shaderCache`, without an extra Settings switch. World
+activation waits for warmup; no cursor/focus/workspace change occurs in rendering.

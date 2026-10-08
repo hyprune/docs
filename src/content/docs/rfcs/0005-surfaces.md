@@ -165,3 +165,15 @@ changes reuse the existing atlas. Invalid themes leave the prior style active.
 The trusted bridge inserts its owned lease; QML never receives credentials or
 writes core configuration files. Themes are runtime state, not a package edit.
 The official shell supplies its Tokens palette and font when it receives a lease.
+
+### Live round 3 correction: direct clicks and logical sizing
+
+In world mode the normal tool forwards a plain button at the crosshair to its
+client without entering interactive mode. The press owns its release; dragging
+updates local coordinates while the ray intersects that client and retains the
+last valid point otherwise. E explicitly enters interactive mode. Carry yaw
+follows camera yaw; its initial pitch/roll and grab-point offset are preserved.
+Free windows and user mounts derive both quad dimensions from current logical
+client size and the configured world scale, independent of backing-buffer and
+monitor scale. Authored tool mounts retain explicit fit-to-mount sizing. These
+are behavioural corrections; IPC 0.6 fields remain unchanged.

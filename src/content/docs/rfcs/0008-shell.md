@@ -66,3 +66,7 @@ fallback; do not open descriptor text as a file or URI. Applications and focus
 remain core authority. Older peers omit these UI additions while existing
 method discovery still gates workspace and surface actions. The reference shell
 supports 0.5 without a mock-only state channel.
+
+## Amendment: M3B Settings
+
+Director adds Settings after the existing tabs. Every action in each of four modes has three capture boxes and clear controls. Settings shows internal conflicts and “steals Hyprland: description” for native collisions, plus long-hold duration and scope vignette. Capture uses the Director's verified lease; save uses `input.set` with `input.control`. Core validates/persists the file. HUD displays `editor.mode`, tool slot and submode. The Map opening intent resets the selected tab to Map.

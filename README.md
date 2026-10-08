@@ -47,6 +47,11 @@ Nothing has been pushed or deployed by this foundation work.
 
 ## Schema mirrors
 
+The Keymap page is generated from core's canonical `config/input.default.json`.
+With the sibling core checkout present, run `python3 scripts/generate-keymap.py`
+after changing defaults, then `npm run check:keymap` before committing. The page
+records the input file's SHA-256 and preserves HJKL / WASD / arrows ordering.
+
 `public/schema/v0` is a checked-in, byte-for-byte mirror from `hyprune/schema`; `public/schema/source.json` records its source commit and SHA-256 checksums. Run `node scripts/sync-schema.mjs ../schema` only after committing schema changes, review the diff, and commit the mirror update. The script rejects a dirty schema contract tree. `npm run check:links` also verifies the mirror hashes. Never edit mirror files directly. Runtime consumers use pinned local schemas, not network retrieval.
 
 ## Foundation review

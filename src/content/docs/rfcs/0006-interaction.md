@@ -59,3 +59,15 @@ invalid keysyms, duplicate bindings, nonfinite numbers and out-of-range values
 reject the complete patch. Deferred diff application preserves camera, window
 poses and unchanged settings. Core's `docs/M3A.md` documents every local option.
 The shell displays authoritative mode/tool state from IPC 0.5.
+
+## Amendment: M3B keymap v2
+
+The owner's `NOTES.md` defines four input modes: world, interactive (E use in place), focus (F smooth fullscreen), and menu. E supports workspace walls without moving the camera. F supports individual windows as well as workspaces. Super+Tab and Back leave interactive/focus; Esc leaves menu. TAB long hold opens Map, using the independent input config's `longHoldMs` (default 1000).
+
+Core owns `$XDG_CONFIG_HOME/hyprune/input.json` (default `~/.config/hyprune/input.json`), watches its parent directory, validates edits and diff-applies them. JSON shares core's existing parser and IPC representation. Each action has zero to three key/chord/button/wheel bindings. Invalid edits retain the last valid config. Hyprland Lua remains compositor setup; editing the input file never requests a Hyprland reload. The generated [keymap](/keymap/) is authoritative for defaults and option ranges.
+
+An enabled binding steals any colliding Hyprland bind only while the world is active and only in its defining mode. The cancellable keyboard/button/axis hooks run before the native keybind manager. Consumed presses own their releases across transitions; native forwarded presses receive balanced manager releases. Native binds are never rewritten, so deactivate, unload and helper failure restore behavior through removal of interception. Uncolliding binds retain native dispatch. The settings collision list reads native keybind records; descriptions for Lua dispatchers can fall back to dispatcher/reference when Hyprland stores no description. Keycode and multi-key native binds are intercepted by the actual triggering event, but their configuration descriptions currently require a manual check.
+
+Tools are 1 normal, 2 window (place/lock), 3 path (open/closed × line/curve/arc), 4 position (move/rotate/scale), and 5 reserved. Position handles use axis arrows, cubes with uniform centre, and rotation arcs. Shift snaps translation to 0.1 m, rotation to 15° and scale factors to 0.1. Paths and object transforms are per-world/area overlays; authored packages are read-only. Window OBB placement checks and real client configure remain required.
+
+All cursor, focus and workspace effects are deferred after the frame. Shader and geometry drawing save/restore GL state and never invoke compositor rendering. Nested software-cursor evidence cannot validate hardware-cursor transitions; those require the core's supervised live checklist.

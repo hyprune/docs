@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/hyprune/schema",
-  "commit": "a816d9d25a62a28f038aeae311e2330188142563",
+  "commit": "a1e2f84f2ae34d2232bf0291fe073f2f5495601c",
   "files": {
     "common.schema.json": "7d4411fa456019d11918d65d24d582abdf6e5b75c893d71553b2d4396354dba2",
     "ipc.schema.json": "d624f3a41d020f89f5963b84abcb83acfffbda0c7ed32613c498f89b541dc7b8"

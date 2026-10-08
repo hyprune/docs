@@ -35,7 +35,7 @@ if (readFileSync('dist/CNAME','utf8').trim() !== 'hyprune.com') errors.push('CNA
 if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1; }
 else console.log(`Checked local links/assets in ${files.filter(f=>f.endsWith('.html')).length} pages, CNAME and ${Object.keys(manifest.files).length} schema mirrors.`);
 
-for(const version of ['v0.2','v0.3','v0.4','v0.5']) {
+for(const version of ['v0.2','v0.3','v0.4','v0.5','v0.6']) {
  const manifest=JSON.parse(readFileSync(`public/schema/${version}/source.json`,'utf8'));
  for(const [name,expected] of Object.entries(manifest.files)) for(const dir of ['public','dist']) {
   const actual=createHash('sha256').update(readFileSync(`${dir}/schema/${version}/${name}`)).digest('hex');

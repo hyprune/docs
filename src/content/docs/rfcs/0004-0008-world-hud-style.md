@@ -40,8 +40,8 @@ only launcher-authorised package paths can provide styles.
 
 ## Validation boundary
 
-Validate theme JSON before loading any asset. Limits: theme 32 KiB, font 4 MiB,
-SVG 64 KiB and 256 nodes. SVG accepts static basic geometry, groups, gradients
+Validate theme JSON before loading any asset. Limits: theme 32 KiB, font 1 MiB,
+SVG 16 KiB and 128 nodes. SVG accepts static basic geometry, groups, gradients
 and internal clipping. Reject scripts, event attributes, CSS, text, animation,
 images, external refs, use, foreignObject, declarations and entities. Parse and
 re-serialize accepted SVG into a private immutable content-addressed cache.
@@ -59,3 +59,8 @@ limits, contrast correction and cached assets. Schema tests reject executable
 fields, URLs, traversal and invisible colors. The original Signal Amber sample
 is installed only in the nested harness's private Lumen Reach package for visual
 checks; no private reference artwork is distributed.
+
+The personal-world v0.1 proposal was reconciled into this version 1 format.
+Its optional `id` and `name` identify the applied skin; per-area accents,
+package-defined text sizing and animation timing are deferred. Invalid optional
+assets fall back per role with one diagnostic; malformed theme JSON uses defaults.

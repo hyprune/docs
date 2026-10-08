@@ -95,10 +95,13 @@ maps to negative quaternion Y. Carried facing and grab offset follow the camera
 quaternion delta together. Core ray tests and native reticle share screen Y.
 
 Debug and capture are scoped actions in world, interactive, focus and menu.
-Older input files inherit missing debug/capture bindings from world without an
-implicit file rewrite; explicit empty lists stay disabled. The compatible IPC
-0.6 input schema amendment permits these optional fields and preserves earlier
-protocol contracts. F3/Y draws core diagnostics. U persists a private timestamped
+Older input files use each mode's default for missing debug/capture bindings
+without an implicit file rewrite; explicit empty lists stay disabled. The
+compatible IPC 0.6 input schema amendment permits these optional fields and
+preserves earlier protocol contracts. F3/Y draws core diagnostics in world;
+F3 does so in the other modes. U captures in world; Super+U captures in
+interactive, focus and menu, leaving ordinary U/Y available for client typing.
+Capture persists a private timestamped
 JSON and PNG from core's completed world frame outside the compositor pass;
 JSON identifies frame camera, source and age. Native 2D focus therefore captures
 the last world frame, not a compositor desktop snapshot. Readback restores GL

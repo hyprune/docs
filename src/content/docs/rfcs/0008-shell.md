@@ -88,3 +88,44 @@ must be associated by its actual Wayland PID before an exclusive overlay opens.
 Presentation has no credential pipes to replay. Core/daemon reconnect remains a
 separate authenticated concern. Director pages use concrete anchored geometry
 rather than the Qt StackLayout size-hint path implicated in the live crashes.
+
+## Amendment: world-locked overlays and screen UI
+
+Core owns world-locked presentation: active waypoint marker/label, its route,
+object/window/workspace interaction prompts and optional area/place labels.
+These are drawn in the world render pass from **that frame's camera**, not from
+shell IPC projection samples. The default displays no area/place markers; input
+v2 `show_area_markers` is an optional boolean, default false, exposed in Settings.
+Interaction prompts appear at aimed, unobstructed usable surfaces. Routes are
+depth-tested world lines. Labels/icons are screen-space billboards anchored by
+the same frame projection. Labels are intentionally readable through geometry;
+route lines retain depth occlusion. Native fullscreen handover hides world-locked
+presentation. Core diagnostics remain available as a screen overlay.
+
+Shell owns Director, menus, notices and other screen UI, including an optional
+compass/minimap. The official IPC 0.6 shell stops drawing IPC-projected world
+markers. Projection data stays available for alternate/older shells, with its
+original timestamp/coordinate contract, sampled at up to 10 Hz. Periodic state
+publication is up to 30 Hz; explicit actions and UI events publish immediately.
+World-locked rendering is independent of either publication rate.
+
+IPC 0.6 adds `overlay.style` under `shell.control`: params `{leaseId, style}`
+require the connection's currently owned shell lease; result `{style}` returns
+the full canonical theme. Earlier protocols do not advertise or accept it.
+`style` is a closed partial object with `fontFamily` (1–96 printable bytes),
+`waypointColor`, `routeColor`, `labelColor`, `promptColor` (three finite sRGB
+components each, 0–1), and optional `iconAtlas` (null means built-in symbols).
+The atlas descriptor is `{path,cellSize,waypointIndex,promptIndex}`: absolute
+local path, square cells 16–128 pixels, indices 0–255. Core accepts only a regular
+same-UID non-symlink PNG, at most 4 MiB encoded and 1024×1024 decoded, with whole
+cells and in-bounds indices. Icons use alpha coverage tinted by marker/prompt
+colour and render at 24 output pixels. Font families resolve through Fontconfig;
+the first implementation covers printable ASCII, with `?` fallback for other
+label glyphs. Colours and fonts have defaults even without a shell.
+
+Theme file I/O, decode, font rasterization and GL uploads run in deferred owner
+work, never inside a compositor frame. Equal themes do no work; colour-only
+changes reuse the existing atlas. Invalid themes leave the prior style active.
+The trusted bridge inserts its owned lease; QML never receives credentials or
+writes core configuration files. Themes are runtime state, not a package edit.
+The official shell supplies its Tokens palette and font when it receives a lease.

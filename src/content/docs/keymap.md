@@ -77,7 +77,7 @@ Q holds scope zoom; the wheel changes its magnification. Shift snaps position-to
 | captureInputLimit | 256 | 16–1024 recent input events in U captures |
 | modes | tables above | All listed actions; 0–3 bindings each |
 
-Binding names use XKB keysyms, `Super+Shift+Ctrl+Alt+key`, `LMB`, `RMB`, `MMB`, `Back`, `Forward`, `ButtonN`, `Wheel`, `WheelUp`, `WheelDown`, or `MouseMove`. Modifier order is canonicalized. F12 remains the emergency exit. Internal conflicts reject a save; Hyprland collisions are reported and accepted. Invalid edits retain the last valid configuration.
+Binding names use XKB keysyms, `Super+Shift+Ctrl+Alt+key`, `LMB`, `RMB`, `MMB`, `Back`, `Forward`, `ButtonN`, `Wheel`, `WheelUp`, `WheelDown`, or `MouseMove`. Keys use the active keyboard layout’s base-level symbol, with letters canonicalized to lowercase; Shift/Ctrl/Alt/Super are separate modifiers. Press identity is retained through release even if modifiers or layout change. Modifier order is canonicalized. F12 remains the emergency exit. Internal conflicts reject a save; Hyprland collisions are reported and accepted. Invalid edits retain the last valid configuration.
 
 U writes a private timestamped capture under `$XDG_STATE_HOME/hyprune/captures/` (default `~/.local/state/hyprune/captures/`) and shows the path in a notice. The file records camera, mode, tools, surfaces, placements, recent IPC/events and the bounded input history.
 

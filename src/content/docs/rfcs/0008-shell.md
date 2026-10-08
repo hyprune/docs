@@ -139,3 +139,69 @@ labels, reticles and screen UI must not inherit the internal world scale. Core
 uses the same camera for both passes. This does not change IPC projection fields
 or the shell's style hook. Shells do not upscale their UI in response to core's
 render scale. Local graphics options are documented in core M3A.md.
+
+
+## Graphics controls and input hold timing (IPC 0.7 / 0.8)
+
+IPC 0.7 inherits IPC 0.6 state, events, grants and methods. It adds:
+
+| Method | Required grant | Parameters | Result |
+| --- | --- | --- | --- |
+| graphics.get | state.read | `{}` | graphics settings snapshot |
+| graphics.set | world.control | `{patch: graphicsPatch}` | graphics settings snapshot |
+
+Core negotiates 0.7 only when offered. Peers offering 0.6 or earlier retain their
+frozen projections and method lists, including strict enum validation. Graphics
+methods are unavailable to earlier versions even if called without advertisement.
+Unauthorised requests receive method-not-advertised, as for existing controls.
+
+A settings snapshot contains `config`, `effective`, `overrides`, `path`, `error`,
+`presets`, `options`, `unsupported`, and `timings`. The first is the validated
+requested graphics config; the second resolves nullable per-preset effects;
+the third is the sparse persisted file layer. The presets and discrete options
+are discoverable; all numeric ranges are specified in the companion schema.
+Unknown effects, unsupported values and invalid types fail validation before any
+write or renderer mutation. Files are private, atomically replaced, and watched
+across editor renames. A bad edit retains the last valid config and sets `error`;
+a repaired file clears it even when it restores exactly the previous value.
+
+Settings writes go through core, never directly from the shell. No Hyprland
+reload is involved. Lua can still provide compositor-level defaults; the user's
+independent graphics file overrides them. A missing file key inherits Lua;
+a null per-effect key inherits the selected preset. Preset changes retain
+explicit effect overrides. No additional public state keys or events are added.
+Settings may poll while open; normal HUD consumers need not subscribe.
+
+Graphics controls cannot lower native application or world-overlay resolution.
+Core owns world-locked markers/prompts and renders them with the current frame's
+camera. Shell owns screen UI. The existing lease-owned `overlay.style` hook is
+unchanged. File/IPC changes happen outside rendering; scalar/sampler changes
+are diff-applied without world texture re-import. FBO allocation and own shader
+rendering remain guarded GL operations; they never trigger compositor rendering.
+
+Diagnostics are explicitly extensible and non-authoritative. GPU measurements
+use nonblocking disjoint queries; unavailable values are null. The seven named
+cost groups are sky, shared world shading, MSAA resolve, bloom, upscale/sharpen,
+native surfaces/geometry, and output/markers. Fused material effects share the
+world shading measurement and must not be displayed as independent additive
+costs. `deliveredFPS` counts new frames, excluding repeated presentations.
+
+No SSR, runtime shadow maps or runtime contact-shadow implementation is claimed.
+These are reported in `unsupported`; attempts to set fictitious switches fail.
+Baked lighting and shadows remain part of world lightmaps.
+
+IPC 0.8 inherits 0.7 and adds required `keymap.holds` to revisioned state.
+It is an array (maximum 64) of pending, unfired long holds, each containing
+`action`, canonical `binding`, `startedAtMs`, and `durationMs`. Start timestamps
+use Linux CLOCK_MONOTONIC milliseconds, matching core's input timer. Shell's
+bridge can sample `time.monotonic()` on receipt and pass remaining duration to
+QML; QML animates locally and does not poll or intercept TAB. Release, mode
+change, keymap replacement, deactivation, or firing removes the entry. Reloading
+only the duration retains the start and updates the duration. Clear animation
+on disconnect. No progress deltas are sent every frame. Earlier peers never
+receive this field; shells must explicitly negotiate 0.8 to consume it.
+
+Canonical schemas are `schema/v0.7/ipc.schema.json` and
+`schema/v0.8/ipc.schema.json`. The 0.7 document matches the shell 36cb85f pin
+exactly. Core's live launcher uses 0.7 until the shell adopts 0.8; its HoldRing
+is ready but wiring that component belongs to the shell workstream.

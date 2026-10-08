@@ -177,3 +177,12 @@ Free windows and user mounts derive both quad dimensions from current logical
 client size and the configured world scale, independent of backing-buffer and
 monitor scale. Authored tool mounts retain explicit fit-to-mount sizing. These
 are behavioural corrections; IPC 0.6 fields remain unchanged.
+
+
+## Graphics quality amendment (IPC 0.7)
+
+World graphics settings affect internal world rendering only. Application
+surfaces, workspace screens and world-locked overlays remain native-resolution.
+The graphics discovery, persistence, supported effects and timing semantics are
+specified in [RFC-0008](./0008-shell#graphics-controls-and-input-hold-timing-ipc-07--08).
+Lower quality never changes logical surface input coordinates or buffer scale.

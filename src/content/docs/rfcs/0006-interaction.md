@@ -37,3 +37,25 @@ A plugin crash or missed movement deadline holds the last safe pose, clears move
 M0/M1 controllers are trusted built-ins compiled with core. M2 third-party movement controllers run out-of-process; avoid a synchronous round trip on every render. They consume bounded simulation snapshots and return timestamped, short-lived intents, which core validates and expires after 100 ms. **This fast-path protocol is deliberately not defined by IPC 0.1**: RFC-0003 only selects a registered mode. A follow-up RFC and schema version must specify sequencing, queries, deadlines and grants before third-party controllers are enabled. An extension manifest's `movementModes` field reserves IDs; it does not activate an unimplemented API.
 
 Native third-party controllers in the compositor are rejected as a public extension mechanism: latency benefits do not justify session-wide crash and input risk. Deterministic replay of normalized actions, collision invariants, mode-switch cancellation and deadline failure are the conformance criteria for the eventual SDK.
+
+## Amendment M3A: daily controls and live configuration
+
+Super+Alt toggles movement/typing; a configurable evdev button also toggles it.
+Typing shows a virtual world pointer, routes hover/click/scroll at its ray and
+allows a native pointer on neighbouring outputs. Escape cancels world interaction;
+F12 remains an independent emergency exit. Held movement is cleared on mode,
+overlay, focus, reload, lock and world transitions. A press consumed by core owns
+its matching release even after a handover.
+
+F flies into an aimed workspace wall and hands over to native desktop input.
+Super+Alt or the typing button flies back to the saved view. Keys 1–5 select
+configured pointer/mount/path slots; path slots are reserved stubs for M3B.
+C holds view magnification; V toggles noclip and F4 toggles flight by default.
+Walking steps up collision risers up to 0.35 m, subject to capsule headroom;
+falling a configurable distance below spawn respawns and clears velocity/input.
+
+`hl.plugin.hyprune.config({...})` accepts validated partial tables. Unknown keys,
+invalid keysyms, duplicate bindings, nonfinite numbers and out-of-range values
+reject the complete patch. Deferred diff application preserves camera, window
+poses and unchanged settings. Core's `docs/M3A.md` documents every local option.
+The shell displays authoritative mode/tool state from IPC 0.5.

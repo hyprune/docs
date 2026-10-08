@@ -94,3 +94,33 @@ from window capture. `data.object.bind` associates an authenticated publisher's
 source ID; source values use the existing bounded `data.publish`/TTL mechanism.
 This hook gives shell/extensions display metadata without executable world hooks,
 window launch commands, raw input injection or new pixel transports.
+
+## Amendment M3A: hand placement and child trees
+
+Super+left drag preserves the hit point offset and camera-to-hit distance.
+Wheel motion changes target distance multiplicatively and eases toward it.
+Super+middle press rolls around the surface normal using the signed ray sweep;
+Super+right drag configures the native client width/height independently, retaining
+pixel-to-world scale and the client's own minimum/maximum size constraints.
+An OBB sweep rejects motion through geometry. Releasing onto a workspace wall
+moves the native client to that workspace and returns it to tiling. A drag from
+a workspace wall extracts the topmost native client at its composed rectangle.
+
+Root, popup and subsurface leases share their parent's transform and logical
+scale; child offsets are top-left logical pixels. Popups sit just in front of
+the parent and get precedence in picking. The true child resource receives
+input; menu interaction preserves parent keyboard focus. Implicit button grabs
+retain their child resource until release, including off-plane coordinates.
+Consumed world presses/releases and empty-space scroll never leak to hidden
+native windows. Unsupported external/cropped/transformed leases stay unavailable.
+
+New standalone windows spawn in front of the camera at configured distance and
+pixel scale, stopping before geometry and existing planes. Transient windows and
+X11 menus attach to their parent rather than receiving independent spawn poses.
+Fullscreen animates the prepared window plane to the viewport, then releases the
+output to native 2D. Exiting animates back to the saved 3D pose. These handovers,
+including rapid reversal and window closure, occur outside rendering.
+
+The mount tool tags a live window, then raycasts a world surface and aligns local
++Z to its facing normal. Collision recovery checks the full rectangle before
+saving an area-owned app-class/title rule and pose through daemon atomic storage.

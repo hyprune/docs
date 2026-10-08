@@ -56,3 +56,13 @@ when a saved target has disappeared. Render data-object source values against
 identity/pose metadata if desired. Method discovery gates every action; older
 clients continue working. Camera lens controls use `camera.fov`; the projection
 markers already reflect core's lens, so shells do not duplicate projection math.
+
+## Amendment M3A: mode, slots and open workspace apps
+
+IPC 0.5 shells display `interaction.mode`, selected 1–5 slot and configured tool
+names. They list `apps` grouped by actual workspace ID, showing theme icon,
+window title and app class. Resolve icons through the local icon theme with a
+fallback; do not open descriptor text as a file or URI. Applications and focus
+remain core authority. Older peers omit these UI additions while existing
+method discovery still gates workspace and surface actions. The reference shell
+supports 0.5 without a mock-only state channel.

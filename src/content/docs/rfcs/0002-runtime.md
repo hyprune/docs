@@ -63,3 +63,17 @@ Track damage/committed buffer identity and geometry generation; unchanged window
 M0: exact Hyprland compatibility gate, unload-safe plugin, static original world, deferred queue assertions, emergency exit and daemon hello/snapshot. M1: live window capture with hidden-workspace liveness, input routing, shell leases and full RFC-0003 control. M2: validated world swaps and sandboxed extension hosts. M3: measured multi-output behavior and external conformance.
 
 Required failure tests: cursor changes under hardware cursor rendering, nested snapshot recursion, workspace switch during capture, daemon/shell death, window close mid-drag, output removal, scene reload with pending worker results, repeated plugin unload/reload, session lock, and capture/VRAM saturation. Core must document actual support; this RFC is not evidence that these tests pass yet.
+
+## Amendment M3A: deferred interaction effects
+
+Hand input and transitions update pure gesture/camera state. Capture leases,
+client size configures, native focus, seat enter/motion/button/axis delivery,
+workspace tiling and cursor visibility execute through tracked `doLater` callbacks
+or the deferred simulation tick with render nesting zero. A pass draws prepared
+surfaces only. Child buffers are leased directly; no recursive compositor
+snapshot rendering is required. GL state is scoped for world and workspace FBOs.
+Cursor visibility changes only when the desired hide/show state changes. Native
+cursor shape requests remain compositor-owned. A nested software-cursor result
+is never evidence of hardware-plane safety; core documents the supervised DRM
+transition checklist before owner testing. Unload cancels queued work and removes
+retained pass elements before resources or hooks retire.

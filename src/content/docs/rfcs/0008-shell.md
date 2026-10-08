@@ -294,3 +294,18 @@ CLI usage and the exact line format.
 Shader cache/warmup statistics remain additive diagnostics under
 `graphics.get().timings.shaderCache`, without an extra Settings switch. World
 activation waits for warmup; no cursor/focus/workspace change occurs in rendering.
+
+### IPC 0.12 amendment: suspended free cursor
+
+The unreleased 0.12 contract additionally introduces `cursor` in interaction and
+editor mode enums. This is a real Hyprland pointer with native layer/output
+passthrough, projected world-window input, and frozen camera. The shell displays
+`CURSOR · Back/Super+Tab to return`. Older negotiated protocols project it to
+`typing` / `interactive` and omit the new world `exit` action. Back and Super+Tab
+work across all active world states, complete gestures before entry, and restore
+the saved world/use/focus state on the next toggle. A missing saved client safely
+returns to world control. All other free-mode keyboard input stays native.
+
+Cursor visibility, focus, workspace changes and return warps are deferred after
+the frame. The pointer can leave the world output and return without being
+recaptured; only an explicit toggle restores world control.

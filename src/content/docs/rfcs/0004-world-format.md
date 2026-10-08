@@ -72,7 +72,7 @@ The small schema CLI covers steps 1 and manifest-local parts of 2. It is **not**
 
 ## Rights and examples
 
-Official worlds must be original, CC0 or CC-BY-4.0 assets with traceable attribution. Prefer original content released as CC-BY-4.0; keep source assets and reproducible export instructions. Tools/scripts are MIT. Third-party files retain their original license and attribution. The schema accepts SPDX expressions for interoperability, but official-world review applies this narrower policy. No Destiny/Bungie assets, meshes, textures, derived scenes, thumbnails or branding may enter these repositories. Hypr3D is a lessons-only historical reference.
+Official worlds must be original, CC0 or CC-BY-4.0 assets with traceable attribution. Prefer original content released as CC-BY-4.0; keep source assets and reproducible export instructions. Tools/scripts are MIT. Third-party files retain their original license and attribution. The schema accepts SPDX expressions for interoperability, but official-world review applies this narrower policy. Nothing may enter these repositories without the right to license it under these terms. Hypr3D is a lessons-only historical reference.
 
 ## Amendment M1: material profile, format 0.2
 

@@ -1,10 +1,21 @@
 ---
 title: "Lessons from Hypr3D"
-description: "A historical footnote: useful failures, no inherited assets or architecture."
+description: "Where Hyprune came from: what we contributed to Hypr3D, and what it taught us."
 ---
 
 
-Hypr3D was the owner's earlier experiment: a C++ Hyprland plugin, GLES renderer, Jolt physics, Quickshell HUD, Lua configuration and Blender-exported GLBs. Hyprune is new code with fresh boundaries. This page records observations from the local concept branch at commit `587434e`; it is not an asset source or compatibility promise.
+[Hypr3D](https://github.com/samine825/Hypr3D) is samine825's Hyprland plugin that turns a workspace into a walkable 3D room: a C++ plugin with a GLES renderer, Jolt physics, Lua configuration and GLB scenes. We found it in its first release week (late September 2026), joined in, and contributed upstream: crash fixes on closing 3D mode and restoring windows, menus/popups/dialogs in the room, drawing under bars and launchers, a typing cursor, noclip and more.
+
+| Upstream Hypr3D (vendored Jolt excluded) | Total | From us |
+| --- | --- | --- |
+| Commits on `main` | 135 | 29 (21%) |
+| Pull requests | 11 opened | 8 merged, 2 open, 1 closed |
+| Lines added | ~23.7k | ~1.7k |
+| Lines surviving in `main` today | ~18.8k | ~1.5k (8%) |
+
+Beyond upstream we kept going in our own fork: about 14.7k more lines across a series of concept branches (workspace screens, a quest-style HUD and director UI, travel and vehicles, multiple worlds, lightmapped rendering).
+
+That is where we learned Hypr3D was asking a different question from ours. Hypr3D asks *what if a Hyprland workspace were 3D?*, a focus on windows in a 3D room. We wanted *what if the computer itself were an explorable world?*: a universe of worlds, places with purpose, and object-based apps. That needed a different architecture, so Hyprune is new code with fresh boundaries, not a fork. This page records what the prototype taught us (observations from our concept branch at commit `587434e`); it is not an asset source or compatibility promise.
 
 ## A callback after windows is still inside the frame
 
@@ -32,4 +43,4 @@ The prototype TODO records stale same-path world reloads, spawn points inside ge
 
 ## Source audit and asset boundary
 
-Reviewed locally: `src/main.cpp`, `src/Render/`, capture code, `quickshell/hypr3d/HudState.qml`, the HUD protocol document, `TODO.md`, and recent git history. No source code, artwork, scenes, textures or thumbnails were copied. Some prototype worlds used personal-use game assets. Official Hyprune content must be original or properly attributed CC0/CC-BY material; derived Bungie/Destiny assets are excluded as well.
+Reviewed locally: `src/main.cpp`, `src/Render/`, capture code, `quickshell/hypr3d/HudState.qml`, the HUD protocol document, `TODO.md`, and recent git history. No source code, artwork, scenes, textures or thumbnails were copied. Some prototype worlds used personal-use game assets. Official Hyprune content must be original or properly attributed CC0/CC-BY material.

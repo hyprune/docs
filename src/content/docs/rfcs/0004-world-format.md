@@ -192,3 +192,45 @@ path segment still use the capsule solver: an obstruction stops autodrive.
 Disconnected declared destinations are rejected. Arbitrary off-graph targets
 retain explicit direct-route behavior. The legacy route namespace keeps its
 existing place-only behavior.
+
+## Amendment: climbable volumes, world format 0.4
+
+World `formatVersion: "0.4"` uses `schema/v0.4/world.schema.json` and adds
+optional `climbables` (at most 128). Earlier formats remain frozen and do not
+accept this field. The new format retains every 0.3 field and its semantics.
+
+```json
+{
+  "id": "hatch-ladder", "type": "ladder",
+  "bottom": [0, 0, 0.55], "top": [0, 6, 0.55],
+  "facing": [0, 0, 1], "width": 1.4, "depth": 0.8,
+  "exits": {"bottom": [0, 0, 1.55], "top": [0, 6, -0.85]},
+  "speed": 2
+}
+```
+
+`bottom` and `top` define the world-space **capsule feet rail**, in metres.
+Their normalized difference is the prism's longitudinal axis. `facing` is the
+unit outward climb-face normal, perpendicular to that axis within 0.001;
+`cross(axis, facing)` is the lateral axis. `width` (0.6–32 m) and `depth`
+(0.1–2 m) are full dimensions, centered on the rail. The segment must ascend,
+be 0.5–100 m long and have normalized Y at least 0.25. This oriented segment
+representation covers ladders, inclined ladders and broad climbable walls;
+no quaternion or glTF node transform is applied again.
+
+`id` is a stable unique slug. `type` is `ladder`, `rope`, `vines` or `chain-link`;
+all share the same controller. Optional `speed` is metres per second along the
+rail, 0.1–8, default 2. `exits.top` and `exits.bottom` are standing capsule feet
+positions, each within 3 m of its corresponding endpoint. All fields except
+speed are required. Unknown properties, duplicate IDs, nonfinite values,
+degenerate/descending segments, invalid normals and remote exits reject loading.
+
+The rail must put the entire upright 0.3 m radius capsule clear of visible and
+collision ladder geometry; position rungs behind it (the fixture uses 0.52 m).
+Core checks standing capsules at both rail ends and exits during load. Runtime
+sweeps every connector, lateral movement and exit against static collision;
+an obstructed rail/exit holds the last safe position. Endpoints are not a
+permission to teleport through a hatch rim. Author unobstructed connectors and
+landings, and a catch prism spanning the intended drop-in opening. Visual meshes
+remain ordinary original/licensed glTF content and are never inferred to be
+climbable. Procedural fixture `core/tests/fixtures/climbing.py` is original CC0.

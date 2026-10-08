@@ -106,3 +106,51 @@ JSON and PNG from core's completed world frame outside the compositor pass;
 JSON identifies frame camera, source and age. Native 2D focus therefore captures
 the last world frame, not a compositor desktop snapshot. Readback restores GL
 state, encoding runs asynchronously, and a notice reports success or failure.
+
+## Amendment: climbing controllers and IPC 0.11
+
+Climbing is a walking activity over RFC-0004 format 0.4 climbable volumes, not
+a replacement public movement mode. `com.hyprune.walk` and `com.hyprune.fly`
+retain their identifiers. Local configuration selects
+`movement.climb_mode = "grab" | "look-to-climb" | "auto-traverse"`, default
+`grab`, through `hl.plugin.hyprune.config({movement={climb_mode="grab"}})`.
+Invalid patches retain the previous configuration.
+
+* **Grab:** moving into a climb face within its prism plus 0.2 m outward reach
+  attaches. Forward/back actions (W/S, K/J or arrows by default) climb up/down
+  independently of pitch. Strafe moves across the authored width while keeping
+  the capsule inside its edges. Releasing input holds without sliding. Space
+  jumps outward, Ctrl slides down at twice authored speed. At the top, core
+  steps smoothly to the authored exit; down/back at the bottom walks to its exit
+  and detaches.
+* **Look-to-climb:** the same rules, with climb velocity multiplied by sine of
+  pitch. Looking up + forward ascends, looking down + forward descends, and a
+  level view holds. Back reverses direction.
+* **Auto-traverse:** E/use within reach of a rail or exit travels to the opposite
+  exit (upper/lower selected by the nearer half of the segment). Enter from a
+  landing onto the rail before descending, and ease into the destination.
+  Space cancels with the same outward jump. A blocked connector cancels; a
+  blocked exit holds. Ordinary use targeting remains available away from ladders.
+
+All three modes catch falling feet crossing the authored prism, including a
+swept crossing between simulation samples. Catch stops downward velocity
+immediately and aligns to the rail gradually. Auto-traverse catches and holds
+until E is pressed. A short detach cooldown prevents immediate recatching after
+jumping. Collision remains enabled, including thin-wall sweeps. The controller
+never attaches in flight/noclip. World changes, explicit camera moves, respawn,
+mode switches, desktop exit and input handovers clear transient climbing state.
+
+A 12 mm hand-over-hand camera bob is visual only and fades on hold/detach;
+`graphics.reduced_motion` removes it. The controller does not rotate the view or
+change look bindings. Attachment alignment, climbing acceleration and endpoint
+motion are bounded, without pose teleports.
+
+IPC **0.11** adds required `movement.state: walking | flying | climbing`,
+`movement.ladderId: string | null`, and `movement.prompt: string` to snapshots
+and deltas. `ladderId` is non-null exactly while climbing. The prompt contains
+core's interaction guidance, for example `W/S climb / Ctrl slide / Space let go`.
+The same text uses the native interaction-prompt path; shell clients may present
+it without guessing movement state. `movement.modeId` remains the selected walk
+or fly strategy. Noclip reports activity `flying`. Protocols 0.1–0.10 omit these
+three fields and retain their original shapes. No public input-injection or
+renderer protocol is introduced by this amendment.

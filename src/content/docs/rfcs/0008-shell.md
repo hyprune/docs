@@ -206,3 +206,47 @@ Canonical schemas are `schema/v0.7/ipc.schema.json` and
 `schema/v0.8/ipc.schema.json`. The 0.7 document matches the shell 36cb85f pin
 exactly. Core's live launcher uses 0.7 until the shell adopts 0.8; its HoldRing
 is ready but wiring that component belongs to the shell workstream.
+
+## Amendment: IPC 0.9 HUD telemetry and concept cycling
+
+IPC 0.9 inherits 0.8. Frozen older schemas do not change. An authenticated or
+observer `state.read` client may call `hud.subscribe({topics})` independently of
+`state.subscribe`. Choose one to five unique topics: `hud.frame`, `hud.pose`,
+`zone.entered`, `zone.exited`, `tool.changed`. The result is `{subscriptionId}`;
+`hud.unsubscribe({subscriptionId})` stops the stream. There is one HUD subscription
+per connection. No historical transition replay is implied; pose samples contain
+the current zone and tool for initialisation.
+
+Every telemetry event contains `subscriptionId`, `sessionId`, `revision` and
+`monotonicMs` (core's steady clock; compare using `session.ping`, not wall time).
+Events describe current simulation state and do not mutate the state revision:
+
+- `hud.frame`: up to 4 Hz; `fps`, `frameMs`, `cpuMs` (render plus update), `gpuMs`
+  (null until all timer queries are available), `renderScale`, effective `preset`.
+- `hud.pose`: up to 30 Hz; `outputId`, `worldId`, `worldName`, `position` in world
+  metres (+Y up), `heading` in radians (zero faces -Z, positive turns right),
+  `pitch`, `zone`, `tool` (1–4), `subtype`. A radar should interpolate this state.
+- `zone.entered` / `zone.exited`: `zone` contains `id`, `homeName`, `worldId`,
+  `worldName`. Authoritative camera containment uses authored zone bounds; first
+  containing zone wins at overlaps. Exiting precedes entering on a change. The
+  area's display name overrides the zone name when the IDs match. Deactivation
+  emits exit. Pose `zone` is null outside all zones.
+- `tool.changed`: `slot`, `name`, `subtype`, emitted on a tool or wheel submode change.
+
+Telemetry samples coalesce/drop under backpressure; clients must not count them
+as simulation steps. State subscriptions and input remain independent. No
+resource/energy stat exists yet; shells must not present synthetic values as game state.
+
+The rebindable world action `hud.cycle` defaults to **5**, replacing reserved
+slot 5. Each nonrepeat press sends `ui.hud.cycle` only to the verified associated
+shell with an owned output lease and a state subscription. Parameters are
+`leaseId`, `outputId`, `sequence`, `monotonicMs`, `sessionId`, `revision`. Sequence
+is monotonic for the runtime and supports duplicate suppression. Shells bind
+with `shell.bind` as soon as their HUD is mapped, not only on opening Director.
+They own concept order, selection persistence and the temporary name banner.
+Application/focus/menu typing remains unaffected. Input files migrate the old
+`tool5` binding to `hud.cycle`; pre-0.9 clients receive the old action spelling in
+input config/capture/conflict responses so their frozen schemas stay valid.
+
+World-locked overlays remain core-rendered. These pose streams support a screen
+radar, compass and zone titles; they do not move world-marker rendering to QML.

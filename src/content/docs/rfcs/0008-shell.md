@@ -129,3 +129,13 @@ changes reuse the existing atlas. Invalid themes leave the prior style active.
 The trusted bridge inserts its owned lease; QML never receives credentials or
 writes core configuration files. Themes are runtime state, not a package edit.
 The official shell supplies its Tokens palette and font when it receives a lease.
+
+### Native overlays with internal world resolution
+
+Core may render world geometry/lighting/bloom at an internal resolution and
+reconstruct colour and depth before composing windows. Client/workspace surfaces
+and core world-locked overlays are rasterized at the output's native resolution;
+labels, reticles and screen UI must not inherit the internal world scale. Core
+uses the same camera for both passes. This does not change IPC projection fields
+or the shell's style hook. Shells do not upscale their UI in response to core's
+render scale. Local graphics options are documented in core M3A.md.

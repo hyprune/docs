@@ -75,7 +75,7 @@ snapshot rendering is required. GL state is scoped for world and workspace FBOs.
 Cursor visibility changes only when the desired hide/show state changes. Native
 cursor shape requests remain compositor-owned. A nested software-cursor result
 is never evidence of hardware-plane safety; core documents the supervised DRM
-transition checklist before owner testing. Unload cancels queued work and removes
+transition checklist before supervised live testing. Unload cancels queued work and removes
 retained pass elements before resources or hooks retire.
 
 ## Proposed M4 amendment: optional world renderer

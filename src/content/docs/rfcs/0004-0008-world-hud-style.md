@@ -4,7 +4,7 @@ description: "Optional declarative world package skins for shell-owned HUD conce
 ---
 
 Status: **proposed**, implementation prototype in shell. Amends RFC-0004 and
-RFC-0008; does not alter frozen world or IPC versions. Owner requested 2026-10-08.
+RFC-0008; does not alter frozen world or IPC versions. Requested 2026-10-08.
 
 ## RFC-0004: optional package extension
 
@@ -57,10 +57,10 @@ suppresses the readable native text outline or the user's reduced-motion setting
 Shell tests exercise traversal/symlink rejection, active/external SVG rejection,
 limits, contrast correction and cached assets. Schema tests reject executable
 fields, URLs, traversal and invisible colors. The original Signal Amber sample
-is installed only in the nested harness's private Lumen Reach package for visual
-checks; no private reference artwork is distributed.
+is installed only in a nested test copy of Lumen Reach for visual checks; it is
+not part of any published package.
 
-The personal-world v0.1 proposal was reconciled into this version 1 format.
+An earlier skin proposal was reconciled into this version 1 format.
 Its optional `id` and `name` identify the applied skin; per-area accents,
 package-defined text sizing and animation timing are deferred. Invalid optional
 assets fall back per role with one diagnostic; malformed theme JSON uses defaults.

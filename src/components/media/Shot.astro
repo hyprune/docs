@@ -1,6 +1,6 @@
 ---
 // A pre-encoded Lumen Reach still (public/media/lumen-reach/<name>-{800,1600}.webp).
-// Images are optimised on the bake host, not at build time; see public/media/README.md.
+// Images are optimised ahead of time, not at site build time; see public/media/README.md.
 interface Props { name: string; alt: string; caption?: string; version?: string; eager?: boolean; wide?: boolean; sizes?: string; }
 const { name, alt, caption, version, eager = false, wide = false, sizes = '(min-width: 72rem) 50rem, 100vw' } = Astro.props;
 const base = `/media/lumen-reach/${name}`;

@@ -62,7 +62,7 @@ The shell displays authoritative mode/tool state from IPC 0.5.
 
 ## Amendment: M3B keymap v2
 
-The owner's `NOTES.md` defines four input modes: world, interactive (E use in place), focus (F smooth fullscreen), and menu. E supports workspace walls without moving the camera. F supports individual windows as well as workspaces. Super+Tab and Back leave interactive/focus; Esc leaves menu. TAB long hold opens Map, using the independent input config's `longHoldMs` (default 1000).
+The interaction design defines four input modes: world, interactive (E use in place), focus (F smooth fullscreen), and menu. E supports workspace walls without moving the camera. F supports individual windows as well as workspaces. Super+Tab and Back leave interactive/focus; Esc leaves menu. TAB long hold opens Map, using the independent input config's `longHoldMs` (default 1000).
 
 Core owns `$XDG_CONFIG_HOME/hyprune/input.json` (default `~/.config/hyprune/input.json`), watches its parent directory, validates edits and diff-applies them. JSON shares core's existing parser and IPC representation. Each action has zero to three key/chord/button/wheel bindings. Keyboard bindings use the current layout’s base-level symbol, canonicalize letters to lowercase, and match modifiers separately. A consumed key retains its press identity through release even if modifiers or layout change, so Shift does not break movement or TAB-hold cancellation. Invalid edits retain the last valid config. Hyprland Lua remains compositor setup; editing the input file never requests a Hyprland reload. The generated [keymap](/keymap/) is authoritative for defaults and option ranges.
 

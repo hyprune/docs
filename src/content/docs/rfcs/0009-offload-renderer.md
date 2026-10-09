@@ -56,7 +56,7 @@ The follow-up merged core `origin/main` **ad81f24** into the spike as
 Vault viewpoints. It includes presets, dynamic resolution, graphics IPC 0.7/0.8,
 BVHs and incremental uploads. The [full report and raw evidence](https://github.com/hyprune/core/blob/936d962/docs/spikes/dgpu-offload.md#quality-headroom)
 include frame intervals, GPU/copy timing, power logs, 4K stills and a separate
-recording-overhead comparison. No core main edits or owner-session tests.
+recording-overhead comparison. No core main edits or live-session tests.
 
 | Setting, 3840×2160 output | Sun Court FPS / world scale | Rime Vault FPS / world scale |
 | --- | --- | --- |
@@ -476,16 +476,16 @@ All numbers below are gates to demonstrate, not results already achieved.
 | Failure/recovery | Worker crash/hang mid-copy, daemon death, output/device removal, lock/unlock, suspend/resume, repeated restart/unload, fallback preserves typing/grabs and ordinary desktop escape |
 | Performance/quality | Intel Auto/High/Ultra versus offload at matched scale/effects; effective scale and preset, depth cost, native surfaces, FPS/pacing/latency distributions, memory, power and idle settling; static and moving Sun Court/Rime Vault viewpoints |
 
-Hardware tests run in the spike's nested harness under
-`flock /tmp/worldshell-nested.lock`, with AC admission, a separate watchdog and
+Hardware tests run in the spike's nested harness while holding its exclusive
+session lock, with AC admission, a separate watchdog and
 short capped runs. Record compositor/renderer GPU identity and exact commits.
-Do not load a test plugin into an owner's live session. Later supervised DRM,
+Do not load a test plugin into a user's live session. Later supervised DRM,
 hardware-cursor, physical presentation and suspend tests need a dedicated
 qualification session; nested success does not establish those properties.
 High-refresh headroom tests are brief, separately admitted and power-guarded;
 "uncapped" never means removing the power watchdog. Stills/video carry settings,
-scale, camera and capture-overhead metadata; encode gallery artifacts in `/tmp`
-and move them in without controlling the gallery watcher.
+scale, camera and capture-overhead metadata; encode capture artifacts outside
+the output directory and move them in when complete.
 
 | Phase | Deliverable and exit gate |
 | --- | --- |
@@ -528,7 +528,7 @@ and seccomp restrictions on new connections/process execution. Unsupported
 confinement or driver interop fails back to local. NVIDIA EGL and Vulkan identities
 must match the same discovered DRM render node; no fixed card number is assumed.
 
-The power policy follows the owner's revised profiles. USB-C, battery and limited
+The power policy follows the revised power profiles. USB-C, battery and limited
 AC keep **auto off**; explicit on permits at most **50 W / 45 FPS**. Qualified full
 AC (reported capacity at least 150 W, no battery discharge) permits **80 W / 60 FPS**.
 Unknown supply data fails closed. `offload_power_cap_w` defaults to 80 (20–100 input

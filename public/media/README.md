@@ -7,6 +7,6 @@ ATTRIBUTION.md in hyprune/worlds). Files are named `<view>-<world version>`.
 poster frame.
 
 Stills were encoded to WebP at 800 and 1600 px wide (hero also 2400 px WebP and
-AVIF) and clips to H.264 MP4 at 1280 px, on the bake host rather than at site
+AVIF) and clips to H.264 MP4 at 1280 px, ahead of time rather than at site
 build time. Only Lumen Reach and the public Switchyard test world may appear
 here.

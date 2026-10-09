@@ -13,3 +13,10 @@ Screenshots were opened and visually inspected: `artifacts/landing-dark.png`, `a
 Starlight emits benign build warnings about an absent optional i18n collection and its built-in 404 content entry. The generated default 404 exists. The link checker excludes canonical metadata (the default 404's canonical route is not a navigation destination).
 
 This validation covers documents, schemas, tooling and the static site. It does not establish runtime, sandbox, glTF package, compositor or DNS correctness. The schema CLI's limits are documented in the schema README. GitHub Actions configuration is committed but has not run remotely; no push, Pages deployment, DNS edit or external message was performed.
+
+# Refresh validation — 2026-10-09
+
+- `npm run build`: 73 pages plus 8 `latest/` redirects; the schema reference has 35 version pages, 8 contract indexes and a landing page.
+- `npm run check:links`: local links, anchors and assets across all pages; `check:schema` verifies all 68 mirrored files against `source.json`, the recorded hyprune/schema commit and schema `HEAD`.
+- `npm run check:keymap`: generated keymap matches core's `config/input.default.json`.
+- `npm run test:browser`: themes, search, diagrams, the lazy raw schema view (IPC 0.15, more than 1,000 highlighted lines), version switching, examples, the no-JS release stepper and 390 px widths of home, progress, roadmap and schema pages; no page errors or failed requests.

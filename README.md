@@ -1,6 +1,6 @@
 # Hyprune docs
 
-An Astro Starlight site for **hyprune.com**: pitch, concepts, architecture diagrams, eight foundation RFCs plus the proposed offload RFC, prototype lessons, contributing, governance and M0–M3 roadmap and proposed core M4 offload gates. Original SVG illustrations and diagrams; no prototype assets. Original prose/code/art are MIT.
+An Astro Starlight site for **hyprune.com**: overview, Try Hyprune guide, concepts, architecture, a version-aware schema reference generated from `hyprune/schema`, the default keymap, progress and roadmap, the RFCs and their amendments, contributing and governance. Diagrams are original SVG. Media under `public/media/` are in-engine captures of Lumen Reach (Hyprune contributors, CC-BY-4.0), pre-encoded on the bake host; see `public/media/README.md`. Original prose/code/art are MIT.
 
 ## Local development and verification
 

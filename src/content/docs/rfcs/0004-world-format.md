@@ -296,3 +296,74 @@ texture index and axes, appear on stderr and in the JSON `warnings` array, and
 do not fail validation. REPEAT/MIRRORED_REPEAT and undeclared meshes are silent.
 This is a diagnostic, not an instruction to change wrapping automatically;
 clamping can be intentional. Cubemap/environment faces are not far cards.
+
+## Amendment: world 0.7 compressed and optimised assets
+
+World format **0.7** lets packages ship GPU-ready textures and compressed
+geometry in `scene.gltf`, using standard Khronos/vendor glTF extensions. The
+world.json shape is unchanged from 0.6 except `formatVersion: "0.7"`. Every
+valid 0.6 document is valid as 0.7 (the inheritance rule); older formats remain
+frozen and must not use these extensions.
+
+| glTF extension | Allowed in 0.7 | Rules |
+| --- | --- | --- |
+| `KHR_texture_basisu` | Material textures | KTX2 images (`image/ktx2`), 2D, one layer and face, LDR, Basis ETC1S or UASTC 4×4, optional Zstandard supercompression. Ship the **full mip chain** in the file: block-compressed textures cannot be mip-mapped at load. Colour slots (base colour, emissive) are sRGB-encoded; data slots (normal, metallic-roughness, occlusion) are linear. A PNG `source` fallback is optional. |
+| `EXT_meshopt_compression` | All geometry | Any mode and filter. The uncompressed fallback buffer may be omitted (`fallback: true`, no URI). |
+| `KHR_mesh_quantization` | All geometry | Quantised attributes are dequantised through the node transform, as glTF specifies. Use at least 14-bit positions (16 recommended) so collision and walking keep their tolerances, and 16-bit `TEXCOORD_1`: it addresses lightmap texels. |
+
+A 0.7 package must list each extension it relies on in `extensionsRequired`, so
+an older core rejects it before activation instead of rendering it wrong. Core
+rejects these extensions for `formatVersion` below 0.7.
+
+Runtime behaviour (normative for core): KTX2 images are transcoded on the loader
+thread to a block format the GPU advertises and can sample as sRGB, in the order
+BC7, BC1/BC3, ASTC 4×4, else RGBA8. ETC2 is skipped because desktop drivers
+often emulate it. Meshopt buffer views are decoded on the loader. World GPU
+budgets count the transcoded size. `hyprune-world-check` has no GPU, so it
+reports the RGBA worst case.
+
+**Lightmaps stay PNG in 0.7.** A lightmap texture referenced from
+`lightmaps[]` must not use `KHR_texture_basisu`. Reasons:
+
+- v0 lightmaps are 8-bit irradiance multiplied by an authored `intensity` (up to
+  ~30 in shipped worlds), so block-compression error is amplified into visible
+  banding and blocking on large flat surfaces.
+- A KTX2 file carries its own mip chain, which bypasses the gutter-safe mip cap
+  the bake pipeline relies on (two levels for 4 px gutters; some groups,
+  such as dense foliage, allow none).
+- HDR irradiance (UASTC HDR, BC6H) needs its own encoding contract, which v0
+  already defers to a future version.
+
+A later amendment can allow KTX2 lightmaps with a declared safe mip count and an
+HDR encoding. Lightmaps are now the largest remaining GPU cost (Lumen Reach:
+about 149 MiB in total after converting its material textures).
+
+### Tooling notes for world builds
+
+Two pitfalls when adding standard optimisers to a world build:
+
+1. **Keep lightmap textures.** world.json's `lightmaps[].texture` is the only
+   reference to lightmap textures; no glTF material uses them. glTF-Transform
+   (`meshopt`, `prune`, most commands) drops textures that no material
+   references and rebuilds the texture array. Re-append the lightmap textures
+   at their original indices afterwards, or put them last and verify the
+   indices, or encode material textures with `basisu`/`ktx` and add
+   `KHR_texture_basisu` in place without rewriting the array.
+2. **Keep node and material indices.** world.json refers to glTF **node**
+   indices (`spawns[].node`, `anchors[].node`, `navigation.node`, `collision[].node`,
+   visibility area nodes, `backdrop.farCards`) and
+   **material** indices (`lightmaps[].material`). gltfpack merges and renumbers
+   nodes, meshes and materials (even with `-kn -km`), so it is unsuitable for
+   world packages unless the build remaps every reference. glTF-Transform
+   `meshopt` preserved node and material order in the core test conversion, but
+   reordered material textures. That is harmless because materials are
+   rewritten consistently. Builds should assert node/material names and order
+   before and after, and run `hyprune-world-check`.
+
+Measured on a converted copy of Lumen Reach 0.7.0 (core `docs/PERF-2026-10.md`):
+package 72 → 42 MiB, GPU memory 270 → 149 MiB, upload 209 → 127 MiB, visually
+indistinguishable (PSNR 37–39 dB).
+
+The schema is [0.7](/schema/v0.7/world.schema.json). The shared validator also
+checks `scene.gltf`'s `extensionsRequired` and lightmap textures against the
+world's `formatVersion` (`validate('scene', gltf, undefined, worldVersion, {world})`).

@@ -76,7 +76,7 @@ Official worlds must be original, CC0 or CC-BY-4.0 assets with traceable attribu
 
 ## Amendment M1: material profile, format 0.2
 
-Format `0.2` uses `hyprune/schema/v0.2/world.schema.json`. Its manifest fields are unchanged from `0.1`; the version identifies the stronger material rendering contract below. Core continues accepting `0.1` packages. IPC versions are independent. No runtime shader source, texture-generation service, or proprietary assets are implied by this profile.
+Format `0.2` uses [`hyprune/schema/v0.2/world.schema.json`](/reference/schema/world/0.2/). Its manifest fields are unchanged from `0.1`; the version identifies the stronger material rendering contract below. Core continues accepting `0.1` packages. IPC versions are independent. No runtime shader source, texture-generation service, or proprietary assets are implied by this profile.
 
 * Honor each glTF texture's sampler: REPEAT, MIRRORED_REPEAT and CLAMP_TO_EDGE independently on S/T; all six minification filters and both magnification filters. If omitted, choose LINEAR_MIPMAP_LINEAR / LINEAR and REPEAT. Generate a full mip chain. Anisotropy is a runtime quality setting, capped at supported hardware limits; core M1 uses up to 8× with trilinear/linear samplers and preserves explicit nearest sampling.
 * Support `KHR_texture_transform` on baseColorTexture, normalTexture, metallicRoughnessTexture, occlusionTexture and emissiveTexture. Apply `offset + rotation * (scale * uv)` using radians, including the extension's texCoord override. Core M1 accepts UV0 and UV1; reject a referenced missing/unsupported set rather than silently sampling UV0. Negative scale and mirrored repeats are legal. Required `KHR_texture_transform` is supported.
@@ -364,6 +364,10 @@ Measured on a converted copy of Lumen Reach 0.7.0 (core `docs/PERF-2026-10.md`):
 package 72 → 42 MiB, GPU memory 270 → 149 MiB, upload 209 → 127 MiB, visually
 indistinguishable (PSNR 37–39 dB).
 
-The schema is [0.7](/schema/v0.7/world.schema.json). The shared validator also
+The schema is [0.7](/reference/schema/world/0.7/). The shared validator also
 checks `scene.gltf`'s `extensionsRequired` and lightmap textures against the
 world's `formatVersion` (`validate('scene', gltf, undefined, worldVersion, {world})`).
+
+## Format versions
+
+World format 0.5 (optional ink outline style and authored visibility regions) is specified in [RFC-0005](/rfcs/0005-surfaces/#amendment-world-05-ink-and-authored-visibility). The [world manifest reference](/reference/schema/world/) lists every format version with its diff and the amendment that introduced it.

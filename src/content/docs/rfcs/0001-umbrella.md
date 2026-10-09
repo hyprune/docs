@@ -22,6 +22,7 @@ A repository boundary follows a release and ownership boundary. Keep the composi
 | **sdk** | Client libraries, extension scaffolding, world tooling, packaging and conformance harnesses | Hyprland ABI bindings, schema ownership, a second daemon | MIT |
 | **schema** | Versioned machine-readable contracts, fixtures and lightweight validation | Renderer or end-user UI | MIT |
 | **docs** | Website, normative RFCs, concepts, guides, roadmap and decision record | Generated API source or executable runtime | MIT original prose/code/art |
+| **hyprune** (meta, added 2026-10-08) | Nix flake, NixOS and Home Manager modules, starter kits, installers, pinned component and world release versions | Component source code, world art | MIT |
 | **.github** | Organization profile, community policy and default templates | Product configuration | MIT except attributed policy text |
 
 Shared assets and standalone examples repositories are created only when independently maintained consumers need them. Until then, keep examples with their API/tool owner and assets with their world or shell. Do not create a central dumping ground.

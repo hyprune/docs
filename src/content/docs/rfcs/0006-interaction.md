@@ -154,3 +154,46 @@ it without guessing movement state. `movement.modeId` remains the selected walk
 or fly strategy. Noclip reports activity `flying`. Protocols 0.1–0.10 omit these
 three fields and retain their original shapes. No public input-injection or
 renderer protocol is introduced by this amendment.
+
+## Amendment: adventure exits and declarative tool inputs (IPC 0.15)
+
+This supersedes the free-cursor return-to-use/focus loop. Back/Super+Tab in use or
+focus exits to world control; in world it enters free cursor (finishing an active
+carry); in free cursor it restores the saved state. If a legacy/internal return
+state is use/focus, the next press exits that state to world, without requiring a
+400 ms timing window. Escape with no application keyboard focus returns to world;
+Escape with application focus remains application input. The configured world
+toggle always deactivates cleanly to the desktop, restoring its workspace and
+cursor, and a subsequent activation begins in world control. Every compositor
+focus, workspace or cursor mutation is deferred outside the render pass.
+
+Tools declare four abstract slots: Primary, Secondary, Alternate, Cycle. Their
+shared input.json world actions are `primary`, `secondary`, `alternate`, `cycle`,
+initially LMB/RMB/MMB/Wheel. A null slot declaration consumes the slot as a no-op.
+A slot press owns its action's release even if the selected tool changes. Global
+Super gestures have precedence and cannot fall through to tool assignments.
+Existing `wheel` configurations migrate to `cycle`; old protocols retain the old
+name. Up to three bindings remain supported for each action.
+
+| Tool | Primary | Secondary | Alternate | Cycle |
+| --- | --- | --- | --- | --- |
+| Normal | Click/interact | Right-click | Middle-click | Scroll client |
+| Window | Tag/mount or lock per sub-mode | Lock/unlock | Unassigned | Place/lock sub-mode |
+| Path | Add point | Remove last point | Open/close | Line/curve/arc |
+| Position | Select/drag gizmo | World/local axes | Toggle snapping | Move/rotate/scale |
+| Placement (5) | Place ahead | Mount on surface | Pocket aimed window | Select queue item |
+
+The declaration pairs an action identifier with a human-readable label. Input
+matching is independent of action execution: future trusted extension tools can
+use this declaration/handler boundary without installing another input hook.
+No new extension permissions or executable IPC actions are granted by this
+amendment. The shell reads declarations rather than hardcoding tool meanings.
+
+`carry.facing` defaults to R, matching through held Super during a carry.
+`windows.carry_face_player` defaults true: picking up turns the window toward the
+player and preserves the grab point. Heading follows the camera; vertical look
+moves the grab point without tilting the window. Keep-orientation mode freezes
+its quaternion. `content.scale` defaults Super+Shift+Wheel, `rotate` moves to
+Super+Ctrl+Wheel, and `window.reset` defaults Super+Shift+MMB. Modifier gestures
+apply regardless of selected tool. HUD concepts are selected in Settings;
+`hud.cycle` has no default binding and key 5 selects Placement.

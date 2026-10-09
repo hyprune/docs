@@ -344,3 +344,32 @@ Requested values remain in `config`, actual values in `effective`/Performance,
 and `atmosphere.get` reports the combined style. No authored enabled ink means no
 ink draw: these overrides do not invent a world style. `atmosphere.set` remains
 a transient authoring preview and must not back a persistent Settings control.
+
+## Amendment: generic tool hints and pocket feedback (IPC 0.15)
+
+Editor state adds `toolSlots:{primary,secondary,alternate,cycle}` and
+`toolDefinitions:[{slot,name,slots}]`. Each slot is null or `{action,label}`;
+labels reflect the current sub-mode. Shells combine them with actual shared
+keymap bindings to render hints; unassigned slots have no hint. Core retains all
+input authority and Super modifier precedence.
+
+`editor.unplaced` is `{count,windows:[{surfaceId,title,appClass,logicalSize}],
+selectedId,preview}`. The count is the pocket badge; preview says whether core
+submits the ghost. `editor.carryFacing` is boolean during carry, null otherwise.
+`editor.contentScale` is null or `{surfaceId,scale,logicalSize,sequence,reset}`;
+scale is baseline width/requested width, greater than one for larger UI. Sequence
+increments for every successful operation, including repeated reset. Successful
+stash sends `runtime.notice` code `placement.pocketed` with a title-bearing
+message. Normal surface inventory remains available for application identities.
+
+Core load leaves the desktop active. A deferred Hyprland notification announces
+readiness and the resolved toggle chord; the live launcher uses the exact chord
+it installed. An opaque normal-config Lua callback without an identifiable bind
+uses a generic configured-toggle hint rather than inventing a shortcut. Adventure
+is the shell's default concept name; no core concept-name enum is introduced.
+
+`editor.toolInput:{modifiers,override,gestures:[{action,label,bindings}]}` supplies
+held-modifier context from core. Super sets override; gestures lists matching
+configured global chords (and the carry-facing action while carrying). A passive
+shell must not grab keys to infer modifier state. HUD tool telemetry permits 5
+in 0.15; older subscribers see Normal/1 when Placement is active.

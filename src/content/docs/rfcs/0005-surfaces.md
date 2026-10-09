@@ -220,3 +220,30 @@ surfaces/HUD and transparent world geometry. No extra geometry draw, MSAA target
 or MSAA resolve is required. This implementation change retains world format 0.5.
 The new graphics quality tier selects fixed 1 px or authored smooth 1–4 px width;
 see RFC-0008's IPC 0.14 amendment. Normal-map detail does not generate ink.
+
+## Amendment: pocket queue and client content sizing (IPC 0.15)
+
+Unplaced root clients on the dedicated room workspace remain alive but are
+excluded from world rendering, workspace-wall composition and pointer targeting.
+Existing durable placements are respected. Existing clients without a placement
+enter the queue on activation; new clients auto-spawn only where a full-size
+collision-free, unoccupied spot exists. A bounded search cannot fall back to
+stacking or continually shrinking clients. Other workspaces remain untouched.
+
+Tool 5 selects the queue, showing one translucent non-interactive preview. Primary
+places ahead at the configured spawn distance; Secondary aligns to the aimed
+surface normal. Geometry/occupancy rejection leaves the client queued. Alternate
+pockets an aimed placed client, preserving its content sizing and durable
+placement while suppressing its live drawing. Most recently pocketed comes first.
+There is no return-to-last-spot action. Entry selects tool 5 for a nonempty queue,
+otherwise tool 1. Popup/subsurface visibility follows the root.
+
+Content scaling requests a new client **logical** size, clamped to 320×200 minimum
+or the smaller output extent, and at most the output's logical dimensions. It
+never treats buffer pixels as client dimensions. Positive wheel steps reduce
+logical resolution by 1/1.12 (larger UI). World width/height stay fixed, adjusting
+world-units-per-logical-pixel independently. Placement records may add
+`content:{logicalSize:[w,h],baseSize:[w,h],worldSize:[metresW,metresH]}`. Older
+placements inherit the normal configured world scale; older IPC hides this field.
+Reset restores the baseline logical size, player-facing orientation and configured
+spawn distance, with collision recovery. Repeated resets emit fresh feedback.

@@ -100,13 +100,13 @@ window launch commands, raw input injection or new pixel transports.
 A loaded world defines where its area workspaces are; the user never has to bind
 them first. Every area without an explicit user binding receives a **default
 home** at `windows.workspace_base + int(workspaceSlot)`. The base is user
-configuration (default `10`, so slot `01` is workspace 11, `02` is 12); `0`
+configuration (default `20`, so slot `01` is workspace 21, `02` is 22); `0`
 disables defaults. Worlds still never name compositor workspace IDs: the slot is
 the only world input.
 
 Explicit state always wins. An area with an explicit binding gets no default, and
 a workspace ID already used by an explicit binding of any world, by the dedicated
-room workspace (`windows.world_workspace`, default 8) or by a configured workspace
+room workspace (`windows.world_workspace`, default 20) or by a configured workspace
 location is skipped rather than shared. Slots that resolve to the same number keep
 the first area. The combined list stays within the 32-binding budget.
 

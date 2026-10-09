@@ -120,3 +120,7 @@ U in world, or Super+U in interactive/focus/menu, writes a private timestamped J
 Compositor graphics, movement speed, sensitivity and inertia remain in `hl.plugin.hyprune.config({...})`; input bindings belong in the independent JSON file.
 
 Tools save paths, window locks and object transforms in `$XDG_STATE_HOME/hyprune/editor.json`, scoped by world and area. Authored world packages stay read-only.
+
+## Workspaces
+
+Entering the world switches the output to the free room, native workspace **20** (`windows.world_workspace`). Each area of the loaded world has a default home at `windows.workspace_base` (**20**) + its slot: slot 01 is workspace 21, slot 02 is 22, and so on. Any Hyprland workspace bind or the Director switching to a home travels to that area, and windows on it appear on the area's main wall. Your own Lua config values and explicit `workspace.bind` homes win over these defaults.

@@ -1,7 +1,7 @@
 ---
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { Badge } from '@astrojs/starlight/components';
-import { allVersions, latest, previous, examplesFor, manifest, type SchemaVersion } from '../../../../lib/schema/catalog';
+import { allVersions, latest, previous, examplesFor, manifest, titleNamesVersion, type SchemaVersion } from '../../../../lib/schema/catalog';
 import { Renderer, diff } from '../../../../lib/schema/render';
 import { rfcLinks, changelogNotes } from '../../../../lib/schema/context';
 import { markdown } from '../../../../lib/schema/markdown';
@@ -21,6 +21,7 @@ const changes = prev ? diff(prev, v) : undefined;
 const notes = await Promise.all(changelogNotes(v, md => md).map(async n => ({ ...n, html: await markdown(n.html) })));
 const rfcs = rfcLinks(v);
 const examples = examplesFor(v);
+const titleVersion = (v.schema.title as string | undefined)?.match(/\b(?:IPC |world |common )?0\.\d+\b/i)?.[0];
 
 const groups = [
   { id: 'fields', title: v.kind.id === 'world' ? 'Manifest fields' : 'Fields', items: sections.filter(s => s.kind === 'fields') },
@@ -50,6 +51,9 @@ const counts = changes ? (['added', 'changed', 'removed'] as const).map(s => [s,
       {v.version === 'proposed' ? <Badge text="Proposed" variant="caution" /> : v === newest ? <Badge text="Latest" variant="success" /> : <>Frozen · <a href={newest.page}>latest is {newest.version}</a></>}
     </dd></div>
     <div><dt>Published</dt><dd>{v.added}</dd></div>
+    {v.schema.title && <div><dt>{titleNamesVersion(v) ? 'Title' : 'Title as published'}</dt><dd>“{v.schema.title}”
+      {!titleNamesVersion(v) && <span class="title-note"> {titleVersion ? `This title names ${titleVersion}, not ${v.version}.` : `This title doesn’t name version ${v.version}.`} Published schemas are frozen byte-for-byte, so it is kept; the version on this page comes from the schema’s path and <code>$id</code>.</span>}
+    </dd></div>}
     <div><dt>Schema ID</dt><dd><a href={v.rawUrl}><code>{v.schema.$id}</code></a></dd></div>
     <div><dt>Dialect</dt><dd>JSON Schema 2020-12 · unknown fields rejected unless marked</dd></div>
     <div><dt>Defined by</dt><dd>

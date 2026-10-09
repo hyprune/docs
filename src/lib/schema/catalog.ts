@@ -71,8 +71,11 @@ function load(kind: KindInfo, dir: string, version: string): SchemaVersion {
   const path = `${dir}/${kind.file}`;
   const text = readFileSync(join(SCHEMA_ROOT, path), 'utf8');
   if (!manifest.files[path]) throw new Error(`${path} is not in public/schema/source.json; run scripts/sync-schema.mjs`);
+  const schema = JSON.parse(text);
+  // Versions come from the path, which must agree with $id; titles are not trusted.
+  if (schema.$id !== `https://hyprune.com/schema/${path}`) throw new Error(`${path}: $id ${schema.$id} does not match its path`);
   return {
-    kind, version, path, rawUrl: `/schema/${path}`, page: pageFor(kind.id, version), schema: JSON.parse(text), text,
+    kind, version, path, rawUrl: `/schema/${path}`, page: pageFor(kind.id, version), schema, text,
     bytes: Buffer.byteLength(text), lines: text.split('\n').length, sha256: manifest.files[path], added: manifest.added?.[path] ?? manifest.committed,
   };
 }
@@ -82,6 +85,14 @@ export const catalog: Record<string, SchemaVersion[]> = Object.fromEntries(KINDS
   const dirs = readdirSync(SCHEMA_ROOT).filter(d => /^v0(\.\d+)?$/.test(d) && existsSync(join(SCHEMA_ROOT, d, kind.file)));
   return [kind.id, dirs.map(d => load(kind, d, dirVersion(d))).sort((a, b) => compareVersions(a.version, b.version))];
 }));
+
+/** Does the published title name this version? (v0 schemas say "v0".) */
+export function titleNamesVersion(v: SchemaVersion) {
+  const t = v.schema.title as string | undefined;
+  if (!t || v.version === 'proposed') return true;
+  const own = v.version === '0.1' ? '(v0|0\\.1)' : v.version.replace('.', '\\.');
+  return new RegExp(`(^|[^\\d.])${own}(?!\\d)`).test(t);
+}
 
 export const allVersions = Object.values(catalog).flat();
 export const latest = (kind: string) => catalog[kind].at(-1)!;

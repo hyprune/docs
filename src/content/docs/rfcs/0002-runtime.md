@@ -107,3 +107,22 @@ serves scene, sky, rays and core/shell marker projections. Older camera.get keep
 its two-field shape. A photo hold uses the local renderer for exact frame pose;
 it does not restart the world or compositor. Recorded camera frames optionally
 include roll/shift, defaulting to zero for old files; camera replay preserves them.
+
+### IPC 0.15 correction: unzoned mount instances and reconnects
+
+`mounts.instances[].areaId` is optional. A window floating in a newly entered
+world may have no home/placement zone; omit the field in that case. When
+present it remains a nonempty slug. Empty strings are invalid. This applies to
+snapshots, deltas and `mounts.changed`. Earlier negotiated schemas retain their
+required field, so core omits unzoned mount-instance metadata for those clients;
+their ordinary surface/app records remain available.
+
+A trusted launcher may renew credentials through a private inherited channel.
+The live supervisor verifies each request's kernel-supplied PID/UID against its
+actual launcher child, then requests a fresh grant from hypruned on a separate
+inherited channel. Grants expire after 30 seconds, are bound to the client ID
+and launcher PID, and can be consumed once. Renewal cannot add capabilities:
+it is restricted to the original launch manifest, at most 8 requests/second,
+4096 per launch and 64 outstanding grants. No public IPC issuance method, token
+file, command-line secret or QML credential is introduced. `down` terminates the
+supervisor and closes both channels.

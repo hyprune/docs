@@ -1,0 +1,21 @@
+---
+// Stable "latest" URL per contract; a static redirect to the newest version.
+import { KINDS, catalog, latest } from '../../../../lib/schema/catalog';
+
+export function getStaticPaths() {
+  return KINDS.filter(k => catalog[k.id].length).map(k => ({ params: { kind: k.id } }));
+}
+const target = latest(Astro.params.kind!).page;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting to {target}</title>
+    <meta http-equiv="refresh" content={`0;url=${target}`} />
+    <link rel="canonical" href={new URL(target, Astro.site).href} />
+    <meta name="robots" content="noindex" />
+    <script is:inline define:vars={{ target }}>location.replace(target + location.hash);</script>
+  </head>
+  <body><a href={target}>{target}</a></body>
+</html>

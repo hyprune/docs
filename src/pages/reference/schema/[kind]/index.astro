@@ -1,0 +1,43 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { KINDS, catalog, previous, type KindInfo } from '../../../../lib/schema/catalog';
+import { diff } from '../../../../lib/schema/render';
+import { rfcLinks } from '../../../../lib/schema/context';
+import VersionSwitcher from '../../../../components/schema/VersionSwitcher.astro';
+
+export function getStaticPaths() {
+  return KINDS.filter(k => catalog[k.id].length).map(kind => ({ params: { kind: kind.id }, props: { kind } }));
+}
+const { kind } = Astro.props as { kind: KindInfo };
+const versions = [...catalog[kind.id]].reverse();
+const rows = versions.map(v => {
+  const p = previous(v);
+  const d = p ? diff(p, v) : undefined;
+  const count = (s: string) => d?.entries.filter(e => e.status === s).length ?? 0;
+  const amendments = rfcLinks(v).filter(r => r.heading);
+  return { v, p, added: count('added'), changed: count('changed'), removed: count('removed'), amendments };
+});
+---
+<StarlightPage frontmatter={{ title: kind.title, description: kind.blurb }}>
+  <p class="schema-crumbs not-content"><a href="/reference/schema/">Schema reference</a> / {kind.title}</p>
+  <VersionSwitcher kind={kind.id} />
+  <p>{kind.blurb}</p>
+  <p>Every version is frozen once published: a new field or rule gets a new version, and older versions stay byte-for-byte identical so consumers can pin them. Pick a version to read its fields, see what changed and view or download the raw JSON.</p>
+  <table class="version-table">
+    <thead><tr><th>Version</th><th>Published</th><th>Change from previous</th><th>Specified in</th><th>Raw</th></tr></thead>
+    <tbody>
+      {rows.map(r => (
+        <tr>
+          <td><a href={r.v.page}><strong>{r.v.version}</strong></a></td>
+          <td class="nowrap">{r.v.added}</td>
+          <td>{!r.p ? 'first version' : r.added + r.changed + r.removed === 0 ? 'same shape' : <>
+            {r.added > 0 && <span class="diff-added">+{r.added}</span>} {r.changed > 0 && <span class="diff-changed">~{r.changed}</span>} {r.removed > 0 && <span class="diff-removed">−{r.removed}</span>}
+          </>}</td>
+          <td>{r.amendments.length ? r.amendments.slice(0, 3).map((a, i) => <>{i > 0 && <br />}<a href={a.href}>{a.heading}</a></>) : kind.rfcs.map(id => <a href={`/rfcs/${id}/`}>RFC-{id.slice(0, 4)}</a>)}</td>
+          <td><a href={r.v.rawUrl} download>{r.v.path.split('/').pop()}</a></td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <p><span class="diff-added">+</span> added, <span class="diff-changed">~</span> changed and <span class="diff-removed">−</span> removed {kind.id === 'ipc' ? 'methods, notifications and types' : 'definitions'}.</p>
+</StarlightPage>

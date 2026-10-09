@@ -52,7 +52,11 @@ With the sibling core checkout present, run `python3 scripts/generate-keymap.py`
 after changing defaults, then `npm run check:keymap` before committing. The page
 records the input file's SHA-256 and preserves HJKL / WASD / arrows ordering.
 
-`public/schema/v0` is a checked-in, byte-for-byte mirror from `hyprune/schema`; `public/schema/source.json` records its source commit and SHA-256 checksums. Run `node scripts/sync-schema.mjs ../schema` only after committing schema changes, review the diff, and commit the mirror update. The script rejects a dirty schema contract tree. `npm run check:links` also verifies the mirror hashes. Never edit mirror files directly. Runtime consumers use pinned local schemas, not network retrieval.
+`public/schema/` is a checked-in, byte-for-byte mirror of every published contract in `hyprune/schema` (all `v0*` version directories, `extensions/`, `examples/` and `CHANGELOG.md`). `public/schema/source.json` records the source commit, each file's SHA-256 and its first-publication date. Raw files keep the URLs in their `$id` (for example `/schema/v0.15/ipc.schema.json`).
+
+After committing schema changes, run `npm run sync:schema` (default source `../schema`), review the diff and commit the mirror. The script rejects a dirty contract tree. `npm run check:schema` (also run by `check:links`) verifies the hashes and, when the sibling schema checkout exists, that the mirror equals the recorded commit and that schema `HEAD` has not moved on. Never edit mirror files directly.
+
+The [schema reference](https://hyprune.com/reference/schema/) is generated from the mirror at build time (`src/lib/schema/`, `src/pages/reference/schema/`): one page per contract version with readable field tables, a structural diff against the previous version, the changelog paragraphs and RFC headings that mention it, examples, and a collapsible highlighted raw view with download. New versions appear automatically after a sync.
 
 ## Foundation review
 

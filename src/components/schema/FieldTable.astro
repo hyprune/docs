@@ -1,0 +1,30 @@
+---
+import type { Row } from '../../lib/schema/render';
+
+interface Props { rows: Row[]; label?: string; summary?: string; }
+const { rows, label, summary } = Astro.props;
+---
+{label && <p class="ft-label"><code>{label}</code>{summary && <> · <span set:html={summary} /></>}</p>}
+{!label && summary && <p class="ft-label" set:html={summary} />}
+{rows.length > 0 && (
+  <div class="ft-wrap">
+    <table class="field-table">
+      <thead><tr><th>Field</th><th>Type</th><th>Constraints</th></tr></thead>
+      <tbody>
+        {rows.map(r => (
+          <tr id={r.id} style={`--depth:${r.depth}`}>
+            <td class="ft-name">
+              <code>{r.name}</code>
+              {r.required && <span class="ft-req" title="required">required</span>}
+            </td>
+            <td class="ft-type" set:html={r.typeHtml} />
+            <td class="ft-notes">
+              {r.notes.length > 0 && <span set:html={r.notes.join(' · ')} />}
+              {r.description && <p class="ft-desc">{r.description}</p>}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}

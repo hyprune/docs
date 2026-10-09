@@ -1,0 +1,20 @@
+---
+import { catalog, type SchemaVersion } from '../../lib/schema/catalog';
+
+interface Props { current?: SchemaVersion; kind: string; }
+const { current, kind } = Astro.props;
+const versions = catalog[kind];
+const newest = versions.at(-1);
+---
+<nav class="version-switcher not-content" aria-label="Versions">
+  <span class="vs-label">Version</span>
+  <ul>
+    {[...versions].reverse().map(v => (
+      <li>
+        <a href={v.page} aria-current={v === current ? 'page' : undefined} class:list={{ latest: v === newest }}>
+          {v.version}{v === newest && <span class="vs-badge">latest</span>}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>

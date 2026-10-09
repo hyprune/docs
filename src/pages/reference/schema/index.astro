@@ -1,0 +1,49 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import { KINDS, catalog, manifest } from '../../../lib/schema/catalog';
+import { changelogMarkdown } from '../../../lib/schema/context';
+import { markdown } from '../../../lib/schema/markdown';
+
+const kinds = KINDS.filter(k => catalog[k.id].length);
+const changelog = await markdown(changelogMarkdown.replace(/^# Changelog\s*/, ''));
+const headings = [
+  { depth: 2, slug: 'contracts', text: 'Contracts' },
+  { depth: 2, slug: 'versioning', text: 'How versions work' },
+  { depth: 2, slug: 'validate', text: 'Validating your files' },
+  { depth: 2, slug: 'changelog', text: 'Schema changelog' },
+];
+---
+<StarlightPage frontmatter={{ title: 'Schema reference', description: 'Every published Hyprune contract — world manifest, IPC, input keymap, extensions — rendered per version with diffs, raw JSON and downloads.' }} headings={headings}>
+  <p>Hyprune’s machine-readable contracts live in <code>hyprune/schema</code> as JSON Schema 2020-12. This reference is generated from those exact files at build time: each version has a readable field reference, the changes since the previous version, the RFC sections that define it and the raw JSON to view or download.</p>
+
+  <h2 id="contracts">Contracts</h2>
+  <div class="schema-cards">
+    {kinds.map(k => {
+      const list = catalog[k.id], newest = list.at(-1)!;
+      return (
+        <a class="schema-card not-content" href={`/reference/schema/${k.id}/`}>
+          <span class="sc-title">{k.title}</span>
+          <span class="sc-version">{newest.version === 'proposed' ? 'proposed' : `latest ${newest.version}`}{list.length > 1 && ` · ${list.length} versions`}</span>
+          <span class="sc-blurb">{k.blurb}</span>
+        </a>
+      );
+    })}
+  </div>
+
+  <h2 id="versioning">How versions work</h2>
+  <ul>
+    <li><strong>World format</strong> and <strong>IPC protocol</strong> versions are independent. A package declares <code>formatVersion</code>; a client negotiates IPC in <a href={`${catalog.ipc.at(-1)!.page}#def-session-hello`}><code>session.hello</code></a>. Today core speaks IPC 0.1 through {catalog.ipc.at(-1)!.version} and loads world formats 0.1 through {catalog.world.at(-1)!.version}.</li>
+    <li>Each version lives in its own directory and never changes after publication. Raw files keep the URL in their <code>$id</code>, for example <a href={catalog.ipc.at(-1)!.rawUrl}><code>{catalog.ipc.at(-1)!.schema.$id}</code></a>, so editors and tools can resolve them.</li>
+    <li>Old versions stay supported. Core accepts every published world format and negotiates any published IPC version; features are gated by comparing version numbers, never against a hard-coded list, and the schema repo’s inheritance tests keep each revision a superset of the one it extends.</li>
+    <li>RFCs are normative for meaning; the schemas pin shape. Each version page links the RFC amendment that introduced it.</li>
+  </ul>
+
+  <h2 id="validate">Validating your files</h2>
+  <p>Map your editor’s JSON schema setting to a raw URL (for example <code>{catalog.world.at(-1)!.schema.$id}</code> for <code>world.json</code>) for completion and inline errors; manifests reject unknown keys, so don’t add a <code>$schema</code> field to the file itself. The <code>hyprune world validate</code> command in the SDK and the schema repository’s Node validator adds semantic checks that JSON Schema can’t express: duplicate IDs, normalised quaternions, AABB ordering, SPDX licences and per-format glTF extension rules.</p>
+
+  <h2 id="changelog">Schema changelog</h2>
+  <div class="changelog" set:html={changelog} />
+
+  <p class="schema-provenance">Mirrored from <code>hyprune/schema</code> at <code>{manifest.commit.slice(0, 12)}</code> ({manifest.committed}); {Object.keys(manifest.files).length} files with SHA-256 checksums in <a href="/schema/source.json"><code>/schema/source.json</code></a>.</p>
+</StarlightPage>

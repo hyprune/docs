@@ -1,0 +1,126 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Badge } from '@astrojs/starlight/components';
+import { allVersions, latest, previous, examplesFor, manifest, type SchemaVersion } from '../../../../lib/schema/catalog';
+import { Renderer, diff } from '../../../../lib/schema/render';
+import { rfcLinks, changelogNotes } from '../../../../lib/schema/context';
+import { markdown } from '../../../../lib/schema/markdown';
+import VersionSwitcher from '../../../../components/schema/VersionSwitcher.astro';
+import FieldTable from '../../../../components/schema/FieldTable.astro';
+import RawJson from '../../../../components/schema/RawJson.astro';
+
+export function getStaticPaths() {
+  return allVersions.map(v => ({ params: { kind: v.kind.id, version: v.version }, props: { v } }));
+}
+
+const { v } = Astro.props as { v: SchemaVersion };
+const newest = latest(v.kind.id);
+const prev = previous(v);
+const sections = new Renderer(v).sections();
+const changes = prev ? diff(prev, v) : undefined;
+const notes = await Promise.all(changelogNotes(v, md => md).map(async n => ({ ...n, html: await markdown(n.html) })));
+const rfcs = rfcLinks(v);
+const examples = examplesFor(v);
+
+const groups = [
+  { id: 'fields', title: v.kind.id === 'world' ? 'Manifest fields' : 'Fields', items: sections.filter(s => s.kind === 'fields') },
+  { id: 'methods', title: 'Methods', items: sections.filter(s => s.kind === 'method') },
+  { id: 'notifications', title: 'Notifications', items: sections.filter(s => s.kind === 'notification') },
+  { id: 'definitions', title: v.kind.id === 'ipc' ? 'Types' : 'Definitions', items: sections.filter(s => s.kind === 'def') },
+  { id: 'envelopes', title: 'Frame envelopes', items: sections.filter(s => s.kind === 'envelope') },
+].filter(g => g.items.length);
+
+const changeCount = changes?.entries.length ?? 0;
+const headings = [
+  ...(prev ? [{ depth: 2, slug: 'changes', text: `Changes since ${prev.version}` }] : []),
+  ...groups.map(g => ({ depth: 2, slug: g.id, text: g.id === 'fields' ? g.title : `${g.title} (${g.items.length})` })),
+  ...(examples.length ? [{ depth: 2, slug: 'examples', text: 'Examples' }] : []),
+];
+const title = `${v.kind.title} ${v.version}`;
+const plural = (n: number, s: string) => `${n} ${s}${n === 1 ? '' : 's'}`;
+const counts = changes ? (['added', 'changed', 'removed'] as const).map(s => [s, changes.entries.filter(e => e.status === s).length] as const).filter(([, n]) => n) : [];
+---
+<StarlightPage frontmatter={{ title, description: `${v.kind.title} schema, version ${v.version}. ${v.kind.blurb}`, tableOfContents: { minHeadingLevel: 2, maxHeadingLevel: 2 } }} headings={headings}>
+  <p class="schema-crumbs not-content"><a href="/reference/schema/">Schema reference</a> / <a href={`/reference/schema/${v.kind.id}/`}>{v.kind.title}</a> / {v.version}</p>
+  <VersionSwitcher current={v} kind={v.kind.id} />
+
+  <p>{v.kind.blurb}</p>
+  <dl class="schema-meta">
+    <div><dt>Status</dt><dd>
+      {v.version === 'proposed' ? <Badge text="Proposed" variant="caution" /> : v === newest ? <Badge text="Latest" variant="success" /> : <>Frozen · <a href={newest.page}>latest is {newest.version}</a></>}
+    </dd></div>
+    <div><dt>Published</dt><dd>{v.added}</dd></div>
+    <div><dt>Schema ID</dt><dd><a href={v.rawUrl}><code>{v.schema.$id}</code></a></dd></div>
+    <div><dt>Dialect</dt><dd>JSON Schema 2020-12 · unknown fields rejected unless marked</dd></div>
+    <div><dt>Defined by</dt><dd>
+      <ul class="rfc-links">{rfcs.map(r => <li><a href={r.href}>{r.heading ? <>{r.title.replace(/:.*/, '')} · {r.heading}</> : r.title}</a></li>)}</ul>
+    </dd></div>
+  </dl>
+
+  <RawJson url={v.rawUrl} text={v.text} title="Raw schema" id="raw" sha256={v.sha256} />
+
+  {prev && changes && (
+    <section>
+      <h2 id="changes">Changes since {prev.version}</h2>
+      {notes.length > 0 && (
+        <div class="changelog-notes">
+          {notes.map(n => <blockquote><p class="cl-section">Changelog · {n.section}</p><Fragment set:html={n.html} /></blockquote>)}
+        </div>
+      )}
+      {changeCount === 0
+        ? <p>No structural changes from <a href={prev.page}>{prev.version}</a>{v.text !== prev.text && ' (identifiers and titles only)'}. The contract shape is identical; the version exists so consumers can pin it.</p>
+        : <p>Structural diff against <a href={prev.page}>{prev.version}</a>: {counts.map(([s, n], i) => <>{i > 0 && ', '}{plural(n, v.kind.id === 'ipc' ? 'entry' : 'definition').replace(/entrys/, 'entries')} {s}</>)}. Descriptions and <code>$id</code> changes are ignored.</p>}
+      {changeCount > 0 && (
+        <details class="diff" open={changeCount <= 30}>
+          <summary>{plural(changeCount, 'change')}</summary>
+          <ul class="diff-list">
+            {changes.entries.map(e => (
+              <li class={`diff-${e.status}`}>
+                <span class="diff-tag">{e.status}</span>
+                {e.status === 'removed' ? <code>{e.section}</code> : <a href={`#${e.id}`}><code>{e.section}</code></a>}
+                {e.changes.length > 0 && (
+                  <ul>{e.changes.slice(0, 40).map(c => (
+                    <li class={`diff-${c.status}`}><span class="diff-sign">{c.status === 'added' ? '+' : c.status === 'removed' ? '−' : '~'}</span> <code>{c.path}</code>
+                      {c.status === 'changed' && <span class="diff-sig"> {c.detail ?? `${c.before} → ${c.after}`}</span>}
+                      {c.status === 'added' && <span class="diff-sig"> {c.after}</span>}
+                    </li>))}
+                    {e.changes.length > 40 && <li>… {e.changes.length - 40} more</li>}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </section>
+  )}
+  {!prev && v.version !== 'proposed' && <p>This is the first published version of this contract.</p>}
+
+  {groups.map(g => (
+    <section>
+      <h2 id={g.id}>{g.title}</h2>
+      {g.id === 'methods' && <p>Each method is a JSON-RPC 2.0 request <code>{'{jsonrpc, id, method, params}'}</code> answered by <code>{'{jsonrpc, id, result}'}</code> or an <a href="#def-error">error</a>. Params and results are listed below.</p>}
+      {g.items.length > 8 && (
+        <ul class="def-index not-content">{g.items.map(s => <li><a href={`#${s.id}`}><code>{s.name}</code></a></li>)}</ul>
+      )}
+      {g.items.map(s => (
+        <div class="def" id={s.kind === 'fields' ? undefined : s.id}>
+          {s.aliases?.map(id => <span id={id} class="anchor-alias" />)}
+          {s.kind !== 'fields' && <h3 class="def-title"><code>{s.name}</code><a class="def-link" href={`#${s.id}`} aria-label={`Link to ${s.name}`}>#</a></h3>}
+          {s.description && <p>{s.description}</p>}
+          {s.tables.map(t => <FieldTable rows={t.rows} label={t.label} summary={t.summary} />)}
+        </div>
+      ))}
+    </section>
+  ))}
+
+  {examples.length > 0 && (
+    <section>
+      <h2 id="examples">Examples</h2>
+      <p>Offline fixtures from the schema repository, validated by its test suite. They show shape, not a real session or package.</p>
+      {examples.map(e => <RawJson url={e.url} text={e.text} title={e.label} open={examples.length === 1} />)}
+    </section>
+  )}
+
+  <p class="schema-provenance">Mirrored byte-for-byte from <code>hyprune/schema</code> at <code>{manifest.commit.slice(0, 12)}</code> ({manifest.committed}). SHA-256 <code>{v.sha256}</code>.</p>
+</StarlightPage>

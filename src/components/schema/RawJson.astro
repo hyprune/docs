@@ -1,0 +1,81 @@
+---
+// Collapsible, syntax-highlighted view of a mirrored JSON file. Small files are
+// highlighted at build time; large schemas (IPC is ~240 KB) are fetched and
+// highlighted when the panel is first opened, so pages stay light.
+import { Code } from '@astrojs/starlight/components';
+
+interface Props { url: string; text: string; title: string; open?: boolean; id?: string; sha256?: string; }
+const { url, text, title, open = false, id, sha256 } = Astro.props;
+const bytes = Buffer.byteLength(text);
+const lines = text.split('\n').length - (text.endsWith('\n') ? 1 : 0);
+const size = bytes > 1024 ? `${(bytes / 1024).toFixed(bytes > 10240 ? 0 : 1)} KB` : `${bytes} B`;
+const inline = bytes <= 24 * 1024;
+const file = url.split('/').pop();
+---
+<details class="raw-json" id={id} open={open} data-src={inline ? undefined : url}>
+  <summary>
+    <span class="raw-title">{title}</span>
+    <span class="raw-meta">{file} · {lines.toLocaleString('en')} lines · {size}</span>
+  </summary>
+  <div class="raw-toolbar not-content">
+    <a class="raw-button" href={url} download={file}>Download</a>
+    <a class="raw-button" href={url}>Open raw</a>
+    <button class="raw-button" type="button" data-copy={url}>Copy</button>
+    {sha256 && <span class="raw-sha" title={`SHA-256 ${sha256}`}>sha256 {sha256.slice(0, 12)}…</span>}
+  </div>
+  {inline
+    ? <Code code={text.replace(/\n$/, '')} lang="json" />
+    : <pre class="raw-code" tabindex="0"><code>Loading {file}…</code></pre>}
+</details>
+
+<script>
+  // Tiny JSON highlighter: keys, strings, numbers, literals, punctuation.
+  const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+  const token = /("(?:[^"\\]|\\.)*")(\s*:)?|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(true|false|null)\b|([{}\[\],])/g;
+  function highlight(src: string) {
+    return src.replace(/\n$/, '').split('\n').map(line => {
+      let out = '', last = 0;
+      for (const m of line.matchAll(token)) {
+        out += esc(line.slice(last, m.index));
+        const [all, str, colon, num, lit, punct] = m;
+        if (str) out += colon ? `<span class="j-key">${esc(str)}</span><span class="j-p">${colon}</span>` : `<span class="j-str">${esc(str)}</span>`;
+        else if (num) out += `<span class="j-num">${num}</span>`;
+        else if (lit) out += `<span class="j-lit">${lit}</span>`;
+        else if (punct) out += `<span class="j-p">${punct}</span>`;
+        last = m.index! + all.length;
+      }
+      return `<span class="j-line">${out + esc(line.slice(last))}</span>`;
+    }).join('\n');
+  }
+  async function load(details: HTMLDetailsElement) {
+    const src = details.dataset.src;
+    if (!src || details.dataset.loaded) return;
+    details.dataset.loaded = '1';
+    const code = details.querySelector('pre.raw-code code')!;
+    try {
+      const res = await fetch(src);
+      if (!res.ok) throw new Error(String(res.status));
+      code.innerHTML = highlight(await res.text());
+    } catch (e) {
+      code.textContent = `Could not load ${src} (${e}). Use Open raw or Download.`;
+      delete details.dataset.loaded;
+    }
+  }
+  for (const details of document.querySelectorAll<HTMLDetailsElement>('details.raw-json')) {
+    details.addEventListener('toggle', () => details.open && load(details));
+    if (details.open) load(details);
+  }
+  // Deep links such as #raw open the panel.
+  const openHash = () => {
+    const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (el instanceof HTMLDetailsElement && el.classList.contains('raw-json')) { el.open = true; el.scrollIntoView(); }
+  };
+  openHash(); addEventListener('hashchange', openHash);
+  for (const button of document.querySelectorAll<HTMLButtonElement>('button[data-copy]')) {
+    button.addEventListener('click', async () => {
+      const text = await (await fetch(button.dataset.copy!)).text();
+      await navigator.clipboard.writeText(text);
+      const label = button.textContent; button.textContent = 'Copied'; setTimeout(() => (button.textContent = label), 1500);
+    });
+  }
+</script>

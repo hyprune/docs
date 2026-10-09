@@ -1,0 +1,25 @@
+---
+// Same camera, successive Lumen Reach releases. Radio buttons switch the frame
+// without JavaScript; without CSS every frame is shown in order.
+interface Props { id: string; title: string; frames: { version: string; name: string; alt: string; note?: string }[]; }
+const { id, title, frames } = Astro.props;
+const last = frames.length - 1;
+---
+<figure class="evolution not-content" aria-label={title}>
+  {frames.map((f, i) => <input type="radio" name={`evo-${id}`} id={`evo-${id}-${i}`} checked={i === last} class={`evo-radio evo-r${i}`} />)}
+  <div class="evo-frames">
+    {frames.map((f, i) => (
+      <div class={`evo-frame evo-f${i}`}>
+        <img src={`/media/lumen-reach/${f.name}-1600.webp`} srcset={`/media/lumen-reach/${f.name}-800.webp 800w, /media/lumen-reach/${f.name}-1600.webp 1600w`}
+          sizes="(min-width: 72rem) 50rem, 100vw" width="1600" height="900" alt={f.alt} loading="lazy" decoding="async" />
+        {f.note && <p class="evo-note"><strong>{f.version}</strong> · {f.note}</p>}
+      </div>
+    ))}
+  </div>
+  <figcaption>
+    <span class="evo-title">{title}</span>
+    <span class="evo-steps" role="group" aria-label="Release">
+      {frames.map((f, i) => <label for={`evo-${id}-${i}`} class={`evo-l${i}`}>{f.version}</label>)}
+    </span>
+  </figcaption>
+</figure>

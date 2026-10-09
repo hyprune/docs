@@ -1,0 +1,12 @@
+---
+interface Props { name: string; title: string; caption?: string; width?: number; height?: number; }
+const { name, title, caption, width = 1280, height = 720 } = Astro.props;
+const base = `/media/video/${name}`;
+---
+<figure class="clip">
+  <video controls muted playsinline preload="none" poster={`${base}.webp`} width={width} height={height} aria-label={title}>
+    <source src={`${base}.mp4`} type="video/mp4" />
+    <a href={`${base}.mp4`}>{title} (MP4)</a>
+  </video>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

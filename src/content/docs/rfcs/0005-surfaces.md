@@ -95,6 +95,37 @@ source ID; source values use the existing bounded `data.publish`/TTL mechanism.
 This hook gives shell/extensions display metadata without executable world hooks,
 window launch commands, raw input injection or new pixel transports.
 
+### M2 follow-up: world-derived default homes (IPC 0.15, no wire change)
+
+A loaded world defines where its area workspaces are; the user never has to bind
+them first. Every area without an explicit user binding receives a **default
+home** at `windows.workspace_base + int(workspaceSlot)`. The base is user
+configuration (default `10`, so slot `01` is workspace 11, `02` is 12); `0`
+disables defaults. Worlds still never name compositor workspace IDs: the slot is
+the only world input.
+
+Explicit state always wins. An area with an explicit binding gets no default, and
+a workspace ID already used by an explicit binding of any world, by the dedicated
+room workspace (`windows.world_workspace`, default 8) or by a configured workspace
+location is skipped rather than shared. Slots that resolve to the same number keep
+the first area. The combined list stays within the 32-binding budget.
+
+Defaults are derived state. Core recomputes them on every world load, explicit
+`workspace.bind`, layout restore and configuration change, and they belong only
+to the loaded world. They appear in `mounts.bindings` and `workspaces.locations`
+with the existing `{id,worldId,areaId}` shape, so the Director lists them like
+any other home, but the daemon never writes them to user layout state.
+`workspace.bind` for a default home's area or ID replaces it with an explicit,
+persisted binding.
+
+Default homes behave exactly like explicit ones: the area's primary
+`mounted-workspace` anchor shows that workspace's windows, tool placement belongs
+to that area, and selecting the workspace travels to the area. Selection covers
+the Director, `workspace.activate`, stock compositor keybinds and dispatchers,
+as M2 specifies; core observes the active workspace from its tick, outside the
+render pass. Returning to any unbound workspace, including the room, re-arms
+travel to the same home.
+
 ## Amendment M3A: hand placement and child trees
 
 Super+left drag preserves the hit point offset and camera-to-hit distance.

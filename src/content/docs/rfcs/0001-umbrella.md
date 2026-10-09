@@ -3,7 +3,7 @@ title: "RFC-0001 — Umbrella architecture"
 description: "Repository boundaries, ownership and licensing for the Hyprune ecosystem."
 ---
 
-**Status: proposed v0 · 2026-10-07 · Implementation target, pending owner review.**
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented: the core, shell, sdk, schema, worlds, docs and .github repositories exist with these boundaries, plus the meta repository `hyprune` (2026-10-08).
 
 
 ## Decision

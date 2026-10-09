@@ -8,7 +8,7 @@ The founding owner is the interim steward. Repository maintainers review work in
 
 ## Decisions
 
-Ordinary fixes use pull request review. Changes to repository boundaries, public formats/protocols, capability policy, licensing or irreversible data migration require an RFC. RFCs progress from proposed -> accepted -> implemented, or superseded/rejected. Accepted means a design decision; implemented requires linked evidence. Current foundation RFCs remain proposed until the owner reviews them.
+Ordinary fixes use pull request review. Changes to repository boundaries, public formats/protocols, capability policy, licensing or irreversible data migration require an RFC. RFCs progress from proposed -> accepted -> implemented, or superseded/rejected. Accepted means a design decision; implemented requires linked evidence. RFC-0001–0009 are accepted, with implementation status recorded on each.
 
 Allow at least seven calendar days for substantive public RFC feedback unless a documented security fix needs faster handling. The steward records the outcome, rationale and dissent in the RFC/PR. Seek one relevant maintainer review in addition to the steward once available; while there is only one maintainer, record the exception. For unresolved disagreement, prefer a reversible experiment behind an explicit unstable boundary.
 
@@ -22,4 +22,4 @@ Use the Contributor Covenant and organization security policy. The conduct conta
 
 ## Decisions awaiting owner review
 
-Ratify the nine RFCs (0001–0009, many with implemented amendments) and the proposed HUD-style amendment, moving each to accepted or implemented with linked evidence; confirm repository license choices; activate conduct@hyprune.com and GitHub private vulnerability reporting; and decide when to open the component repositories. The Hyprland target (0.56.2) and the hyprune.com deployment are settled. These are review items, not blockers for development.
+RFC-0001–0009 were accepted on 2026-10-09; each status line records how far it is implemented. The HUD-style amendment remains proposed. Still open: confirm repository license choices, activate conduct@hyprune.com and GitHub private vulnerability reporting, and decide when to open the component repositories. These are review items, not blockers for development.

@@ -3,7 +3,7 @@ title: "RFC-0002 — Core runtime"
 description: "Process ownership, safe render phases, capture scheduling and failure recovery."
 ---
 
-**Status: proposed v0 · 2026-10-07 · Implementation target, pending owner review.**
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented in core through the [IPC 0.15 correction](#ipc-015-correction-unzoned-mount-instances-and-reconnects); the optional world renderer ([RFC-0009](/rfcs/0009-offload-renderer/)) is implemented through phase 1, default off.
 
 
 ## Decision: a small plugin and a helper

@@ -3,7 +3,7 @@ title: "RFC-0008 — Shell contract"
 description: "The minimum obligations of any Hyprune shell."
 ---
 
-**Status: proposed v0 · 2026-10-07 · Implementation target, pending owner review.**
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented by the reference Quickshell shell through the [IPC 0.15 tool hints and pocket feedback amendment](#amendment-generic-tool-hints-and-pocket-feedback-ipc-015).
 
 
 ## Decision

@@ -3,7 +3,7 @@ title: "RFC-0005 — Surfaces and screen types"
 description: "Pixels, geometry, focus and trusted routing across the desktop/world boundary."
 ---
 
-**Status: proposed v0 · 2026-10-07 · Implementation target, pending owner review.**
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through the [IPC 0.15 pocket queue and content sizing amendment](#amendment-pocket-queue-and-client-content-sizing-ipc-015).
 
 
 ## Decision and vocabulary

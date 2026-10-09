@@ -1,6 +1,6 @@
 # Hyprune docs
 
-An Astro Starlight site for **hyprune.com**: overview, Try Hyprune guide, concepts, architecture, a version-aware schema reference generated from `hyprune/schema`, the default keymap, progress and roadmap, the RFCs and their amendments, contributing and governance. Diagrams are original SVG. Media under `public/media/` are in-engine captures of Lumen Reach (Hyprune contributors, CC-BY-4.0), pre-encoded on the bake host; see `public/media/README.md`. Original prose/code/art are MIT.
+An Astro Starlight site for **hyprune.com**: overview, Try Hyprune guide, concepts, architecture, a version-aware schema reference generated from `hyprune/schema`, the default keymap, progress and roadmap, the RFCs and their amendments, contributing and governance. Diagrams are original SVG. Media under `public/media/` are in-engine captures of Lumen Reach (Hyprune contributors, CC-BY-4.0), pre-encoded ahead of time; see `public/media/README.md`. Original prose/code/art are MIT.
 
 ## Local development and verification
 
@@ -60,6 +60,6 @@ The [schema reference](https://hyprune.com/reference/schema/) is generated from 
 
 ## Foundation review
 
-All RFCs remain **proposed** until owner review. Ratify architecture/licenses and coordinate the exact Hyprland target with core. Community setup remains: provision **conduct@hyprune.com** (placeholder, not yet monitored) and enable/test GitHub private vulnerability reporting. Do not publish a personal address.
+RFC-0001–0009 are **accepted** (2026-10-09) with implementation status on each; the HUD-style amendment is proposed. Licenses still need ratifying. Community setup remains: provision **conduct@hyprune.com** (placeholder, not yet monitored) and enable/test GitHub private vulnerability reporting. Do not publish a personal address.
 
 [Starlight setup reference](https://starlight.astro.build/manual-setup/) · [Astro Pages guide](https://docs.astro.build/en/guides/deploy/github/)

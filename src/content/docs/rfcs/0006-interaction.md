@@ -3,7 +3,7 @@ title: "RFC-0006 — Interaction and movement modes"
 description: "A fixed-step movement contract with a permanent route back to the desktop."
 ---
 
-**Status: proposed v0 · 2026-10-07 · Implementation target, pending owner review.**
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through the [IPC 0.15 adventure exits and declarative tool inputs amendment](#amendment-adventure-exits-and-declarative-tool-inputs-ipc-015).
 
 
 ## Decision

@@ -3,7 +3,7 @@ title: "RFC-0009 — Optional offload renderer"
 description: "A supervised world renderer, explicit cross-GPU frames, power admission and local fallback."
 ---
 
-**Status: proposed · 2026-10-08 · Core M4 design. Phase 1 is implemented on core main, off by default and verified in nested sessions only (see the [phase 1 amendment](#phase-1-implementation-amendment-hot-switching-and-performance-010) and the [roadmap](/roadmap/)). The buffer protocol remains private to core.**
+**Status: accepted · proposed 2026-10-08, accepted 2026-10-09 · phase 1 implemented, default off.** Phase 1 is on core main and verified in nested sessions; physical power-profile qualification is pending (see the [phase 1 amendment](#phase-1-implementation-amendment-hot-switching-and-performance-010) and the [roadmap](/roadmap/)). The buffer protocol remains private to core.
 
 This amends [RFC-0002](/rfcs/0002-runtime/) without moving compositor or input
 authority. Its buffer protocol is private to core, not a public provider API.

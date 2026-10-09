@@ -3,7 +3,7 @@ title: "RFC-0007 — Extension model and SDK"
 description: "Process-based extensions, explicit grants and reproducible packages."
 ---
 
-**Status: proposed v0 · 2026-10-07 · Implementation target, pending owner review.**
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Partly implemented: the [extension manifest schema](/reference/schema/extension/) and SDK scaffolding exist; the core extension host (sandbox, grant approval, crash/update/rollback) does not yet.
 
 
 ## Decision

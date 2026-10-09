@@ -186,3 +186,25 @@ surfaces, workspace screens and world-locked overlays remain native-resolution.
 The graphics discovery, persistence, supported effects and timing semantics are
 specified in [RFC-0008](/rfcs/0008-shell/#graphics-controls-and-input-hold-timing-ipc-07--08).
 Lower quality never changes logical surface input coordinates or buffer scale.
+
+## Amendment: world 0.5 ink and authored visibility
+
+Optional `atmosphere.outline` contains enabled, display-RGB colour (0–1), widthPx
+(1–4 logical pixels), relative linear-depth threshold (0.0001–1) and normal
+threshold (1−dot, 0.001–2). All fields are required when present. An independent
+native-resolution geometry normal/depth pass draws opaque/masked world geometry;
+the ink composite precedes blend geometry, app/workspace surfaces and HUD. It
+never samples client pixels. Material-ID edges and normal-map edges are omitted.
+`graphics.outline` is a nullable boolean preset override; permission plus authored
+enabled style are both required. F3/Performance expose its separate measured cost.
+
+Optional `visibility.areas` (up to 256) declares unique IDs, finite increasing AABB
+bounds, glTF node subtree indices and directed `visibleFrom` area IDs. A region is
+visible from itself and those sources, without transitive closure. Overlapping
+source bounds union their visible sets. Outside all bounds, or without metadata,
+all geometry draws. Unassigned geometry and editor-transformed nodes always draw.
+Conflicting subtree assignments and unknown links/nodes are invalid. Authors must
+include visibility through apertures; core does not infer occlusion from AABBs.
+Filtering applies to every world submission pass, including glass, depth and ink;
+collision, navigation, live app/screens and HUD never disappear through it.
+`graphics.visibility_culling` permits live comparisons; diagnostics report counts.

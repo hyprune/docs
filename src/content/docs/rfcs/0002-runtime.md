@@ -87,3 +87,23 @@ Default in-process rendering and the render-phase rule remain mandatory.
 Its private pose/buffer/fence protocol is not public IPC or an extension SDK;
 power admission and prepared local fallback are shipping gates. See its staged
 M4 plan and measured limitations before treating the spike as desktop support.
+
+## Amendment: IPC 0.13 authoring-camera authority
+
+`camera.author` is a separate launch capability for trusted dev/photo tooling,
+never a normal shell grant. In active world control `camera.photo` accepts metre
+`position`, normalized quaternion `orientation`, vertical `fov` (5–140 degrees),
+optional NDC `lensShift` (two components −2..2), and fixed `renderScale` (0.25–1).
+One connection owns the hold. Updates by that connection replace the lens; other
+writers cannot take it over. `camera.release`, disconnect and world exit restore
+the prior camera; loading another world resets to its spawn. Movement/look/scope
+cannot overwrite a held lens. Captures and debug remain usable. All ownership
+changes happen in the owner event loop, outside the render pass.
+
+`camera.get` on 0.13 returns actual pose, roll radians, vertical FOV, lensShift,
+held boolean and renderScale (null if not held). Lens shift moves the optical axis
+to NDC `(x,y)` (+right/+up); roll uses local +Z. The same camera basis/projection
+serves scene, sky, rays and core/shell marker projections. Older camera.get keeps
+its two-field shape. A photo hold uses the local renderer for exact frame pose;
+it does not restart the world or compositor. Recorded camera frames optionally
+include roll/shift, defaulting to zero for old files; camera replay preserves them.

@@ -309,3 +309,12 @@ returns to world control. All other free-mode keyboard input stays native.
 Cursor visibility, focus, workspace changes and return warps are deferred after
 the frame. The pointer can leave the world output and return without being
 recaptured; only an explicit toggle restores world control.
+
+## Amendment: IPC 0.13 Performance controls
+
+Performance metadata adds nullable boolean `outline`, boolean
+`visibility_culling`, a dedicated `outline` GPU cost and visible/submitted batch
+counts. Shells may show these through the existing options/presets/control data.
+Older protocol responses omit the new keys. World discovery may accept format
+0.5; normal shells must not request the separate `camera.author` capability.
+Core retains responsibility for rolled/shifted world-locked marker projection.

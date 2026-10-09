@@ -9,13 +9,13 @@ import Shot from '../../components/media/Shot.astro';
 import Evolution from '../../components/media/Evolution.astro';
 import Video from '../../components/media/Video.astro';
 
-Work on Hyprune started on **7 October 2026**. As of 9 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.15 and the release world has shipped six versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
+Work on Hyprune started on **7 October 2026**. As of 9 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.15 and the release world has shipped seven versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
 
 All images and clips on this page are in-engine captures of **Lumen Reach**, the official release world (Hyprune contributors, CC-BY-4.0).
 
 ## Lumen Reach, release by release
 
-<Video name="lumen-reach-tour-0.7.2" title="A 33-second tour of Lumen Reach 0.7.2" caption="The current state: a tour of all four homes in the 0.7.2 release candidate (walkable roof route; not yet published). Rendered in-engine frame by frame in an isolated nested session, High preset." />
+<Video name="lumen-reach-tour-0.7.2" title="A 33-second tour of Lumen Reach 0.7.2" caption="The current release: a tour of all four homes in Lumen Reach 0.7.2. Rendered in-engine frame by frame in an isolated nested session, High preset." />
 
 The same camera across releases. Pick a version:
 
@@ -32,7 +32,7 @@ The same camera across releases. Pick a version:
   { version: '0.5.0', name: 'rime-vault-0.5.0', alt: 'Rime Vault in 0.5.0: speckled walls and a sparse floor.', note: 'before the frost pass' },
   { version: '0.6.0', name: 'rime-vault-0.6.0', alt: 'Rime Vault in 0.6.0: console rows, frosted steel and amber practical lights.', note: 'frost materials, console banks, cable grates' },
   { version: '0.7.0', name: 'rime-vault-0.7.0', alt: 'Rime Vault in 0.7.0: a lighter service hall with consoles and an orange instrument wall.', note: 'lighter hall, consoles and instrument wall' },
-  { version: '0.7.1', name: 'rime-vault-0.7.1', alt: 'Rime Vault in 0.7.1: consoles and an orange instrument wall in the frosted service hall.', note: 'current release' },
+  { version: '0.7.1', name: 'rime-vault-0.7.1', alt: 'Rime Vault in 0.7.1: consoles and an orange instrument wall in the frosted service hall.', note: 'unchanged from 0.7.0' },
 ]} />
 
 <Video name="rime-vault-0.5-to-0.6" title="Rime Vault before and after the 0.6.0 frost pass" caption="Rime Vault, 0.5.0 before and 0.6.0 after, on three identical camera paths. Isolated nested session, Medium preset on an Intel iGPU; only labels and cuts added." />
@@ -45,8 +45,9 @@ The same camera across releases. Pick a version:
 | **0.6.1** | 9 Oct | 45.2 MB | 222,403 | 326 MiB | Moves to world format 0.5: authored visibility regions for every home |
 | **0.7.0** | 9 Oct | 47.9 MB | 244,312 | 373 MiB | Closed sky dome and mountain basin; flight passes over the perimeter; 56-view any-angle sweep and full route traversal |
 | **0.7.1** | 9 Oct | 46.9 MB | 244,526 | 373 MiB | Fixes from the first live walk: sky seam, a capped stair, the night sky |
+| [**0.7.2**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.7.2) | 9 Oct | 46.8 MB | 245,330 | 373 MiB | A walkable, clear roof route |
 
-GPU memory is the package checker's upload estimate at full texture resolution. A 0.7.2 that makes the roof route walkable is in progress. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
+GPU memory is the package checker's upload estimate at full texture resolution. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
 
 <div class="shot-grid">
   <Shot name="signal-rise-reflector-0.6.0" alt="Signal Rise reflector dish against snowy peaks at night." caption="Signal Rise reflector" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />

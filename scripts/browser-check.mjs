@@ -4,7 +4,7 @@ import { readFile, stat, mkdir } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
 import assert from 'node:assert/strict';
 const root = resolve('dist');
-const mime = {'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.wasm':'application/wasm','.png':'image/png','.woff2':'font/woff2'};
+const mime = {'.webp':'image/webp','.avif':'image/avif','.mp4':'video/mp4','.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.json':'application/json','.wasm':'application/wasm','.png':'image/png','.woff2':'font/woff2'};
 const server = createServer(async (req,res) => {
   try {
     let file = resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));
@@ -41,15 +41,35 @@ try {
   assert.ok(await page.locator('.pagefind-ui__result-link').count() > 0);
   await page.screenshot({path:'artifacts/search.png'});
   await page.keyboard.press('Escape');
+  // Schema reference: lazy raw view, version switcher, diff and anchors.
+  await page.goto(base+'/reference/schema/ipc/latest/',{waitUntil:'networkidle'});
+  assert.match(page.url(),/\/reference\/schema\/ipc\/0\.\d+\/$/);
+  await page.locator('details#raw > summary').click();
+  await page.locator('details#raw .j-line').first().waitFor();
+  assert.ok(await page.locator('details#raw .j-line').count() > 1000);
+  assert.ok(await page.locator('#changes').count() === 1);
+  await page.locator('.version-switcher a',{hasText:/^0\.2$/}).click();
+  await page.waitForURL(/\/ipc\/0\.2\/$/);
+  assert.equal(await page.locator('.version-switcher a[aria-current="page"]').innerText(),'0.2');
+  await page.goto(base+'/reference/schema/world/0.1/',{waitUntil:'networkidle'});
+  assert.ok(await page.locator('section:has(#examples) .expressive-code').count() >= 1);
+  // Release stepper switches frames without JavaScript.
+  await page.goto(base+'/progress/',{waitUntil:'networkidle'});
+  const visible = () => page.locator('.evolution').first().locator('.evo-frame').evaluateAll(els => els.map(e => getComputedStyle(e).visibility));
+  assert.deepEqual(await visible(),['hidden','hidden','hidden','visible']);
+  await page.locator('.evolution').first().locator('label',{hasText:'0.4.0'}).click();
+  await page.waitForTimeout(400);
+  assert.deepEqual(await visible(),['visible','hidden','hidden','hidden']);
+  await page.screenshot({path:'artifacts/progress.png'});
   await page.setViewportSize({width:390,height:844});
-  for (const path of ['/','/architecture/','/rfcs/0003-ipc/']) {
+  for (const path of ['/','/architecture/','/rfcs/0003-ipc/','/progress/','/roadmap/','/reference/schema/','/reference/schema/world/0.7/']) {
     await page.goto(base+path,{waitUntil:'networkidle'});
     const overflow = await page.evaluate(()=>document.documentElement.scrollWidth > innerWidth);
     assert.equal(overflow,false,`mobile overflow ${path}`);
   }
   await page.screenshot({path:'artifacts/ipc-mobile.png',fullPage:true});
   assert.deepEqual(errors,[]);
-  console.log('Browser checks passed: landing, diagrams, RFC, themes, live search, mobile widths; no page errors or failed requests.');
+  console.log('Browser checks passed: landing, diagrams, RFC, themes, live search, schema raw view and version switch, release stepper, mobile widths; no page errors or failed requests.');
 } finally {
   await browser?.close();
   await new Promise(r=>server.close(r));

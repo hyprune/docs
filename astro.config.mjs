@@ -12,9 +12,27 @@ export default defineConfig({
     customCss: ['./src/styles/custom.css'],
     editLink: { baseUrl: 'https://github.com/hyprune/docs/edit/main/' },
     sidebar: [
-      { label: 'Start here', items: [{ label: 'The idea', link: '/' }, { label: 'Concepts', slug: 'concepts' }, { label: 'Architecture', slug: 'architecture' }, { label: 'Roadmap', slug: 'roadmap' }] },
-      { label: 'RFCs · v0', items: [{ autogenerate: { directory: 'rfcs' } }] },
-      { label: 'Build with us', items: [{ slug: 'first-session' }, { slug: 'keymap' }, { slug: 'contributing' }, { slug: 'governance' }, { slug: 'lessons' }] },
+      { label: 'Guide', items: [
+        { label: 'Overview', link: '/' },
+        { label: 'Try Hyprune', slug: 'first-session' },
+        { slug: 'concepts' },
+        { slug: 'architecture' },
+      ] },
+      { label: 'Reference', items: [
+        { label: 'Schema reference', link: '/reference/schema/' },
+        { label: 'World manifest', link: '/reference/schema/world/' },
+        { label: 'IPC protocol', link: '/reference/schema/ipc/' },
+        { label: 'Input keymap schema', link: '/reference/schema/input/' },
+        { label: 'Default keymap', slug: 'keymap' },
+      ] },
+      { label: 'Project', items: [
+        { slug: 'progress' },
+        { slug: 'roadmap' },
+        { slug: 'contributing' },
+        { slug: 'governance' },
+        { slug: 'lessons' },
+      ] },
+      { label: 'RFCs', collapsed: true, items: [{ autogenerate: { directory: 'rfcs' } }] },
     ],
   })],
 });

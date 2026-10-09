@@ -234,3 +234,65 @@ permission to teleport through a hatch rim. Author unobstructed connectors and
 landings, and a catch prism spanning the intended drop-in opening. Visual meshes
 remain ordinary original/licensed glTF content and are never inferred to be
 climbable. Procedural fixture `core/tests/fixtures/climbing.py` is original CC0.
+
+## Amendment: world 0.6 playable bounds and backdrop validation
+
+World format **0.6** adds optional gameplay bounds. Earlier versions remain
+valid and have unrestricted flight unless their collision geometry blocks it.
+Coordinates are world metres, +Y up. Bounds apply to the **camera eye**, not the
+player's feet or the camera frustum.
+
+```json
+{
+  "playable": {
+    "volumes": [
+      {"type": "box", "min": [-40, -2, -40], "max": [40, 30, 40]},
+      {"type": "convex", "points": [[40, 0, 0], [50, 0, 0], [40, 15, 0], [40, 0, 15]]}
+    ],
+    "maxFlyHeight": 24
+  },
+  "backdrop": {"farCards": [12, 15]}
+}
+```
+
+`playable.volumes` is a union. A box requires strictly increasing min/max on
+all axes; a convex hull takes 4–16 distinct points spanning nonzero volume.
+Coordinates and heights range from −100000 to +100000 m. Each declaration has
+at most eight volumes. `maxFlyHeight` is an **absolute world-space eye Y** and
+clips all volumes in that declaration. A world declaration can contain only a
+height cap; an area declaration must include volumes.
+
+An existing `areas[]` entry can also contain `playable` with the same shape.
+All declared area regions form a union (at most 64 area volumes in total),
+intersected with the world envelope if present. This permits movement between
+adjacent/overlapping rooms without switching bounds based on a nearest-area
+heuristic. Undeclared areas add no constraints or implicit volumes. Authors
+must cover intended connecting passages and keep the world/area intersection
+nonempty. These volumes describe permitted flight, independently of visibility
+culling and window placement zones.
+
+Core enforces bounds only during ordinary fly movement. The live Lua option
+`player.fly_bounds_allowance` expands every boundary plane, including height
+caps, by **0.5 m by default**, range **0–20 m**. In the final metre, outward
+movement slows smoothly; it cannot cross the expanded boundary or jump gaps
+between disconnected regions. Tangential movement remains possible. Enabling
+fly while already outside returns toward the nearest permitted region at up
+to 3 m/s without teleporting. Walking, climbing, collision, scripted travel and
+the capability-gated authoring camera retain their existing semantics.
+
+Noclip ignores both bounds and fall respawn. On crossing outside the authored
+(unexpanded) bounds, core emits the existing `runtime.notice` event with
+`level: "warning"`, `code: "world.bounds.left"`, and message
+“Leaving world bounds · noclip is unbounded”. It emits once per outward
+crossing, including enabling noclip outside, and resets on world load. Shells
+show this through their existing notice UI. No IPC version bump or cursor
+transition is needed; authoring bounds are omitted from IPC area records.
+
+`backdrop.farCards` explicitly identifies up to 256 glTF node indices, including
+rendered descendants, used as distant sky/backdrop cards. The authoritative
+`hyprune-world-check PACKAGE` validates indices and warns if a texture sampled
+by those meshes uses `CLAMP_TO_EDGE` (33071) on S or T. Warnings name the node,
+texture index and axes, appear on stderr and in the JSON `warnings` array, and
+do not fail validation. REPEAT/MIRRORED_REPEAT and undeclared meshes are silent.
+This is a diagnostic, not an instruction to change wrapping automatically;
+clamping can be intentional. Cubemap/environment faces are not far cards.

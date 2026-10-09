@@ -3,7 +3,7 @@ title: "RFC-0008 — Shell contract"
 description: "The minimum obligations of any Hyprune shell."
 ---
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented by the reference Quickshell shell through the [IPC 0.15 tool hints and pocket feedback amendment](#amendment-generic-tool-hints-and-pocket-feedback-ipc-015).
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented by the reference Quickshell shell through the [IPC 0.16 upscaler amendment](#amendment-ipc-016-upscaler).
 
 
 ## Decision
@@ -373,3 +373,30 @@ held-modifier context from core. Super sets override; gestures lists matching
 configured global chords (and the carry-facing action while carrying). A passive
 shell must not grab keys to infer modifier state. HUD tool telemetry permits 5
 in 0.15; older subscribers see Normal/1 when Placement is active.
+
+## Amendment: IPC 0.16 upscaler
+
+`graphics.upscaler` is `"fsr1"`, `"bilinear"`, or null (preset inheritance; every
+preset uses `"fsr1"`). It selects the reconstruction used when the world renders
+below output size (dynamic or fixed render scale below 1):
+
+- `fsr1`: AMD FidelityFX FSR 1, EASU edge-adaptive upscale followed by RCAS
+  sharpening, on display-encoded colour. `sharpen` 0–1 maps to RCAS 2–0 stops.
+- `bilinear`: bilinear reconstruction with a bounded 4-tap unsharp mask;
+  `sharpen` 0–1 weights it and zero disables it.
+
+FSR 1 needs GLSL ES 3.1. Without it core reports `bilinear` as the active
+upscaler (`graphics.get().timings.upscaler` = `{requested, active, error}`) while
+`config`/`effective` keep the requested value. Native client surfaces, the HUD and
+world-locked markers are never upscaled. The shared `upscale_sharpen` cost covers
+the whole reconstruction (FSR: internal-resolution tone pass, EASU and RCAS). On a
+4K Intel iGPU FSR 1 costs about 2 ms more than bilinear and removes the
+stair-stepped edges that bilinear + sharpen produces at 0.375–0.5 scale; the
+dynamic resolution controller absorbs the difference.
+
+Changes apply without reload, through `graphics.set`, graphics.json or the Lua
+config. Older negotiated replies omit `upscaler` from config, effective,
+overrides, options, presets and Performance records; older peers cannot write it
+(`graphics.set` with `upscaler` below 0.16 is an invalid-params error). All
+earlier capabilities remain inherited. Shells show the setting next to
+Sharpening when the session negotiated 0.16 or later.

@@ -86,3 +86,10 @@ package's `scene.gltf` against its world format: 0.7 may require
 lightmap textures stay PNG in every v0 format. Exports `atLeast()`,
 `worldFormats` and `sceneExtensions()` so version gates are not hard-coded lists.
 Inheritance test: every valid 0.6 document is valid as 0.7. IPC is unchanged.
+
+## IPC 0.16 — 2026-10-10
+
+`v0.16/ipc.schema.json`: graphics `upscaler` setting (`fsr1` | `bilinear` |
+null) in config, effective values, overrides, presets and `graphics.set`
+patches; `session.hello` reports `0.16`. Inheritance test: every 0.15
+definition exists in 0.16 and the graphics properties differ only by the new key.

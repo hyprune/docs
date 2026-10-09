@@ -56,10 +56,11 @@ try {
   // Release stepper switches frames without JavaScript.
   await page.goto(base+'/progress/',{waitUntil:'networkidle'});
   const visible = () => page.locator('.evolution').first().locator('.evo-frame').evaluateAll(els => els.map(e => getComputedStyle(e).visibility));
-  assert.deepEqual(await visible(),['hidden','hidden','hidden','visible']);
+  const initial = await visible();
+  assert.deepEqual(initial,[...initial.slice(0,-1).map(()=>'hidden'),'visible']);
   await page.locator('.evolution').first().locator('label',{hasText:'0.4.0'}).click();
   await page.waitForTimeout(400);
-  assert.deepEqual(await visible(),['visible','hidden','hidden','hidden']);
+  assert.deepEqual(await visible(),['visible',...initial.slice(1).map(()=>'hidden')]);
   await page.screenshot({path:'artifacts/progress.png'});
   await page.setViewportSize({width:390,height:844});
   for (const path of ['/','/architecture/','/rfcs/0003-ipc/','/progress/','/roadmap/','/reference/schema/','/reference/schema/world/0.7/']) {

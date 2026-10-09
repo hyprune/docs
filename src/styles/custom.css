@@ -4,6 +4,9 @@
   :root[data-theme='light'] { --sl-color-accent-low: #d6f5e7; --sl-color-accent: #14634e; --sl-color-accent-high: #124433; }
   body { background-image: radial-gradient(ellipse at 85% 0%, #428c7020, transparent 48rem); }
   .site-title { font-weight: 750; letter-spacing: -.04em; }
+  /* Header lockup: bold small lockup at 50 px tall (~164 px wide, inside its 160–239 px range). */
+  :root { --sl-nav-height: 4rem; }
+  .site-title img { height: 3.125rem; }
   h1, h2, h3 { letter-spacing: -.035em; }
   .hero h1 { font-size: clamp(2.6rem, 5vw, 4.8rem); line-height: 1.04; max-width: 13ch; }
   .hero .tagline { max-width: 39rem; line-height: 1.65; }
@@ -166,4 +169,23 @@
   .home-shot img { display: block; width: 100%; height: auto; border-radius: 1rem; border: 1px solid var(--sl-color-gray-5); box-shadow: 0 30px 60px -30px #000a; }
   .home-shot figcaption { font-size: .8rem; color: var(--sl-color-gray-3); margin-top: .5rem; text-align: right; }
   .hero { padding-bottom: 1rem; }
+}
+
+/* Brand page */
+@layer hyprune {
+  .brand-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .75rem; }
+  .brand-stack { display: grid; gap: .75rem; }
+  .brand-row > *, .brand-stack > * { margin: 0 !important; }
+  .brand-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .6rem; min-height: 12rem; padding: 1.25rem 1rem .75rem; border-radius: 1rem; border: 1px solid var(--sl-color-gray-5); }
+  .brand-tile img { max-width: 100%; height: auto; }
+  .brand-tile figcaption { font-size: .78rem; margin-top: auto; text-align: center; }
+  .brand-navy { background: #0f1a27; } .brand-navy figcaption { color: #a9c3bd; }
+  .brand-paper { background: #f3f7f3; } .brand-paper figcaption { color: #456c6c; }
+  .brand-auto { background: var(--sl-color-bg-nav); color: var(--sl-color-white); } .brand-auto figcaption { color: var(--sl-color-gray-2); }
+  .brand-wide { min-height: 0; padding-top: 1.75rem; }
+  .brand-pixels { flex-direction: row; flex-wrap: wrap; }
+  .brand-pixels img { image-rendering: pixelated; }
+  .brand-pixels figcaption { flex-basis: 100%; }
+  .brand-mono { display: block; max-width: 100%; background: currentColor; -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat; }
+  .swatch { display: inline-block; width: .9rem; height: .9rem; border-radius: .25rem; background: var(--c); vertical-align: -.1rem; margin-right: .3rem; border: 1px solid var(--sl-color-gray-5); }
 }

@@ -1,0 +1,142 @@
+---
+title: Progress
+description: "How Hyprune got here: dated milestones, Lumen Reach release by release, and performance numbers over time."
+tableOfContents:
+  maxHeadingLevel: 2
+---
+
+import Shot from '../../components/media/Shot.astro';
+import Evolution from '../../components/media/Evolution.astro';
+import Video from '../../components/media/Video.astro';
+
+Hyprune's first commits landed on **7 October 2026**. Three days later, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.15 and the release world has shipped six versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
+
+All images and clips on this page are in-engine captures of **Lumen Reach**, the official release world (Hyprune contributors, CC-BY-4.0).
+
+## Lumen Reach, release by release
+
+The same camera across releases. Pick a version:
+
+<Evolution id="terrace" title="Sun Court terrace" frames={[
+  { version: '0.4.0', name: 'sun-court-terrace-0.4.0', alt: 'Sun Court terrace in Lumen Reach 0.4.0: painted valley backdrop with waterfalls, flat facade.', note: 'first release: four connected homes' },
+  { version: '0.5.0', name: 'sun-court-terrace-0.5.0', alt: 'Sun Court terrace in Lumen Reach 0.5.0: denser facade details and fixtures.', note: 'visual polish: facade plates, fixtures, canopy seams' },
+  { version: '0.6.0', name: 'sun-court-terrace-0.6.0', alt: 'Sun Court terrace in Lumen Reach 0.6.0, rendered at 4K.', note: 'unchanged here; the pass went into Rime Vault' },
+  { version: '0.7.0', name: 'sun-court-terrace-0.7.0', alt: 'Sun Court terrace in Lumen Reach 0.7.0: a closed sky dome with a mountain lake basin and viaduct.', note: 'closed sky dome and mountain basin' },
+]} />
+
+<Evolution id="rime" title="Rime Vault" frames={[
+  { version: '0.4.0', name: 'rime-vault-0.4.0', alt: 'Rime Vault in 0.4.0: a dark hall with a wall screen and sparse floor.', note: 'first release' },
+  { version: '0.5.0', name: 'rime-vault-0.5.0', alt: 'Rime Vault in 0.5.0: speckled walls and a sparse floor.', note: 'before the frost pass' },
+  { version: '0.6.0', name: 'rime-vault-0.6.0', alt: 'Rime Vault in 0.6.0: console rows, frosted steel and amber practical lights.', note: 'frost materials, console banks, cable grates' },
+  { version: '0.7.0', name: 'rime-vault-0.7.0', alt: 'Rime Vault in 0.7.0: a lighter service hall with consoles and an orange instrument wall.', note: 'current look' },
+]} />
+
+<Video name="rime-vault-0.5-to-0.6" title="Rime Vault before and after the 0.6.0 frost pass" caption="Rime Vault, 0.5.0 before and 0.6.0 after, on three identical camera paths. Isolated nested session, Medium preset on an Intel iGPU; only labels and cuts added." />
+
+| Release | Published | Archive | Triangles | GPU memory (estimate) | What changed |
+| --- | --- | ---: | ---: | ---: | --- |
+| **0.4.0** | 8 Oct | 34.5 MB | 210,067 | 272 MiB | First release: Sun Court, Array Hall, Rime Vault and Signal Rise, 24 mounts, routes and alternate stairs |
+| **0.5.0** | 8 Oct | 38.5 MB | 199,911 | 286 MiB | Visual polish in every home; about 60 frames/s per home at Medium on an Intel iGPU at 4K |
+| **0.6.0** | 8 Oct | 45.2 MB | 222,403 | 326 MiB | Rime Vault frost and density pass |
+| **0.6.1** | 9 Oct | 45.2 MB | 222,403 | 326 MiB | Moves to world format 0.5: authored visibility regions for every home |
+| **0.7.0** | 9 Oct | 47.9 MB | 244,312 | 373 MiB | Closed sky dome and mountain basin; flight passes over the perimeter; 56-view any-angle sweep and full route traversal |
+| **0.7.1** | 9 Oct | 46.9 MB | 244,526 | 373 MiB | Fixes from the first live walk: sky seam, a capped stair, the night sky |
+
+GPU memory is the package checker's upload estimate at full texture resolution. A 0.7.2 that makes the roof route walkable is in progress. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
+
+<div class="shot-grid">
+  <Shot name="signal-rise-reflector-0.6.0" alt="Signal Rise reflector dish against snowy peaks at night." caption="Signal Rise reflector" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />
+  <Shot name="rime-vault-console-row-0.6.0" alt="Rime Vault console row with keyboards, catwalk and cable grates." caption="Rime Vault console row" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />
+  <Shot name="rime-vault-sealed-door-0.6.0" alt="A sealed door labelled continuation, lit by red and amber lamps." caption="The sealed continuation" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />
+  <Shot name="home-sun-court-0.7" alt="Sun Court with a live terminal window on its main wall, labelled workspace 11." caption="A live terminal on the Sun Court wall during the workspace-homes change (before homes moved to 21+)" version="0.7" sizes="(min-width: 72rem) 24rem, 50vw" />
+</div>
+
+## Frame rate, power and memory
+
+The test machine is a laptop with an Intel Panther Lake iGPU driving a 4K output, often on USB-C power. Every number below comes from an isolated nested session with Lumen Reach unless noted. The source documents are in the core repository.
+
+### From about 15 to 60 frames per second at 4K
+
+At native 4K with fixed full-resolution rendering, the median frame interval was **66.6 ms (about 15 FPS)**. Dynamic resolution brought it to a **16.7 ms median (60 FPS)** on 8 October. Most of the gain came from rendering fewer pixels and cutting memory traffic, not from drawing fewer objects. A later run sustained **60.01 newly rendered frames per second for 23 seconds with zero reused frames**, at automatic Low quality and a world render scale of 0.375–0.5.
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">World pass, 4K Intel</span><span class="stat-value">5.74 ms</span><span class="stat-delta">from 22.38 ms at native scale</span></div>
+  <div class="stat"><span class="stat-label">Ink outline pass</span><span class="stat-value">1.10 ms</span><span class="stat-delta">from 7.51 ms</span></div>
+  <div class="stat"><span class="stat-label">First use of a shader</span><span class="stat-value">0.90 ms</span><span class="stat-delta">from 26.40 ms, with warm-up</span></div>
+  <div class="stat"><span class="stat-label">Desktop back after daemon dies</span><span class="stat-value">0.052 s</span><span class="stat-delta">recovery watchdog</span></div>
+</div>
+
+### Render on demand (9 October)
+
+A world frame is rendered only when its inputs change: the camera, a window's content or an animation. When nothing changes, the last frame is presented again.
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">World frames, static scene</span><span class="stat-value">0 /s</span><span class="stat-delta">from 59.7 /s</span></div>
+  <div class="stat"><span class="stat-label">Compositor GPU busy, static</span><span class="stat-value">1.2%</span><span class="stat-delta">from 42.1%</span></div>
+  <div class="stat"><span class="stat-label">GPU idle residency</span><span class="stat-value">88.0%</span><span class="stat-delta">from 43.5%, system-wide</span></div>
+  <div class="stat"><span class="stat-label">GPU memory estimate</span><span class="stat-value">269.5 MiB</span><span class="stat-delta">from 373.6 MiB, same scene</span></div>
+</div>
+
+A window updating at about 30 Hz now costs 28.9 world frames per second instead of 60. The first frame after idle took 32 ms. The memory saving comes from one colour upload, a uniform buffer, frustum culling and indexed draws.
+
+### FSR 1 upscaling (9 October)
+
+The world renders below output resolution and is upscaled. AMD FidelityFX Super Resolution 1 (EASU + RCAS) is now the default upscaler, with bilinear plus sharpening as the fallback. It costs about 2 ms of GPU time per frame at 0.375–0.5 scale, which dynamic resolution absorbs. It keeps edges and screen text crisper:
+
+<Shot name="fsr1-vs-bilinear-stairs" alt="Two crops of the same stairs and railing at 0.375 render scale. Left: bilinear upscaling with blocky edges. Right: FSR 1 with cleaner edges." caption="Arrival stairs at 0.375 render scale: bilinear plus sharpen (left), FSR 1 (right)." version="0.7.0" />
+
+### Compressed assets: world format 0.7 (9 October)
+
+World format 0.7 lets packages use KTX2/Basis textures, meshopt compression and quantised meshes. Core supports all three. A trial conversion of Lumen Reach 0.7.0 shrank the package from **72 to 42 MiB** and GPU memory from **269.5 to 148.9 MiB**, at 36.8–39.2 dB PSNR. Lightmaps stay PNG. No published Lumen Reach release uses the format yet.
+
+### Optional dGPU offload (RFC-0009, 8 October)
+
+On laptops with a discrete GPU, a supervised Vulkan worker can render the world there and hand frames back over DMA-BUF. It runs under a power budget: 50 W / 45 FPS on USB-C or battery, 80 W / 60 FPS on qualified mains power. Phase 1 is merged and **off by default**. Performance → Offload switches it at runtime, and the renderer falls back to local rendering immediately if the worker stalls. At native 4K on USB-C the worker held 45 FPS at a 32.8 W peak.
+
+<Video name="dgpu-quality" title="Intel Auto compared with NVIDIA Ultra at 4K" width={1280} height={498} caption="Prototype quality comparison at 4K, Sun Court and Rime Vault: Intel Auto (Low, dynamic scale) against an NVIDIA laptop GPU at native 4K with 4× MSAA, capped at 45 FPS. World only; no application windows." />
+
+The Intel iGPU already reaches 60 FPS at 4K with dynamic resolution, so offload is about quality headroom, not reaching 60. It has not been qualified on physical power profiles yet.
+
+## Timeline
+
+Times are CEST (UTC+2). Contract versions link to their [schema reference](/reference/schema/) pages.
+
+<p class="timeline-day">Tuesday 7 October: foundations</p>
+<ol class="timeline">
+  <li class="major"><span class="when">18:57</span><span class="what">Schemas v0 and the foundation RFCs</span><p>IPC 0.1 and world format 0.1 with a validator; RFC-0001–0008 and this site.</p></li>
+  <li class="major"><span class="when">19:07–19:36</span><span class="what">Core M0: a safe place</span><p>Exact-version Hyprland plugin, <code>hypruned</code> daemon, original room, free flight, emergency exit, nested test harness.</p></li>
+  <li><span class="when">20:34–21:04</span><span class="what">Core M1: materials and navigation</span><p><a href="/reference/schema/ipc/0.2/">IPC 0.2</a> and <a href="/reference/schema/world/0.2/">world 0.2</a>: camera, waypoints, travel and autodrive; PBR materials and UV1 lightmaps.</p></li>
+  <li class="major"><span class="when">21:41–22:09</span><span class="what">First real session</span><p>Core, the Quickshell shell and the Switchyard test world over authenticated <a href="/reference/schema/ipc/0.3/">IPC 0.3</a>.</p></li>
+  <li><span class="when">22:57–23:41</span><span class="what">Workspace homes</span><p><a href="/reference/schema/ipc/0.4/">IPC 0.4</a> and <a href="/reference/schema/world/0.3/">world 0.3</a>: areas, typed mounts, placement volumes, HDR bloom and sky lighting.</p></li>
+</ol>
+
+<p class="timeline-day">Wednesday 8 October: hands-on, first release, offload</p>
+<ol class="timeline">
+  <li><span class="when">08:10–09:37</span><span class="what">Hands-on interaction</span><p><a href="/reference/schema/ipc/0.5/">IPC 0.5</a>: tools, carrying and custom window placement.</p></li>
+  <li><span class="when">10:35–12:36</span><span class="what">Keymap v2</span><p><a href="/reference/schema/ipc/0.6/">IPC 0.6</a> and the <a href="/reference/schema/input/">input schema</a>: three bindings per action, live-reloaded and editable in Settings.</p></li>
+  <li class="major"><span class="when">12:56</span><span class="what">Lumen Reach 0.4.0 and Switchyard 0.1.1 released</span><p>The first official world packages.</p></li>
+  <li><span class="when">12:54–13:17</span><span class="what">Starter kits and installers</span><p>Nix flake, NixOS and Home Manager modules, kits and an Arch installer in the meta repository.</p></li>
+  <li><span class="when">18:48</span><span class="what">Dynamic render scale</span><p>The change behind 60 FPS at 4K on the iGPU.</p></li>
+  <li><span class="when">20:47–21:01</span><span class="what">Graphics presets and hold timing</span><p><a href="/reference/schema/ipc/0.7/">IPC 0.7</a> and <a href="/reference/schema/ipc/0.8/">0.8</a>: Low/Medium/High/Ultra and auto, with GPU timings for the shell.</p></li>
+  <li><span class="when">21:27</span><span class="what">Lumen Reach 0.5.0</span><p>Visual polish pass.</p></li>
+  <li><span class="when">21:32</span><span class="what">RFC-0009 proposed</span><p><a href="/rfcs/0009-offload-renderer/">Optional supervised GPU offload</a>.</p></li>
+  <li><span class="when">22:46</span><span class="what">HUD telemetry</span><p><a href="/reference/schema/ipc/0.9/">IPC 0.9</a>: opt-in HUD streams and concept cycling.</p></li>
+  <li class="major"><span class="when">23:09–23:33</span><span class="what">Performance page and offload phase 1</span><p><a href="/reference/schema/ipc/0.10/">IPC 0.10</a>: live Performance controls. Offload phase 1 merged, off by default. Lumen Reach 0.6.0 released (23:13).</p></li>
+  <li><span class="when">23:30</span><span class="what">Climbing contracts</span><p><a href="/reference/schema/ipc/0.11/">IPC 0.11</a> and <a href="/reference/schema/world/0.4/">world 0.4</a>: climbable volumes and three climbing styles.</p></li>
+</ol>
+
+<p class="timeline-day">Thursday 9 October: playable, faster, smaller</p>
+<ol class="timeline">
+  <li class="major"><span class="when">00:03–00:46</span><span class="what">Climbing merged; recording and free cursor</span><p><a href="/reference/schema/ipc/0.12/">IPC 0.12</a>: deterministic input and camera recording and replay; Super+Tab or Back for a real cursor.</p></li>
+  <li><span class="when">02:17–02:36</span><span class="what">Ink and visibility</span><p><a href="/reference/schema/ipc/0.13/">IPC 0.13</a> and <a href="/reference/schema/world/0.5/">world 0.5</a>: authored outline style, visibility regions and an authoring photo camera.</p></li>
+  <li><span class="when">02:48–03:28</span><span class="what">Ink quality tiers</span><p><a href="/reference/schema/ipc/0.14/">IPC 0.14</a>: fast and smooth outlines with persistent overrides.</p></li>
+  <li><span class="when">04:27</span><span class="what">Lumen Reach 0.6.1</span><p>The first release on world format 0.5.</p></li>
+  <li class="major"><span class="when">09:57–10:08</span><span class="what">Tool slots and the pocket</span><p><a href="/reference/schema/ipc/0.15/">IPC 0.15</a>: shared Primary/Secondary/Alternate/Cycle bindings and the Placement tool's pocket queue.</p></li>
+  <li><span class="when">14:25–15:42</span><span class="what">Playable bounds and recovery</span><p><a href="/reference/schema/world/0.6/">World 0.6</a> fly bounds. The shell survives invalid frames and renews its credentials without dropping the session.</p></li>
+  <li class="major"><span class="when">15:53</span><span class="what">Lumen Reach 0.7.0</span><p>Closed sky dome, any-angle checks, full route traversal.</p></li>
+  <li><span class="when">17:44–18:24</span><span class="what">World-derived workspace homes</span><p>The world room is workspace 20 and each area's home is 20 + its slot.</p></li>
+  <li class="major"><span class="when">17:48</span><span class="what">Render on demand</span><p>Static scenes stop rendering, and compositor GPU load drops from 42% to 1%.</p></li>
+  <li><span class="when">18:58–19:50</span><span class="what">FSR 1 becomes the default upscaler</span></li>
+  <li><span class="when">19:38</span><span class="what">Lumen Reach 0.7.1</span><p>Fixes from the owner's first live walk of 0.7.0.</p></li>
+  <li class="major"><span class="when">19:21–20:16</span><span class="what">World format 0.7</span><p><a href="/reference/schema/world/0.7/">Compressed and optimised scene assets</a>: KTX2, meshopt and quantised meshes.</p></li>
+</ol>

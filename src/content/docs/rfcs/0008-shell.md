@@ -318,3 +318,29 @@ counts. Shells may show these through the existing options/presets/control data.
 Older protocol responses omit the new keys. World discovery may accept format
 0.5; normal shells must not request the separate `camera.author` capability.
 Core retains responsibility for rolled/shifted world-locked marker projection.
+
+
+## Amendment: IPC 0.14 ink quality
+
+`graphics.outline_quality` is `"fast"`, `"smooth"`, or null (preset inheritance).
+Low/Medium inherit fast; High/Ultra smooth. Fast is a fixed one-logical-pixel
+sparse gradient outline. Smooth honours world `outline.widthPx` (1–4), with
+native-pixel antialiased coverage. Both preserve the independent `outline` permit.
+The existing options/presets/Performance control records expose the tier and
+live state. Changes need no reload. Older negotiated replies omit the tier;
+older peers cannot write it. All earlier capabilities remain inherited.
+
+The shared `outline` cost includes packed internal normal/depth, edge detection,
+and native sparse composite. Both controls refer to that one cost; never sum them.
+Normal encoding shares world shading. Native app surfaces/HUD remain excluded;
+offload applies world ink in the renderer child before transport.
+
+
+0.14 additionally exposes nullable `outline_width_px` (1–4) and `outline_colour`
+(display RGB triplet, 0–1). `graphics.set` atomically persists these in graphics.json.
+Explicit user values override the current world's style across reloads; null
+restores the authored default. Width editing applies to Smooth; Fast renders 1 px.
+Requested values remain in `config`, actual values in `effective`/Performance,
+and `atmosphere.get` reports the combined style. No authored enabled ink means no
+ink draw: these overrides do not invent a world style. `atmosphere.set` remains
+a transient authoring preview and must not back a persistent Settings control.

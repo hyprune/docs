@@ -208,3 +208,15 @@ include visibility through apertures; core does not infer occlusion from AABBs.
 Filtering applies to every world submission pass, including glass, depth and ink;
 collision, navigation, live app/screens and HUD never disappear through it.
 `graphics.visibility_culling` permits live comparisons; diagnostics report counts.
+
+
+### IPC 0.14 implementation amendment: internal ink
+
+The native-resolution normal/depth geometry pass described above is superseded.
+Ink reuses opaque HDR alpha for compact geometry normals and the existing depth
+resolve, packs them at internal world resolution, and runs a sparse edge kernel.
+A cheap native composite reconstructs thin logical-pixel coverage before live
+surfaces/HUD and transparent world geometry. No extra geometry draw, MSAA target
+or MSAA resolve is required. This implementation change retains world format 0.5.
+The new graphics quality tier selects fixed 1 px or authored smooth 1–4 px width;
+see RFC-0008's IPC 0.14 amendment. Normal-map detail does not generate ink.

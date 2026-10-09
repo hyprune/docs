@@ -1,0 +1,22 @@
+{
+  "manifestVersion": "0.1",
+  "id": "com.hyprune.clock",
+  "version": "0.1.0",
+  "name": "World clock",
+  "license": "MIT",
+  "apiVersion": "0.1",
+  "runtime": "process",
+  "entrypoint": "bin/clock",
+  "capabilities": [
+    "state.read"
+  ],
+  "contributes": {
+    "widgets": [
+      "com.hyprune.clock.widget"
+    ]
+  },
+  "sandbox": {
+    "required": true,
+    "network": false
+  }
+}

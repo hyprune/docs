@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hyprune.com/schema/v0.6/ipc.schema.json",
-  "title": "Hyprune M3B IPC 0.6",
+  "$id": "https://hyprune.com/schema/v0.9/ipc.schema.json",
+  "title": "Hyprune IPC 0.8",
   "oneOf": [
     {
       "$ref": "#/$defs/request"
@@ -52,10 +52,10 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "spawnId": {
-                  "$ref": "common.schema.json#/$defs/slug"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                 }
               },
               "required": [
@@ -118,7 +118,7 @@
           "type": "object",
           "properties": {
             "modeId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "position": {
               "type": "array",
@@ -268,7 +268,7 @@
           "maxLength": 128
         },
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         },
         "state": {
           "$ref": "#/$defs/state"
@@ -298,7 +298,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "name": {
               "type": "string",
@@ -315,7 +315,7 @@
         "capabilities": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/capability"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/capability"
           },
           "minItems": 0,
           "uniqueItems": true
@@ -338,7 +338,7 @@
       "type": "object",
       "properties": {
         "protocol": {
-          "const": "0.6"
+          "const": "0.9"
         },
         "sessionId": {
           "type": "string",
@@ -348,7 +348,7 @@
         "capabilities": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/capability"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/capability"
           },
           "minItems": 0,
           "uniqueItems": true
@@ -403,7 +403,11 @@
               "input.set",
               "input.capture",
               "input.capture.cancel",
-              "overlay.style"
+              "overlay.style",
+              "graphics.get",
+              "graphics.set",
+              "hud.subscribe",
+              "hud.unsubscribe"
             ]
           },
           "minItems": 0,
@@ -421,7 +425,13 @@
               "ui.closed",
               "data.updated",
               "mounts.changed",
-              "presentation.changed"
+              "presentation.changed",
+              "hud.frame",
+              "hud.pose",
+              "zone.entered",
+              "zone.exited",
+              "tool.changed",
+              "ui.hud.cycle"
             ]
           },
           "minItems": 0,
@@ -495,7 +505,7 @@
       "type": "object",
       "properties": {
         "monotonicMs": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -783,10 +793,10 @@
       "type": "object",
       "properties": {
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "spawnId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -798,7 +808,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -879,7 +889,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -939,7 +949,7 @@
       "type": "object",
       "properties": {
         "modeId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -951,7 +961,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1035,7 +1045,7 @@
           "maxLength": 128
         },
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1110,7 +1120,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1198,7 +1208,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1264,7 +1274,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1343,10 +1353,10 @@
               "maxLength": 128
             },
             "baseRevision": {
-              "$ref": "common.schema.json#/$defs/revision"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
             },
             "revision": {
-              "$ref": "common.schema.json#/$defs/revision"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
             },
             "changes": {
               "type": "object",
@@ -1383,10 +1393,10 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "$ref": "common.schema.json#/$defs/id"
+                          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                         },
                         "spawnId": {
-                          "$ref": "common.schema.json#/$defs/slug"
+                          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                         }
                       },
                       "required": [
@@ -1449,7 +1459,7 @@
                   "type": "object",
                   "properties": {
                     "modeId": {
-                      "$ref": "common.schema.json#/$defs/id"
+                      "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                     },
                     "position": {
                       "type": "array",
@@ -1881,6 +1891,18 @@
         },
         {
           "$ref": "#/$defs/overlay.style.request"
+        },
+        {
+          "$ref": "#/$defs/graphics.get.request"
+        },
+        {
+          "$ref": "#/$defs/graphics.set.request"
+        },
+        {
+          "$ref": "#/$defs/hud.subscribe.request"
+        },
+        {
+          "$ref": "#/$defs/hud.unsubscribe.request"
         }
       ]
     },
@@ -2026,6 +2048,18 @@
         },
         {
           "$ref": "#/$defs/overlay.style.response"
+        },
+        {
+          "$ref": "#/$defs/graphics.get.response"
+        },
+        {
+          "$ref": "#/$defs/graphics.set.response"
+        },
+        {
+          "$ref": "#/$defs/hud.subscribe.response"
+        },
+        {
+          "$ref": "#/$defs/hud.unsubscribe.response"
         }
       ]
     },
@@ -2057,6 +2091,24 @@
         },
         {
           "$ref": "#/$defs/presentation.changed.notification"
+        },
+        {
+          "$ref": "#/$defs/hud.frame.notification"
+        },
+        {
+          "$ref": "#/$defs/hud.pose.notification"
+        },
+        {
+          "$ref": "#/$defs/zone.entered.notification"
+        },
+        {
+          "$ref": "#/$defs/zone.exited.notification"
+        },
+        {
+          "$ref": "#/$defs/tool.changed.notification"
+        },
+        {
+          "$ref": "#/$defs/ui.hud.cycle.notification"
         }
       ]
     },
@@ -2220,7 +2272,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "values": {
           "type": "object",
@@ -3303,7 +3355,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "values": {
           "type": "object",
@@ -3410,7 +3462,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -3689,7 +3741,7 @@
           "type": "object",
           "properties": {
             "sourceId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "values": {
               "type": "object",
@@ -3766,10 +3818,10 @@
           "type": "object",
           "properties": {
             "worldId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "spawnId": {
-              "$ref": "common.schema.json#/$defs/slug"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
             }
           },
           "required": [
@@ -4026,7 +4078,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "name": {
                   "type": "string",
@@ -4140,7 +4192,7 @@
                   "maxLength": 128
                 },
                 "worldId": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "monotonicMs": {
                   "type": "integer",
@@ -4202,10 +4254,10 @@
                 "maxLength": 256
               },
               "worldId": {
-                "$ref": "common.schema.json#/$defs/id"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
               },
               "spawnId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4231,7 +4283,7 @@
         "areas": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/area"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/area"
           },
           "maxItems": 32
         },
@@ -4241,19 +4293,19 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "pose": {
-                "$ref": "common.schema.json#/$defs/pose"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
               },
               "size": {
-                "$ref": "common.schema.json#/$defs/size2"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
               },
               "mount": {
-                "$ref": "common.schema.json#/$defs/mount"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/mount"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4278,10 +4330,10 @@
                 "maximum": 2147483647
               },
               "worldId": {
-                "$ref": "common.schema.json#/$defs/id"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4301,13 +4353,13 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "rule": {
                     "type": "object",
@@ -4341,10 +4393,10 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
                     "const": ""
@@ -4369,10 +4421,10 @@
                     "additionalProperties": false
                   },
                   "pose": {
-                    "$ref": "common.schema.json#/$defs/pose"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
                   },
                   "size": {
-                    "$ref": "common.schema.json#/$defs/size2"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
                   }
                 },
                 "required": [
@@ -4395,13 +4447,13 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "pose": {
-                "$ref": "common.schema.json#/$defs/pose"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
               },
               "mountType": {
                 "enum": [
@@ -4426,7 +4478,7 @@
                     "type": "null"
                   },
                   {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   }
                 ]
               }
@@ -4469,7 +4521,7 @@
         "placementZones": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/placementZone"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/placementZone"
           },
           "maxItems": 32
         },
@@ -4489,7 +4541,7 @@
                 "minimum": 1
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "anchorId": {
                 "type": "string",
@@ -4536,7 +4588,7 @@
               "type": "null"
             },
             {
-              "$ref": "common.schema.json#/$defs/atmosphere"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/atmosphere"
             }
           ]
         },
@@ -4568,10 +4620,10 @@
           "maximum": 2147483647
         },
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "areaId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -4872,7 +4924,7 @@
           "maxLength": 256
         },
         "anchorId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -5035,13 +5087,13 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "rule": {
                     "type": "object",
@@ -5075,10 +5127,10 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
                     "const": ""
@@ -5103,10 +5155,10 @@
                     "additionalProperties": false
                   },
                   "pose": {
-                    "$ref": "common.schema.json#/$defs/pose"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
                   },
                   "size": {
-                    "$ref": "common.schema.json#/$defs/size2"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
                   }
                 },
                 "required": [
@@ -5181,10 +5233,10 @@
       "type": "object",
       "properties": {
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "areaId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         },
         "rule": {
           "type": "object",
@@ -5279,10 +5331,10 @@
       "type": "object",
       "properties": {
         "objectId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         },
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -5368,7 +5420,7 @@
               "type": "null"
             },
             {
-              "$ref": "common.schema.json#/$defs/atmosphere"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/atmosphere"
             }
           ]
         },
@@ -5437,7 +5489,7 @@
       "type": "object",
       "properties": {
         "profile": {
-          "$ref": "common.schema.json#/$defs/atmosphere"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/atmosphere"
         }
       },
       "required": [
@@ -6100,7 +6152,7 @@
                   "maxItems": 3,
                   "uniqueItems": true
                 },
-                "tool5": {
+                "hud.cycle": {
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -6195,7 +6247,7 @@
                 "tool2",
                 "tool3",
                 "tool4",
-                "tool5",
+                "hud.cycle",
                 "transport",
                 "autopilot",
                 "primary",
@@ -6500,6 +6552,9 @@
         "error": {
           "type": "string",
           "maxLength": 4096
+        },
+        "holds": {
+          "$ref": "#/$defs/inputHolds"
         }
       },
       "required": [
@@ -6508,7 +6563,8 @@
         "steals",
         "conflicts",
         "capture",
-        "error"
+        "error",
+        "holds"
       ],
       "additionalProperties": false
     },
@@ -6888,7 +6944,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -6981,7 +7037,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -7047,7 +7103,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -7368,6 +7424,1188 @@
         "jsonrpc",
         "id",
         "result"
+      ],
+      "additionalProperties": false
+    },
+    "graphicsConfig": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra",
+            "intel"
+          ]
+        },
+        "msaa": {
+          "enum": [
+            1,
+            2,
+            4,
+            null
+          ]
+        },
+        "bloom": {
+          "enum": [
+            "off",
+            "low",
+            "high",
+            null
+          ]
+        },
+        "fog": {
+          "enum": [
+            "off",
+            "linear",
+            "height",
+            null
+          ]
+        },
+        "sky": {
+          "enum": [
+            "off",
+            "gradient",
+            "environment",
+            null
+          ]
+        },
+        "anisotropy": {
+          "enum": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            null
+          ]
+        },
+        "reflections": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "normal_maps": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "specular": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ambient_occlusion": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "alpha_haze": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "dynamic_resolution": {
+          "type": "boolean"
+        },
+        "reduced_motion": {
+          "type": "boolean"
+        },
+        "render_scale": {
+          "anyOf": [
+            {
+              "const": "auto"
+            },
+            {
+              "type": "number",
+              "minimum": 0.375,
+              "maximum": 1
+            }
+          ]
+        },
+        "target_fps": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 240
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 110
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 16
+        },
+        "bloom_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "sharpen": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "quality",
+        "msaa",
+        "bloom",
+        "fog",
+        "sky",
+        "anisotropy",
+        "reflections",
+        "normal_maps",
+        "specular",
+        "ambient_occlusion",
+        "alpha_haze",
+        "dynamic_resolution",
+        "reduced_motion",
+        "render_scale",
+        "target_fps",
+        "fov",
+        "exposure",
+        "bloom_strength",
+        "sharpen"
+      ],
+      "additionalProperties": false
+    },
+    "graphicsPatch": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra",
+            "intel"
+          ]
+        },
+        "msaa": {
+          "enum": [
+            1,
+            2,
+            4,
+            null
+          ]
+        },
+        "bloom": {
+          "enum": [
+            "off",
+            "low",
+            "high",
+            null
+          ]
+        },
+        "fog": {
+          "enum": [
+            "off",
+            "linear",
+            "height",
+            null
+          ]
+        },
+        "sky": {
+          "enum": [
+            "off",
+            "gradient",
+            "environment",
+            null
+          ]
+        },
+        "anisotropy": {
+          "enum": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            null
+          ]
+        },
+        "reflections": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "normal_maps": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "specular": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ambient_occlusion": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "alpha_haze": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "dynamic_resolution": {
+          "type": "boolean"
+        },
+        "reduced_motion": {
+          "type": "boolean"
+        },
+        "render_scale": {
+          "anyOf": [
+            {
+              "const": "auto"
+            },
+            {
+              "type": "number",
+              "minimum": 0.375,
+              "maximum": 1
+            }
+          ]
+        },
+        "target_fps": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 240
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 110
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 16
+        },
+        "bloom_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "sharpen": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "graphics.get.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "graphics.get.result": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "effective": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "overrides": {
+          "$ref": "#/$defs/graphicsPatch"
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "error": {
+          "type": "string"
+        },
+        "presets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/graphicsPatch"
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array"
+          }
+        },
+        "unsupported": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ssr",
+              "runtime_shadows",
+              "contact_shadows"
+            ]
+          }
+        },
+        "timings": {
+          "type": "object",
+          "description": "Extensible diagnostic measurements; GPU timings can be null when unavailable."
+        }
+      },
+      "required": [
+        "config",
+        "effective",
+        "overrides",
+        "path",
+        "error",
+        "presets",
+        "options",
+        "unsupported",
+        "timings"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.get.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "graphics.get"
+        },
+        "params": {
+          "$ref": "#/$defs/graphics.get.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.get.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/graphics.get.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.params": {
+      "type": "object",
+      "properties": {
+        "patch": {
+          "$ref": "#/$defs/graphicsPatch"
+        }
+      },
+      "required": [
+        "patch"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.result": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "effective": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "overrides": {
+          "$ref": "#/$defs/graphicsPatch"
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "error": {
+          "type": "string"
+        },
+        "presets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/graphicsPatch"
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array"
+          }
+        },
+        "unsupported": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ssr",
+              "runtime_shadows",
+              "contact_shadows"
+            ]
+          }
+        },
+        "timings": {
+          "type": "object",
+          "description": "Extensible diagnostic measurements; GPU timings can be null when unavailable."
+        }
+      },
+      "required": [
+        "config",
+        "effective",
+        "overrides",
+        "path",
+        "error",
+        "presets",
+        "options",
+        "unsupported",
+        "timings"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "graphics.set"
+        },
+        "params": {
+          "$ref": "#/$defs/graphics.set.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/graphics.set.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "inputHolds": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "binding": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "startedAtMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "durationMs": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 5000
+          }
+        },
+        "required": [
+          "action",
+          "binding",
+          "startedAtMs",
+          "durationMs"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "hud.subscribe.params": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "hud.frame",
+              "hud.pose",
+              "zone.entered",
+              "zone.exited",
+              "tool.changed"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "topics"
+      ],
+      "additionalProperties": false
+    },
+    "hud.subscribe.result": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId"
+      ],
+      "additionalProperties": false
+    },
+    "hud.subscribe.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "hud.subscribe"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.subscribe.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "hud.subscribe.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/hud.subscribe.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.result": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        }
+      },
+      "required": [
+        "ok"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "hud.unsubscribe"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.unsubscribe.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/hud.unsubscribe.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "hudZone": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "homeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "id",
+        "homeName",
+        "worldId",
+        "worldName"
+      ],
+      "additionalProperties": false
+    },
+    "hud.frame.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fps": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frameMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpuMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpuMs": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "renderScale": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "preset": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra"
+          ]
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "fps",
+        "frameMs",
+        "cpuMs",
+        "gpuMs",
+        "renderScale",
+        "preset"
+      ],
+      "additionalProperties": false
+    },
+    "hud.frame.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "hud.frame"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.frame.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "hud.pose.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "position": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "heading": {
+          "type": "number"
+        },
+        "pitch": {
+          "type": "number"
+        },
+        "zone": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hudZone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tool": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "subtype": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "outputId",
+        "worldId",
+        "worldName",
+        "position",
+        "heading",
+        "pitch",
+        "zone",
+        "tool",
+        "subtype"
+      ],
+      "additionalProperties": false
+    },
+    "hud.pose.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "hud.pose"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.pose.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "zone.entered.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "zone": {
+          "$ref": "#/$defs/hudZone"
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "zone"
+      ],
+      "additionalProperties": false
+    },
+    "zone.entered.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "zone.entered"
+        },
+        "params": {
+          "$ref": "#/$defs/zone.entered.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "zone.exited.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "zone": {
+          "$ref": "#/$defs/hudZone"
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "zone"
+      ],
+      "additionalProperties": false
+    },
+    "zone.exited.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "zone.exited"
+        },
+        "params": {
+          "$ref": "#/$defs/zone.exited.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "tool.changed.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slot": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "subtype": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "slot",
+        "name",
+        "subtype"
+      ],
+      "additionalProperties": false
+    },
+    "tool.changed.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "tool.changed"
+        },
+        "params": {
+          "$ref": "#/$defs/tool.changed.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "ui.hud.cycle.params": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "leaseId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "leaseId",
+        "outputId",
+        "sequence"
+      ],
+      "additionalProperties": false
+    },
+    "ui.hud.cycle.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "ui.hud.cycle"
+        },
+        "params": {
+          "$ref": "#/$defs/ui.hud.cycle.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
       ],
       "additionalProperties": false
     }

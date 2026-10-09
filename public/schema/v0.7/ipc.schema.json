@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hyprune.com/schema/v0.6/ipc.schema.json",
-  "title": "Hyprune M3B IPC 0.6",
+  "$id": "https://hyprune.com/schema/v0.7/ipc.schema.json",
+  "title": "Hyprune IPC 0.7",
   "oneOf": [
     {
       "$ref": "#/$defs/request"
@@ -52,10 +52,10 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "spawnId": {
-                  "$ref": "common.schema.json#/$defs/slug"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                 }
               },
               "required": [
@@ -118,7 +118,7 @@
           "type": "object",
           "properties": {
             "modeId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "position": {
               "type": "array",
@@ -268,7 +268,7 @@
           "maxLength": 128
         },
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         },
         "state": {
           "$ref": "#/$defs/state"
@@ -298,7 +298,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "name": {
               "type": "string",
@@ -315,7 +315,7 @@
         "capabilities": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/capability"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/capability"
           },
           "minItems": 0,
           "uniqueItems": true
@@ -338,7 +338,7 @@
       "type": "object",
       "properties": {
         "protocol": {
-          "const": "0.6"
+          "const": "0.7"
         },
         "sessionId": {
           "type": "string",
@@ -348,7 +348,7 @@
         "capabilities": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/capability"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/capability"
           },
           "minItems": 0,
           "uniqueItems": true
@@ -403,7 +403,9 @@
               "input.set",
               "input.capture",
               "input.capture.cancel",
-              "overlay.style"
+              "overlay.style",
+              "graphics.get",
+              "graphics.set"
             ]
           },
           "minItems": 0,
@@ -495,7 +497,7 @@
       "type": "object",
       "properties": {
         "monotonicMs": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -783,10 +785,10 @@
       "type": "object",
       "properties": {
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "spawnId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -798,7 +800,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -879,7 +881,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -939,7 +941,7 @@
       "type": "object",
       "properties": {
         "modeId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -951,7 +953,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1035,7 +1037,7 @@
           "maxLength": 128
         },
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1110,7 +1112,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1198,7 +1200,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1264,7 +1266,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1343,10 +1345,10 @@
               "maxLength": 128
             },
             "baseRevision": {
-              "$ref": "common.schema.json#/$defs/revision"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
             },
             "revision": {
-              "$ref": "common.schema.json#/$defs/revision"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
             },
             "changes": {
               "type": "object",
@@ -1383,10 +1385,10 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "$ref": "common.schema.json#/$defs/id"
+                          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                         },
                         "spawnId": {
-                          "$ref": "common.schema.json#/$defs/slug"
+                          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                         }
                       },
                       "required": [
@@ -1449,7 +1451,7 @@
                   "type": "object",
                   "properties": {
                     "modeId": {
-                      "$ref": "common.schema.json#/$defs/id"
+                      "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                     },
                     "position": {
                       "type": "array",
@@ -1881,6 +1883,12 @@
         },
         {
           "$ref": "#/$defs/overlay.style.request"
+        },
+        {
+          "$ref": "#/$defs/graphics.get.request"
+        },
+        {
+          "$ref": "#/$defs/graphics.set.request"
         }
       ]
     },
@@ -2026,6 +2034,12 @@
         },
         {
           "$ref": "#/$defs/overlay.style.response"
+        },
+        {
+          "$ref": "#/$defs/graphics.get.response"
+        },
+        {
+          "$ref": "#/$defs/graphics.set.response"
         }
       ]
     },
@@ -2220,7 +2234,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "values": {
           "type": "object",
@@ -3303,7 +3317,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "values": {
           "type": "object",
@@ -3410,7 +3424,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -3689,7 +3703,7 @@
           "type": "object",
           "properties": {
             "sourceId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "values": {
               "type": "object",
@@ -3766,10 +3780,10 @@
           "type": "object",
           "properties": {
             "worldId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "spawnId": {
-              "$ref": "common.schema.json#/$defs/slug"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
             }
           },
           "required": [
@@ -4026,7 +4040,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "name": {
                   "type": "string",
@@ -4140,7 +4154,7 @@
                   "maxLength": 128
                 },
                 "worldId": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "monotonicMs": {
                   "type": "integer",
@@ -4202,10 +4216,10 @@
                 "maxLength": 256
               },
               "worldId": {
-                "$ref": "common.schema.json#/$defs/id"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
               },
               "spawnId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4231,7 +4245,7 @@
         "areas": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/area"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/area"
           },
           "maxItems": 32
         },
@@ -4241,19 +4255,19 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "pose": {
-                "$ref": "common.schema.json#/$defs/pose"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
               },
               "size": {
-                "$ref": "common.schema.json#/$defs/size2"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
               },
               "mount": {
-                "$ref": "common.schema.json#/$defs/mount"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/mount"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4278,10 +4292,10 @@
                 "maximum": 2147483647
               },
               "worldId": {
-                "$ref": "common.schema.json#/$defs/id"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4301,13 +4315,13 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "rule": {
                     "type": "object",
@@ -4341,10 +4355,10 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
                     "const": ""
@@ -4369,10 +4383,10 @@
                     "additionalProperties": false
                   },
                   "pose": {
-                    "$ref": "common.schema.json#/$defs/pose"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
                   },
                   "size": {
-                    "$ref": "common.schema.json#/$defs/size2"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
                   }
                 },
                 "required": [
@@ -4395,13 +4409,13 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "pose": {
-                "$ref": "common.schema.json#/$defs/pose"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
               },
               "mountType": {
                 "enum": [
@@ -4426,7 +4440,7 @@
                     "type": "null"
                   },
                   {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   }
                 ]
               }
@@ -4469,7 +4483,7 @@
         "placementZones": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/placementZone"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/placementZone"
           },
           "maxItems": 32
         },
@@ -4489,7 +4503,7 @@
                 "minimum": 1
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "anchorId": {
                 "type": "string",
@@ -4536,7 +4550,7 @@
               "type": "null"
             },
             {
-              "$ref": "common.schema.json#/$defs/atmosphere"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/atmosphere"
             }
           ]
         },
@@ -4568,10 +4582,10 @@
           "maximum": 2147483647
         },
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "areaId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -4872,7 +4886,7 @@
           "maxLength": 256
         },
         "anchorId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -5035,13 +5049,13 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "rule": {
                     "type": "object",
@@ -5075,10 +5089,10 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
                     "const": ""
@@ -5103,10 +5117,10 @@
                     "additionalProperties": false
                   },
                   "pose": {
-                    "$ref": "common.schema.json#/$defs/pose"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
                   },
                   "size": {
-                    "$ref": "common.schema.json#/$defs/size2"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
                   }
                 },
                 "required": [
@@ -5181,10 +5195,10 @@
       "type": "object",
       "properties": {
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "areaId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         },
         "rule": {
           "type": "object",
@@ -5279,10 +5293,10 @@
       "type": "object",
       "properties": {
         "objectId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         },
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -5368,7 +5382,7 @@
               "type": "null"
             },
             {
-              "$ref": "common.schema.json#/$defs/atmosphere"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/atmosphere"
             }
           ]
         },
@@ -5437,7 +5451,7 @@
       "type": "object",
       "properties": {
         "profile": {
-          "$ref": "common.schema.json#/$defs/atmosphere"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/atmosphere"
         }
       },
       "required": [
@@ -6888,7 +6902,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -6981,7 +6995,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -7047,7 +7061,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -7362,6 +7376,522 @@
         },
         "result": {
           "$ref": "#/$defs/overlay.style.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "graphicsConfig": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra",
+            "intel"
+          ]
+        },
+        "msaa": {
+          "enum": [
+            1,
+            2,
+            4,
+            null
+          ]
+        },
+        "bloom": {
+          "enum": [
+            "off",
+            "low",
+            "high",
+            null
+          ]
+        },
+        "fog": {
+          "enum": [
+            "off",
+            "linear",
+            "height",
+            null
+          ]
+        },
+        "sky": {
+          "enum": [
+            "off",
+            "gradient",
+            "environment",
+            null
+          ]
+        },
+        "anisotropy": {
+          "enum": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            null
+          ]
+        },
+        "reflections": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "normal_maps": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "specular": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ambient_occlusion": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "alpha_haze": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "dynamic_resolution": {
+          "type": "boolean"
+        },
+        "reduced_motion": {
+          "type": "boolean"
+        },
+        "render_scale": {
+          "anyOf": [
+            {
+              "const": "auto"
+            },
+            {
+              "type": "number",
+              "minimum": 0.375,
+              "maximum": 1
+            }
+          ]
+        },
+        "target_fps": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 240
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 110
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 16
+        },
+        "bloom_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "sharpen": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "quality",
+        "msaa",
+        "bloom",
+        "fog",
+        "sky",
+        "anisotropy",
+        "reflections",
+        "normal_maps",
+        "specular",
+        "ambient_occlusion",
+        "alpha_haze",
+        "dynamic_resolution",
+        "reduced_motion",
+        "render_scale",
+        "target_fps",
+        "fov",
+        "exposure",
+        "bloom_strength",
+        "sharpen"
+      ],
+      "additionalProperties": false
+    },
+    "graphicsPatch": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra",
+            "intel"
+          ]
+        },
+        "msaa": {
+          "enum": [
+            1,
+            2,
+            4,
+            null
+          ]
+        },
+        "bloom": {
+          "enum": [
+            "off",
+            "low",
+            "high",
+            null
+          ]
+        },
+        "fog": {
+          "enum": [
+            "off",
+            "linear",
+            "height",
+            null
+          ]
+        },
+        "sky": {
+          "enum": [
+            "off",
+            "gradient",
+            "environment",
+            null
+          ]
+        },
+        "anisotropy": {
+          "enum": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            null
+          ]
+        },
+        "reflections": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "normal_maps": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "specular": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ambient_occlusion": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "alpha_haze": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "dynamic_resolution": {
+          "type": "boolean"
+        },
+        "reduced_motion": {
+          "type": "boolean"
+        },
+        "render_scale": {
+          "anyOf": [
+            {
+              "const": "auto"
+            },
+            {
+              "type": "number",
+              "minimum": 0.375,
+              "maximum": 1
+            }
+          ]
+        },
+        "target_fps": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 240
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 110
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 16
+        },
+        "bloom_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "sharpen": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "graphics.get.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "graphics.get.result": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "effective": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "overrides": {
+          "$ref": "#/$defs/graphicsPatch"
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "error": {
+          "type": "string"
+        },
+        "presets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/graphicsPatch"
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array"
+          }
+        },
+        "unsupported": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ssr",
+              "runtime_shadows",
+              "contact_shadows"
+            ]
+          }
+        },
+        "timings": {
+          "type": "object",
+          "description": "Extensible diagnostic measurements; GPU timings can be null when unavailable."
+        }
+      },
+      "required": [
+        "config",
+        "effective",
+        "overrides",
+        "path",
+        "error",
+        "presets",
+        "options",
+        "unsupported",
+        "timings"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.get.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "graphics.get"
+        },
+        "params": {
+          "$ref": "#/$defs/graphics.get.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.get.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/graphics.get.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.params": {
+      "type": "object",
+      "properties": {
+        "patch": {
+          "$ref": "#/$defs/graphicsPatch"
+        }
+      },
+      "required": [
+        "patch"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.result": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "effective": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "overrides": {
+          "$ref": "#/$defs/graphicsPatch"
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "error": {
+          "type": "string"
+        },
+        "presets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/graphicsPatch"
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array"
+          }
+        },
+        "unsupported": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ssr",
+              "runtime_shadows",
+              "contact_shadows"
+            ]
+          }
+        },
+        "timings": {
+          "type": "object",
+          "description": "Extensible diagnostic measurements; GPU timings can be null when unavailable."
+        }
+      },
+      "required": [
+        "config",
+        "effective",
+        "overrides",
+        "path",
+        "error",
+        "presets",
+        "options",
+        "unsupported",
+        "timings"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "graphics.set"
+        },
+        "params": {
+          "$ref": "#/$defs/graphics.set.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/graphics.set.result"
         }
       },
       "required": [

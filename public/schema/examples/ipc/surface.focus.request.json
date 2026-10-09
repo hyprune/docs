@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "id": "7",
+  "method": "surface.focus",
+  "params": {
+    "surfaceId": "surface-1",
+    "intent": "pointer"
+  }
+}

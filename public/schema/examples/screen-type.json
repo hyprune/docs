@@ -1,0 +1,24 @@
+{
+  "descriptorVersion": "0.1",
+  "id": "com.hyprune.window",
+  "name": "Application window",
+  "provider": "com.hyprune.core",
+  "source": "window",
+  "geometry": "plane",
+  "defaultSize": [
+    1.6,
+    0.9
+  ],
+  "resolution": {
+    "width": 1920,
+    "height": 1080
+  },
+  "input": {
+    "pointer": true,
+    "keyboard": true,
+    "touch": false
+  },
+  "alphaMode": "blend",
+  "colorSpace": "srgb",
+  "maxFps": 60
+}

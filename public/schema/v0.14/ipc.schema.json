@@ -1,21 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hyprune.com/schema/v0.6/ipc.schema.json",
-  "title": "Hyprune M3B IPC 0.6",
-  "oneOf": [
-    {
-      "$ref": "#/$defs/request"
-    },
-    {
-      "$ref": "#/$defs/response"
-    },
-    {
-      "$ref": "#/$defs/notification"
-    },
-    {
-      "$ref": "#/$defs/error"
-    }
-  ],
+  "$id": "https://hyprune.com/schema/v0.14/ipc.schema.json",
+  "title": "Hyprune IPC 0.14: efficient ink and persistent presentation overrides",
   "$defs": {
     "state": {
       "type": "object",
@@ -52,10 +38,10 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "spawnId": {
-                  "$ref": "common.schema.json#/$defs/slug"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                 }
               },
               "required": [
@@ -118,7 +104,7 @@
           "type": "object",
           "properties": {
             "modeId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "position": {
               "type": "array",
@@ -135,12 +121,38 @@
               },
               "minItems": 4,
               "maxItems": 4
+            },
+            "state": {
+              "enum": [
+                "walking",
+                "flying",
+                "climbing"
+              ]
+            },
+            "ladderId": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                }
+              ]
+            },
+            "prompt": {
+              "type": "string",
+              "maxLength": 256
             }
           },
           "required": [
             "modeId",
             "position",
-            "orientation"
+            "orientation",
+            "state",
+            "ladderId",
+            "prompt"
           ],
           "additionalProperties": false
         },
@@ -268,7 +280,7 @@
           "maxLength": 128
         },
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         },
         "state": {
           "$ref": "#/$defs/state"
@@ -298,7 +310,7 @@
           "type": "object",
           "properties": {
             "id": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "name": {
               "type": "string",
@@ -315,7 +327,17 @@
         "capabilities": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/capability"
+            "enum": [
+              "state.read",
+              "world.control",
+              "surface.control",
+              "movement.control",
+              "shell.control",
+              "runtime.control",
+              "data.publish",
+              "input.control",
+              "camera.author"
+            ]
           },
           "minItems": 0,
           "uniqueItems": true
@@ -338,7 +360,7 @@
       "type": "object",
       "properties": {
         "protocol": {
-          "const": "0.6"
+          "const": "0.14"
         },
         "sessionId": {
           "type": "string",
@@ -348,7 +370,17 @@
         "capabilities": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/capability"
+            "enum": [
+              "state.read",
+              "world.control",
+              "surface.control",
+              "movement.control",
+              "shell.control",
+              "runtime.control",
+              "data.publish",
+              "input.control",
+              "camera.author"
+            ]
           },
           "minItems": 0,
           "uniqueItems": true
@@ -403,7 +435,20 @@
               "input.set",
               "input.capture",
               "input.capture.cancel",
-              "overlay.style"
+              "overlay.style",
+              "graphics.get",
+              "graphics.set",
+              "hud.subscribe",
+              "hud.unsubscribe",
+              "recording.start",
+              "recording.stop",
+              "recording.mark",
+              "recording.status",
+              "replay.start",
+              "replay.stop",
+              "replay.status",
+              "camera.photo",
+              "camera.release"
             ]
           },
           "minItems": 0,
@@ -421,7 +466,13 @@
               "ui.closed",
               "data.updated",
               "mounts.changed",
-              "presentation.changed"
+              "presentation.changed",
+              "hud.frame",
+              "hud.pose",
+              "zone.entered",
+              "zone.exited",
+              "tool.changed",
+              "ui.hud.cycle"
             ]
           },
           "minItems": 0,
@@ -495,7 +546,7 @@
       "type": "object",
       "properties": {
         "monotonicMs": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -783,10 +834,10 @@
       "type": "object",
       "properties": {
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "spawnId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -798,7 +849,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -879,7 +930,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -939,7 +990,7 @@
       "type": "object",
       "properties": {
         "modeId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -951,7 +1002,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1035,7 +1086,7 @@
           "maxLength": 128
         },
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1110,7 +1161,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1198,7 +1249,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1264,7 +1315,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -1343,10 +1394,10 @@
               "maxLength": 128
             },
             "baseRevision": {
-              "$ref": "common.schema.json#/$defs/revision"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
             },
             "revision": {
-              "$ref": "common.schema.json#/$defs/revision"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
             },
             "changes": {
               "type": "object",
@@ -1383,10 +1434,10 @@
                       "type": "object",
                       "properties": {
                         "id": {
-                          "$ref": "common.schema.json#/$defs/id"
+                          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                         },
                         "spawnId": {
-                          "$ref": "common.schema.json#/$defs/slug"
+                          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                         }
                       },
                       "required": [
@@ -1449,7 +1500,7 @@
                   "type": "object",
                   "properties": {
                     "modeId": {
-                      "$ref": "common.schema.json#/$defs/id"
+                      "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                     },
                     "position": {
                       "type": "array",
@@ -1466,12 +1517,38 @@
                       },
                       "minItems": 4,
                       "maxItems": 4
+                    },
+                    "state": {
+                      "enum": [
+                        "walking",
+                        "flying",
+                        "climbing"
+                      ]
+                    },
+                    "ladderId": {
+                      "anyOf": [
+                        {
+                          "type": "null"
+                        },
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 128
+                        }
+                      ]
+                    },
+                    "prompt": {
+                      "type": "string",
+                      "maxLength": 256
                     }
                   },
                   "required": [
                     "modeId",
                     "position",
-                    "orientation"
+                    "orientation",
+                    "state",
+                    "ladderId",
+                    "prompt"
                   ],
                   "additionalProperties": false
                 },
@@ -1881,6 +1958,39 @@
         },
         {
           "$ref": "#/$defs/overlay.style.request"
+        },
+        {
+          "$ref": "#/$defs/graphics.get.request"
+        },
+        {
+          "$ref": "#/$defs/graphics.set.request"
+        },
+        {
+          "$ref": "#/$defs/hud.subscribe.request"
+        },
+        {
+          "$ref": "#/$defs/hud.unsubscribe.request"
+        },
+        {
+          "$ref": "#/$defs/recording.start.request"
+        },
+        {
+          "$ref": "#/$defs/recording.stop.request"
+        },
+        {
+          "$ref": "#/$defs/recording.mark.request"
+        },
+        {
+          "$ref": "#/$defs/recording.status.request"
+        },
+        {
+          "$ref": "#/$defs/replay.start.request"
+        },
+        {
+          "$ref": "#/$defs/replay.stop.request"
+        },
+        {
+          "$ref": "#/$defs/replay.status.request"
         }
       ]
     },
@@ -2026,6 +2136,39 @@
         },
         {
           "$ref": "#/$defs/overlay.style.response"
+        },
+        {
+          "$ref": "#/$defs/graphics.get.response"
+        },
+        {
+          "$ref": "#/$defs/graphics.set.response"
+        },
+        {
+          "$ref": "#/$defs/hud.subscribe.response"
+        },
+        {
+          "$ref": "#/$defs/hud.unsubscribe.response"
+        },
+        {
+          "$ref": "#/$defs/recording.start.response"
+        },
+        {
+          "$ref": "#/$defs/recording.stop.response"
+        },
+        {
+          "$ref": "#/$defs/recording.mark.response"
+        },
+        {
+          "$ref": "#/$defs/recording.status.response"
+        },
+        {
+          "$ref": "#/$defs/replay.start.response"
+        },
+        {
+          "$ref": "#/$defs/replay.stop.response"
+        },
+        {
+          "$ref": "#/$defs/replay.status.response"
         }
       ]
     },
@@ -2057,6 +2200,24 @@
         },
         {
           "$ref": "#/$defs/presentation.changed.notification"
+        },
+        {
+          "$ref": "#/$defs/hud.frame.notification"
+        },
+        {
+          "$ref": "#/$defs/hud.pose.notification"
+        },
+        {
+          "$ref": "#/$defs/zone.entered.notification"
+        },
+        {
+          "$ref": "#/$defs/zone.exited.notification"
+        },
+        {
+          "$ref": "#/$defs/tool.changed.notification"
+        },
+        {
+          "$ref": "#/$defs/ui.hud.cycle.notification"
         }
       ]
     },
@@ -2220,7 +2381,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "values": {
           "type": "object",
@@ -2358,11 +2519,51 @@
           },
           "minItems": 4,
           "maxItems": 4
+        },
+        "roll": {
+          "type": "number",
+          "minimum": -3.141593,
+          "maximum": 3.141593
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 3,
+          "maximum": 140
+        },
+        "lensShift": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": -2,
+            "maximum": 2
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "held": {
+          "type": "boolean"
+        },
+        "renderScale": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0.25,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
         "position",
-        "orientation"
+        "orientation",
+        "roll",
+        "fov",
+        "lensShift",
+        "held",
+        "renderScale"
       ],
       "additionalProperties": false
     },
@@ -3303,7 +3504,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "values": {
           "type": "object",
@@ -3410,7 +3611,7 @@
       "type": "object",
       "properties": {
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -3689,7 +3890,7 @@
           "type": "object",
           "properties": {
             "sourceId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "values": {
               "type": "object",
@@ -3766,10 +3967,10 @@
           "type": "object",
           "properties": {
             "worldId": {
-              "$ref": "common.schema.json#/$defs/id"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
             },
             "spawnId": {
-              "$ref": "common.schema.json#/$defs/slug"
+              "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
             }
           },
           "required": [
@@ -4026,7 +4227,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "name": {
                   "type": "string",
@@ -4140,7 +4341,7 @@
                   "maxLength": 128
                 },
                 "worldId": {
-                  "$ref": "common.schema.json#/$defs/id"
+                  "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                 },
                 "monotonicMs": {
                   "type": "integer",
@@ -4202,10 +4403,10 @@
                 "maxLength": 256
               },
               "worldId": {
-                "$ref": "common.schema.json#/$defs/id"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
               },
               "spawnId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4231,7 +4432,7 @@
         "areas": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/area"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/area"
           },
           "maxItems": 32
         },
@@ -4241,19 +4442,19 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "pose": {
-                "$ref": "common.schema.json#/$defs/pose"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
               },
               "size": {
-                "$ref": "common.schema.json#/$defs/size2"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
               },
               "mount": {
-                "$ref": "common.schema.json#/$defs/mount"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/mount"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4278,10 +4479,10 @@
                 "maximum": 2147483647
               },
               "worldId": {
-                "$ref": "common.schema.json#/$defs/id"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               }
             },
             "required": [
@@ -4301,13 +4502,13 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "rule": {
                     "type": "object",
@@ -4341,10 +4542,10 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
                     "const": ""
@@ -4369,10 +4570,10 @@
                     "additionalProperties": false
                   },
                   "pose": {
-                    "$ref": "common.schema.json#/$defs/pose"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
                   },
                   "size": {
-                    "$ref": "common.schema.json#/$defs/size2"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
                   }
                 },
                 "required": [
@@ -4395,13 +4596,13 @@
             "type": "object",
             "properties": {
               "id": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "pose": {
-                "$ref": "common.schema.json#/$defs/pose"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
               },
               "mountType": {
                 "enum": [
@@ -4426,7 +4627,7 @@
                     "type": "null"
                   },
                   {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   }
                 ]
               }
@@ -4469,7 +4670,7 @@
         "placementZones": {
           "type": "array",
           "items": {
-            "$ref": "common.schema.json#/$defs/placementZone"
+            "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/placementZone"
           },
           "maxItems": 32
         },
@@ -4489,7 +4690,7 @@
                 "minimum": 1
               },
               "areaId": {
-                "$ref": "common.schema.json#/$defs/slug"
+                "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
               },
               "anchorId": {
                 "type": "string",
@@ -4536,14 +4737,14 @@
               "type": "null"
             },
             {
-              "$ref": "common.schema.json#/$defs/atmosphere"
+              "$ref": "#/$defs/authorAtmosphere"
             }
           ]
         },
         "fov": {
           "type": "number",
           "minimum": 3,
-          "maximum": 110
+          "maximum": 140
         },
         "quality": {
           "enum": [
@@ -4568,10 +4769,10 @@
           "maximum": 2147483647
         },
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "areaId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -4872,7 +5073,7 @@
           "maxLength": 256
         },
         "anchorId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         }
       },
       "required": [
@@ -5035,13 +5236,13 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "rule": {
                     "type": "object",
@@ -5075,10 +5276,10 @@
                 "type": "object",
                 "properties": {
                   "worldId": {
-                    "$ref": "common.schema.json#/$defs/id"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
                   },
                   "areaId": {
-                    "$ref": "common.schema.json#/$defs/slug"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
                   },
                   "anchorId": {
                     "const": ""
@@ -5103,10 +5304,10 @@
                     "additionalProperties": false
                   },
                   "pose": {
-                    "$ref": "common.schema.json#/$defs/pose"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/pose"
                   },
                   "size": {
-                    "$ref": "common.schema.json#/$defs/size2"
+                    "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/size2"
                   }
                 },
                 "required": [
@@ -5181,10 +5382,10 @@
       "type": "object",
       "properties": {
         "worldId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         },
         "areaId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         },
         "rule": {
           "type": "object",
@@ -5279,10 +5480,10 @@
       "type": "object",
       "properties": {
         "objectId": {
-          "$ref": "common.schema.json#/$defs/slug"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/slug"
         },
         "sourceId": {
-          "$ref": "common.schema.json#/$defs/id"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/id"
         }
       },
       "required": [
@@ -5368,7 +5569,7 @@
               "type": "null"
             },
             {
-              "$ref": "common.schema.json#/$defs/atmosphere"
+              "$ref": "#/$defs/authorAtmosphere"
             }
           ]
         },
@@ -5437,7 +5638,7 @@
       "type": "object",
       "properties": {
         "profile": {
-          "$ref": "common.schema.json#/$defs/atmosphere"
+          "$ref": "#/$defs/authorAtmosphere"
         }
       },
       "required": [
@@ -5741,7 +5942,8 @@
             "movement",
             "typing",
             "workspace",
-            "fullscreen"
+            "fullscreen",
+            "cursor"
           ]
         },
         "tool": {
@@ -6100,7 +6302,7 @@
                   "maxItems": 3,
                   "uniqueItems": true
                 },
-                "tool5": {
+                "hud.cycle": {
                   "type": "array",
                   "items": {
                     "type": "string",
@@ -6169,6 +6371,26 @@
                   },
                   "maxItems": 3,
                   "uniqueItems": true
+                },
+                "record.toggle": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "maxItems": 3,
+                  "uniqueItems": true
+                },
+                "exit": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "maxItems": 3,
+                  "uniqueItems": true
                 }
               },
               "required": [
@@ -6195,13 +6417,15 @@
                 "tool2",
                 "tool3",
                 "tool4",
-                "tool5",
+                "hud.cycle",
                 "transport",
                 "autopilot",
                 "primary",
                 "secondary",
                 "wheel",
-                "fly"
+                "fly",
+                "record.toggle",
+                "exit"
               ],
               "additionalProperties": false
             },
@@ -6237,10 +6461,21 @@
                   },
                   "maxItems": 3,
                   "uniqueItems": true
+                },
+                "record.toggle": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "maxItems": 3,
+                  "uniqueItems": true
                 }
               },
               "required": [
-                "exit"
+                "exit",
+                "record.toggle"
               ],
               "additionalProperties": false
             },
@@ -6276,10 +6511,21 @@
                   },
                   "maxItems": 3,
                   "uniqueItems": true
+                },
+                "record.toggle": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "maxItems": 3,
+                  "uniqueItems": true
                 }
               },
               "required": [
-                "exit"
+                "exit",
+                "record.toggle"
               ],
               "additionalProperties": false
             },
@@ -6315,10 +6561,21 @@
                   },
                   "maxItems": 3,
                   "uniqueItems": true
+                },
+                "record.toggle": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "maxItems": 3,
+                  "uniqueItems": true
                 }
               },
               "required": [
-                "exit"
+                "exit",
+                "record.toggle"
               ],
               "additionalProperties": false
             }
@@ -6500,6 +6757,9 @@
         "error": {
           "type": "string",
           "maxLength": 4096
+        },
+        "holds": {
+          "$ref": "#/$defs/inputHolds"
         }
       },
       "required": [
@@ -6508,7 +6768,8 @@
         "steals",
         "conflicts",
         "capture",
-        "error"
+        "error",
+        "holds"
       ],
       "additionalProperties": false
     },
@@ -6635,7 +6896,8 @@
             "world",
             "interactive",
             "focus",
-            "menu"
+            "menu",
+            "cursor"
           ]
         },
         "tool": {
@@ -6888,7 +7150,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -6981,7 +7243,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -7047,7 +7309,7 @@
       "type": "object",
       "properties": {
         "revision": {
-          "$ref": "common.schema.json#/$defs/revision"
+          "$ref": "https://hyprune.com/schema/v0.6/common.schema.json#/$defs/revision"
         }
       },
       "required": [
@@ -7370,6 +7632,2496 @@
         "result"
       ],
       "additionalProperties": false
+    },
+    "graphicsConfig": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra",
+            "intel"
+          ]
+        },
+        "msaa": {
+          "enum": [
+            1,
+            2,
+            4,
+            null
+          ]
+        },
+        "bloom": {
+          "enum": [
+            "off",
+            "low",
+            "high",
+            null
+          ]
+        },
+        "fog": {
+          "enum": [
+            "off",
+            "linear",
+            "height",
+            null
+          ]
+        },
+        "sky": {
+          "enum": [
+            "off",
+            "gradient",
+            "environment",
+            null
+          ]
+        },
+        "anisotropy": {
+          "enum": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            null
+          ]
+        },
+        "reflections": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "normal_maps": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "specular": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ambient_occlusion": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "alpha_haze": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "dynamic_resolution": {
+          "type": "boolean"
+        },
+        "reduced_motion": {
+          "type": "boolean"
+        },
+        "render_scale": {
+          "anyOf": [
+            {
+              "const": "auto"
+            },
+            {
+              "type": "number",
+              "minimum": 0.375,
+              "maximum": 1
+            }
+          ]
+        },
+        "target_fps": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 240
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 110
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 16
+        },
+        "bloom_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "sharpen": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "offload": {
+          "enum": [
+            "off",
+            "auto",
+            "on"
+          ]
+        },
+        "offload_power_cap_w": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 100
+        },
+        "scale_min": {
+          "type": "number",
+          "minimum": 0.375,
+          "maximum": 1
+        },
+        "scale_max": {
+          "type": "number",
+          "minimum": 0.375,
+          "maximum": 1
+        },
+        "outline": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "visibility_culling": {
+          "type": "boolean"
+        },
+        "outline_quality": {
+          "enum": [
+            "fast",
+            "smooth",
+            null
+          ]
+        },
+        "outline_width_px": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 4
+            }
+          ]
+        },
+        "outline_colour": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "quality",
+        "msaa",
+        "bloom",
+        "fog",
+        "sky",
+        "anisotropy",
+        "reflections",
+        "normal_maps",
+        "specular",
+        "ambient_occlusion",
+        "alpha_haze",
+        "dynamic_resolution",
+        "reduced_motion",
+        "render_scale",
+        "target_fps",
+        "fov",
+        "exposure",
+        "bloom_strength",
+        "sharpen",
+        "offload",
+        "offload_power_cap_w",
+        "scale_min",
+        "scale_max",
+        "outline",
+        "visibility_culling",
+        "outline_quality",
+        "outline_width_px",
+        "outline_colour"
+      ],
+      "additionalProperties": false
+    },
+    "graphicsPatch": {
+      "type": "object",
+      "properties": {
+        "quality": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra",
+            "intel"
+          ]
+        },
+        "msaa": {
+          "enum": [
+            1,
+            2,
+            4,
+            null
+          ]
+        },
+        "bloom": {
+          "enum": [
+            "off",
+            "low",
+            "high",
+            null
+          ]
+        },
+        "fog": {
+          "enum": [
+            "off",
+            "linear",
+            "height",
+            null
+          ]
+        },
+        "sky": {
+          "enum": [
+            "off",
+            "gradient",
+            "environment",
+            null
+          ]
+        },
+        "anisotropy": {
+          "enum": [
+            1,
+            2,
+            4,
+            8,
+            16,
+            null
+          ]
+        },
+        "reflections": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "normal_maps": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "specular": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "ambient_occlusion": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "alpha_haze": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "dynamic_resolution": {
+          "type": "boolean"
+        },
+        "reduced_motion": {
+          "type": "boolean"
+        },
+        "render_scale": {
+          "anyOf": [
+            {
+              "const": "auto"
+            },
+            {
+              "type": "number",
+              "minimum": 0.375,
+              "maximum": 1
+            }
+          ]
+        },
+        "target_fps": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 240
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 110
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 16
+        },
+        "bloom_strength": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 4
+        },
+        "sharpen": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "offload": {
+          "enum": [
+            "off",
+            "auto",
+            "on"
+          ]
+        },
+        "offload_power_cap_w": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 100
+        },
+        "scale_min": {
+          "type": "number",
+          "minimum": 0.375,
+          "maximum": 1
+        },
+        "scale_max": {
+          "type": "number",
+          "minimum": 0.375,
+          "maximum": 1
+        },
+        "outline": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "visibility_culling": {
+          "type": "boolean"
+        },
+        "outline_quality": {
+          "enum": [
+            "fast",
+            "smooth",
+            null
+          ]
+        },
+        "outline_width_px": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 4
+            }
+          ]
+        },
+        "outline_colour": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "graphics.get.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "graphics.get.result": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "effective": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "overrides": {
+          "$ref": "#/$defs/graphicsPatch"
+        },
+        "path": {
+          "type": "string",
+          "maxLength": 4096
+        },
+        "error": {
+          "type": "string"
+        },
+        "presets": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/graphicsPatch"
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array"
+          }
+        },
+        "unsupported": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "ssr",
+              "runtime_shadows",
+              "contact_shadows"
+            ]
+          }
+        },
+        "timings": {
+          "type": "object",
+          "description": "Extensible diagnostic measurements; GPU timings can be null when unavailable."
+        },
+        "performance": {
+          "$ref": "#/$defs/performance"
+        }
+      },
+      "required": [
+        "config",
+        "effective",
+        "overrides",
+        "path",
+        "error",
+        "presets",
+        "options",
+        "unsupported",
+        "timings",
+        "performance"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.get.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "graphics.get"
+        },
+        "params": {
+          "$ref": "#/$defs/graphics.get.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.get.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/graphics.get.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.params": {
+      "type": "object",
+      "properties": {
+        "patch": {
+          "$ref": "#/$defs/graphicsPatch"
+        }
+      },
+      "required": [
+        "patch"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.result": {
+      "$ref": "#/$defs/graphics.get.result"
+    },
+    "graphics.set.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "graphics.set"
+        },
+        "params": {
+          "$ref": "#/$defs/graphics.set.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "graphics.set.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/graphics.set.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "inputHolds": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "binding": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "startedAtMs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "durationMs": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 5000
+          }
+        },
+        "required": [
+          "action",
+          "binding",
+          "startedAtMs",
+          "durationMs"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "hud.subscribe.params": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "hud.frame",
+              "hud.pose",
+              "zone.entered",
+              "zone.exited",
+              "tool.changed"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 5,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "topics"
+      ],
+      "additionalProperties": false
+    },
+    "hud.subscribe.result": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId"
+      ],
+      "additionalProperties": false
+    },
+    "hud.subscribe.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "hud.subscribe"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.subscribe.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "hud.subscribe.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/hud.subscribe.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.result": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        }
+      },
+      "required": [
+        "ok"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "hud.unsubscribe"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.unsubscribe.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "hud.unsubscribe.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/hud.unsubscribe.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "hudZone": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "homeName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "id",
+        "homeName",
+        "worldId",
+        "worldName"
+      ],
+      "additionalProperties": false
+    },
+    "hud.frame.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "fps": {
+          "type": "number",
+          "minimum": 0
+        },
+        "frameMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "cpuMs": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gpuMs": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "renderScale": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "preset": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra"
+          ]
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "fps",
+        "frameMs",
+        "cpuMs",
+        "gpuMs",
+        "renderScale",
+        "preset"
+      ],
+      "additionalProperties": false
+    },
+    "hud.frame.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "hud.frame"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.frame.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "hud.pose.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "worldName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "position": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "heading": {
+          "type": "number"
+        },
+        "pitch": {
+          "type": "number"
+        },
+        "zone": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/hudZone"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tool": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "subtype": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "outputId",
+        "worldId",
+        "worldName",
+        "position",
+        "heading",
+        "pitch",
+        "zone",
+        "tool",
+        "subtype"
+      ],
+      "additionalProperties": false
+    },
+    "hud.pose.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "hud.pose"
+        },
+        "params": {
+          "$ref": "#/$defs/hud.pose.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "zone.entered.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "zone": {
+          "$ref": "#/$defs/hudZone"
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "zone"
+      ],
+      "additionalProperties": false
+    },
+    "zone.entered.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "zone.entered"
+        },
+        "params": {
+          "$ref": "#/$defs/zone.entered.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "zone.exited.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "zone": {
+          "$ref": "#/$defs/hudZone"
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "zone"
+      ],
+      "additionalProperties": false
+    },
+    "zone.exited.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "zone.exited"
+        },
+        "params": {
+          "$ref": "#/$defs/zone.exited.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "tool.changed.params": {
+      "type": "object",
+      "properties": {
+        "subscriptionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "slot": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "subtype": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "subscriptionId",
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "slot",
+        "name",
+        "subtype"
+      ],
+      "additionalProperties": false
+    },
+    "tool.changed.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "tool.changed"
+        },
+        "params": {
+          "$ref": "#/$defs/tool.changed.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "ui.hud.cycle.params": {
+      "type": "object",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "monotonicMs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "leaseId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "outputId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "sessionId",
+        "revision",
+        "monotonicMs",
+        "leaseId",
+        "outputId",
+        "sequence"
+      ],
+      "additionalProperties": false
+    },
+    "ui.hud.cycle.notification": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "method": {
+          "const": "ui.hud.cycle"
+        },
+        "params": {
+          "$ref": "#/$defs/ui.hud.cycle.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "performanceControl": {
+      "type": "object",
+      "properties": {
+        "requested": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          ]
+        },
+        "effective": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            },
+            {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          ]
+        },
+        "gpuMs": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sharedPass": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "passGpuMs": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "requested",
+        "effective",
+        "gpuMs",
+        "sharedPass",
+        "passGpuMs"
+      ],
+      "additionalProperties": false
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "enum": [
+            "unknown",
+            "battery",
+            "usb-c",
+            "limited-ac",
+            "full-ac"
+          ]
+        },
+        "powerW": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "capW": {
+          "type": "number",
+          "minimum": 0
+        },
+        "targetFPS": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 60
+        },
+        "reason": {
+          "type": "string"
+        },
+        "pid": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "enum": [
+            "off",
+            "auto",
+            "on"
+          ]
+        },
+        "activeRenderer": {
+          "enum": [
+            "in-process",
+            "offload"
+          ]
+        },
+        "status": {
+          "enum": [
+            "active",
+            "warming",
+            "local"
+          ]
+        },
+        "preset": {
+          "enum": [
+            "auto",
+            "low",
+            "medium",
+            "high",
+            "ultra",
+            "custom",
+            "intel"
+          ]
+        },
+        "requested": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "effective": {
+          "$ref": "#/$defs/graphicsConfig"
+        },
+        "costsMs": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "workerTimings": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "controls": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/performanceControl"
+          }
+        }
+      },
+      "required": [
+        "profile",
+        "powerW",
+        "capW",
+        "targetFPS",
+        "reason",
+        "pid",
+        "generation",
+        "mode",
+        "activeRenderer",
+        "status",
+        "preset",
+        "requested",
+        "effective",
+        "costsMs",
+        "workerTimings",
+        "controls"
+      ],
+      "additionalProperties": false
+    },
+    "replayAssertions": {
+      "type": "object",
+      "properties": {
+        "recorded": {
+          "type": "boolean"
+        },
+        "tolerance": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "marks": {
+          "type": "object",
+          "maxProperties": 128,
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "camera": {
+                "type": "object",
+                "properties": {
+                  "position": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "yaw": {
+                    "type": "number"
+                  },
+                  "pitch": {
+                    "type": "number"
+                  },
+                  "fov": {
+                    "type": "number"
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
+              },
+              "mode": {
+                "enum": [
+                  "world",
+                  "interactive",
+                  "focus",
+                  "menu",
+                  "cursor"
+                ]
+              },
+              "tool": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 4
+              },
+              "subtype": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "scope": {
+                "type": "boolean"
+              },
+              "noclip": {
+                "type": "boolean"
+              },
+              "movement": {
+                "enum": [
+                  "walk",
+                  "fly"
+                ]
+              },
+              "tolerance": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "recordingStatus": {
+      "type": "object",
+      "properties": {
+        "recording": {
+          "type": "boolean"
+        },
+        "playing": {
+          "type": "boolean"
+        },
+        "path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 4096
+        },
+        "frame": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 36001
+        },
+        "mode": {
+          "enum": [
+            "input",
+            "camera"
+          ]
+        },
+        "failures": {
+          "type": "array",
+          "maxItems": 128,
+          "items": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "recording",
+        "playing",
+        "path",
+        "frame",
+        "mode",
+        "failures",
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "recording.start.params": {
+      "type": "object",
+      "properties": {
+        "includeAppKeys": {
+          "type": "boolean"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "recording.start.result": {
+      "$ref": "#/$defs/recordingStatus"
+    },
+    "recording.start.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "recording.start"
+        },
+        "params": {
+          "$ref": "#/$defs/recording.start.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "recording.start.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/recording.start.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "recording.stop.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "recording.stop.result": {
+      "$ref": "#/$defs/recordingStatus"
+    },
+    "recording.stop.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "recording.stop"
+        },
+        "params": {
+          "$ref": "#/$defs/recording.stop.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "recording.stop.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/recording.stop.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "recording.mark.params": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "recording.mark.result": {
+      "$ref": "#/$defs/recordingStatus"
+    },
+    "recording.mark.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "recording.mark"
+        },
+        "params": {
+          "$ref": "#/$defs/recording.mark.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "recording.mark.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/recording.mark.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "recording.status.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "recording.status.result": {
+      "$ref": "#/$defs/recordingStatus"
+    },
+    "recording.status.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "recording.status"
+        },
+        "params": {
+          "$ref": "#/$defs/recording.status.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "recording.status.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/recording.status.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "replay.start.params": {
+      "type": "object",
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "mode": {
+          "enum": [
+            "input",
+            "camera"
+          ]
+        },
+        "smoothingMs": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "assertions": {
+          "$ref": "#/$defs/replayAssertions"
+        }
+      },
+      "required": [
+        "path"
+      ],
+      "additionalProperties": false
+    },
+    "replay.start.result": {
+      "$ref": "#/$defs/recordingStatus"
+    },
+    "replay.start.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "replay.start"
+        },
+        "params": {
+          "$ref": "#/$defs/replay.start.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "replay.start.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/replay.start.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "replay.stop.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "replay.stop.result": {
+      "$ref": "#/$defs/recordingStatus"
+    },
+    "replay.stop.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "replay.stop"
+        },
+        "params": {
+          "$ref": "#/$defs/replay.stop.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "replay.stop.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/replay.stop.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "replay.status.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "replay.status.result": {
+      "$ref": "#/$defs/recordingStatus"
+    },
+    "replay.status.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "replay.status"
+        },
+        "params": {
+          "$ref": "#/$defs/replay.status.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "replay.status.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/replay.status.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "authorAtmosphere": {
+      "type": "object",
+      "properties": {
+        "fog": {
+          "type": "object",
+          "properties": {
+            "color": {
+              "$ref": "https://hyprune.com/schema/v0.4/common.schema.json#/$defs/vec3"
+            },
+            "density": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "heightFalloff": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "baseHeight": {
+              "type": "number",
+              "minimum": -10000,
+              "maximum": 10000
+            },
+            "excludeUnlit": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "color",
+            "density",
+            "heightFalloff",
+            "baseHeight",
+            "excludeUnlit"
+          ],
+          "additionalProperties": false
+        },
+        "sky": {
+          "type": "object",
+          "properties": {
+            "zenith": {
+              "$ref": "https://hyprune.com/schema/v0.4/common.schema.json#/$defs/vec3"
+            },
+            "horizon": {
+              "$ref": "https://hyprune.com/schema/v0.4/common.schema.json#/$defs/vec3"
+            },
+            "ground": {
+              "$ref": "https://hyprune.com/schema/v0.4/common.schema.json#/$defs/vec3"
+            },
+            "sun": {
+              "type": "object",
+              "properties": {
+                "direction": {
+                  "$ref": "https://hyprune.com/schema/v0.4/common.schema.json#/$defs/vec3"
+                },
+                "color": {
+                  "$ref": "https://hyprune.com/schema/v0.4/common.schema.json#/$defs/vec3"
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "angularRadius": {
+                  "type": "number",
+                  "minimum": 0.001,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "direction",
+                "color",
+                "intensity",
+                "angularRadius"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "zenith",
+            "horizon",
+            "ground",
+            "sun"
+          ],
+          "additionalProperties": false
+        },
+        "environment": {
+          "type": "object",
+          "properties": {
+            "faces": {
+              "type": "array",
+              "items": {
+                "$ref": "https://hyprune.com/schema/v0.4/common.schema.json#/$defs/path"
+              },
+              "minItems": 6,
+              "maxItems": 6
+            },
+            "encoding": {
+              "enum": [
+                "srgb",
+                "linear"
+              ]
+            },
+            "intensity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "rotation": {
+              "type": "number",
+              "minimum": -6.283186,
+              "maximum": 6.283186
+            },
+            "maxResolution": {
+              "type": "integer",
+              "minimum": 16,
+              "maximum": 512
+            }
+          },
+          "required": [
+            "faces",
+            "encoding",
+            "intensity",
+            "rotation",
+            "maxResolution"
+          ],
+          "additionalProperties": false
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100
+        },
+        "toneMapping": {
+          "enum": [
+            "aces",
+            "reinhard",
+            "linear"
+          ]
+        },
+        "bloom": {
+          "type": "object",
+          "properties": {
+            "strength": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "threshold": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "radius": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 8
+            }
+          },
+          "required": [
+            "strength",
+            "threshold",
+            "radius"
+          ],
+          "additionalProperties": false
+        },
+        "outline": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "colour": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "widthPx": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 4
+            },
+            "depthThreshold": {
+              "type": "number",
+              "minimum": 0.0001,
+              "maximum": 1
+            },
+            "normalThreshold": {
+              "type": "number",
+              "minimum": 0.001,
+              "maximum": 2
+            }
+          },
+          "required": [
+            "enabled",
+            "colour",
+            "widthPx",
+            "depthThreshold",
+            "normalThreshold"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "fog",
+        "sky",
+        "exposure",
+        "toneMapping",
+        "bloom"
+      ],
+      "additionalProperties": false
+    },
+    "camera.photo.params": {
+      "type": "object",
+      "properties": {
+        "position": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": -100000,
+            "maximum": 100000
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "orientation": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "fov": {
+          "type": "number",
+          "minimum": 5,
+          "maximum": 140
+        },
+        "renderScale": {
+          "type": "number",
+          "minimum": 0.25,
+          "maximum": 1
+        },
+        "lensShift": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": -2,
+            "maximum": 2
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "position",
+        "orientation",
+        "fov",
+        "renderScale"
+      ],
+      "additionalProperties": false
+    },
+    "camera.photo.result": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "camera.photo.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "camera.photo"
+        },
+        "params": {
+          "$ref": "#/$defs/camera.photo.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "camera.photo.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/camera.photo.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
+    },
+    "camera.release.params": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "additionalProperties": false
+    },
+    "camera.release.result": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "revision"
+      ],
+      "additionalProperties": false
+    },
+    "camera.release.request": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "method": {
+          "const": "camera.release"
+        },
+        "params": {
+          "$ref": "#/$defs/camera.release.params"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "method",
+        "params"
+      ],
+      "additionalProperties": false
+    },
+    "camera.release.response": {
+      "type": "object",
+      "properties": {
+        "jsonrpc": {
+          "const": "2.0"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "result": {
+          "$ref": "#/$defs/camera.release.result"
+        }
+      },
+      "required": [
+        "jsonrpc",
+        "id",
+        "result"
+      ],
+      "additionalProperties": false
     }
-  }
+  },
+  "anyOf": [
+    {
+      "$ref": "#/$defs/request"
+    },
+    {
+      "$ref": "#/$defs/response"
+    },
+    {
+      "$ref": "#/$defs/notification"
+    },
+    {
+      "$ref": "#/$defs/error"
+    },
+    {
+      "$ref": "#/$defs/camera.photo.request"
+    },
+    {
+      "$ref": "#/$defs/camera.photo.response"
+    },
+    {
+      "$ref": "#/$defs/camera.release.request"
+    },
+    {
+      "$ref": "#/$defs/camera.release.response"
+    }
+  ]
 }

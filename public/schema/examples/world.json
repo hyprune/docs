@@ -1,0 +1,111 @@
+{
+  "formatVersion": "0.1",
+  "id": "com.hyprune.observatory",
+  "version": "0.1.0",
+  "name": "Observatory",
+  "license": "CC-BY-4.0",
+  "scene": "scene.gltf",
+  "defaultSpawn": "arrival",
+  "spawns": [
+    {
+      "id": "arrival",
+      "pose": {
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    }
+  ],
+  "attribution": [
+    {
+      "path": ".",
+      "author": "Hyprune contributors",
+      "license": "CC-BY-4.0"
+    }
+  ],
+  "zones": [
+    {
+      "id": "work",
+      "name": "Work",
+      "bounds": {
+        "min": [
+          -4,
+          0,
+          -4
+        ],
+        "max": [
+          4,
+          4,
+          4
+        ]
+      }
+    }
+  ],
+  "anchors": [
+    {
+      "id": "desk",
+      "pose": {
+        "position": [
+          0,
+          1.4,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "size": [
+        1.6,
+        0.9
+      ],
+      "screenType": "com.hyprune.window"
+    }
+  ],
+  "collision": [
+    {
+      "node": 0,
+      "shape": "mesh",
+      "layer": "static"
+    }
+  ],
+  "navigation": {
+    "kind": "mesh",
+    "node": 1,
+    "agentRadius": 0.3,
+    "agentHeight": 1.8
+  },
+  "lightmaps": [
+    {
+      "material": 0,
+      "texture": 1,
+      "texCoord": 1,
+      "encoding": "linear",
+      "intensity": 1
+    }
+  ],
+  "audio": [
+    {
+      "id": "air",
+      "path": "audio/air.ogg",
+      "position": [
+        0,
+        2,
+        0
+      ],
+      "radius": 10,
+      "gain": 0.2,
+      "loop": true
+    }
+  ]
+}

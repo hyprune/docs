@@ -1,0 +1,18 @@
+{
+  "jsonrpc": "2.0",
+  "method": "state.delta",
+  "params": {
+    "subscriptionId": "sub-1",
+    "sessionId": "session-1",
+    "baseRevision": 0,
+    "revision": 1,
+    "changes": {
+      "runtime": {
+        "active": true,
+        "outputs": [
+          "output-1"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "jsonrpc": "2.0",
+  "id": "11",
+  "method": "shell.overlay",
+  "params": {
+    "leaseId": "lease-1",
+    "outputId": "output-1",
+    "visible": true,
+    "exclusiveInput": true
+  }
+}

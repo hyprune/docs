@@ -1,0 +1,10 @@
+{
+  "jsonrpc": "2.0",
+  "id": "9",
+  "method": "shell.claim",
+  "params": {
+    "outputs": [
+      "output-1"
+    ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "jsonrpc": "2.0",
+  "id": "1",
+  "result": {
+    "protocol": "0.1",
+    "sessionId": "session-1",
+    "capabilities": [
+      "state.read"
+    ],
+    "methods": [
+      "session.hello",
+      "session.ping",
+      "state.subscribe",
+      "state.snapshot",
+      "state.unsubscribe"
+    ],
+    "events": [
+      "state.delta",
+      "runtime.notice",
+      "session.revoked"
+    ]
+  }
+}

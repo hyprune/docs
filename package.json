@@ -10,9 +10,11 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check:links": "node scripts/check-links.mjs",
+    "check:links": "node scripts/check-links.mjs && node scripts/check-schema.mjs",
     "check:keymap": "python3 scripts/generate-keymap.py --check",
-    "test:browser": "node scripts/browser-check.mjs"
+    "test:browser": "node scripts/browser-check.mjs",
+    "check:schema": "node scripts/check-schema.mjs",
+    "sync:schema": "node scripts/sync-schema.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.5",

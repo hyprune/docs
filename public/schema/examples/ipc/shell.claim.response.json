@@ -1,0 +1,8 @@
+{
+  "jsonrpc": "2.0",
+  "id": "9",
+  "result": {
+    "leaseId": "lease-1",
+    "revision": 1
+  }
+}

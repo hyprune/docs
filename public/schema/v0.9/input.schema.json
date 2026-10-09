@@ -1,7 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hyprune.com/schema/v0.6/input.schema.json",
-  "title": "Hyprune input keymap v2",
+  "$id": "https://hyprune.com/schema/v0.9/input.schema.json",
   "type": "object",
   "properties": {
     "version": {
@@ -266,7 +265,7 @@
               "maxItems": 3,
               "uniqueItems": true
             },
-            "tool5": {
+            "hud.cycle": {
               "type": "array",
               "items": {
                 "type": "string",
@@ -361,7 +360,7 @@
             "tool2",
             "tool3",
             "tool4",
-            "tool5",
+            "hud.cycle",
             "transport",
             "autopilot",
             "primary",

@@ -1,0 +1,8 @@
+{
+  "jsonrpc": "2.0",
+  "id": "10",
+  "method": "shell.release",
+  "params": {
+    "leaseId": "lease-1"
+  }
+}

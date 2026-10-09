@@ -1,0 +1,9 @@
+{
+  "jsonrpc": "2.0",
+  "method": "runtime.notice",
+  "params": {
+    "level": "info",
+    "code": "world.ready",
+    "message": "World ready."
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "jsonrpc": "2.0",
+  "id": "4",
+  "result": {
+    "snapshot": {
+      "sessionId": "session-1",
+      "revision": 0,
+      "state": {
+        "runtime": {
+          "active": false,
+          "outputs": [
+            "output-1"
+          ]
+        },
+        "world": null,
+        "surfaces": [],
+        "movement": {
+          "modeId": "com.hyprune.fly",
+          "position": [
+            0,
+            1,
+            0
+          ],
+          "orientation": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "shell": {
+          "leases": []
+        }
+      }
+    }
+  }
+}

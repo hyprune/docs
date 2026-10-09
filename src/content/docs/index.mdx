@@ -1,43 +1,69 @@
 ---
 title: A world you can work in.
-description: Hyprune is an explorable desktop environment for Hyprland, built to become a framework for world-driven computing.
+description: Hyprune is an explorable desktop environment for Hyprland. Your workspaces become places you can walk, fly and climb between, with live application windows on their walls.
 template: splash
 hero:
   title: A world you can work in.
-  tagline: What if the computer itself were an explorable world? Hyprune brings your applications into places you can move through, shape, and make your own.
-  image:
-    file: ../../assets/world.svg
+  tagline: What if the computer itself were an explorable world? Hyprune turns your Hyprland workspaces into places you can move through, with live application windows on their walls and your normal desktop one key away.
   actions:
-    - text: Explore the idea
-      link: /concepts/
+    - text: See the progress
+      link: /progress/
       icon: right-arrow
-    - text: Read the architecture
-      link: /architecture/
+    - text: Learn the concepts
+      link: /concepts/
       variant: secondary
+    - text: Schema reference
+      link: /reference/schema/
+      variant: minimal
 ---
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import Shot from '../../components/media/Shot.astro';
 
-<p class="eyebrow">Hyprland beneath. A world ahead.</p>
+<figure class="home-shot">
+  <picture>
+    <source type="image/avif" srcset="/media/lumen-reach/sun-court-terrace-0.7.0-2400.avif" />
+    <img src="/media/lumen-reach/sun-court-terrace-0.7.0-1600.webp" srcset="/media/lumen-reach/sun-court-terrace-0.7.0-800.webp 800w, /media/lumen-reach/sun-court-terrace-0.7.0-1600.webp 1600w, /media/lumen-reach/sun-court-terrace-0.7.0-2400.webp 2400w" sizes="(min-width: 80rem) 72rem, 100vw" width="2400" height="1350" alt="The Sun Court terrace in Lumen Reach: a bench and a geodesic instrument on a stone terrace, a large wall screen on the building to the left, and a mountain lake valley with a viaduct beyond." fetchpriority="high" />
+  </picture>
+  <figcaption>Sun Court terrace, Lumen Reach 0.7.0, rendered in-engine. World by Hyprune contributors, CC-BY-4.0.</figcaption>
+</figure>
+
+<div class="stats">
+  <a class="stat" href="/reference/schema/ipc/"><span class="stat-label">IPC protocol</span><span class="stat-value">0.15</span><span class="stat-delta">15 frozen versions</span></a>
+  <a class="stat" href="/reference/schema/world/"><span class="stat-label">World format</span><span class="stat-value">0.7</span><span class="stat-delta">compressed assets</span></a>
+  <a class="stat" href="/progress/#lumen-reach-release-by-release"><span class="stat-label">Lumen Reach</span><span class="stat-value">0.7.1</span><span class="stat-delta">official release world</span></a>
+  <a class="stat" href="/architecture/"><span class="stat-label">Hyprland target</span><span class="stat-value">0.56.2</span><span class="stat-delta">exact-version plugin</span></a>
+</div>
 
 ## Your desktop becomes a place.
 
-A quiet room for deep work. An observatory for your projects. A studio with windows where you left them. Hyprune is an open foundation for desktop experiences that have space, presence, and a sense of place.
-
-Your applications stay real applications. Your world supplies the setting. Your shell supplies the controls. You choose how to move between them—and can always return to the ordinary desktop.
-
-<CardGrid stagger>
-  <Card title="Worlds with purpose" icon="rocket">Author original environments in glTF, place surface anchors, and give everyday work a spatial home.</Card>
-  <Card title="A desktop, still" icon="laptop">Bring live application windows into the world, with deliberate focus, familiar input, and a dependable exit.</Card>
-  <Card title="Make it yours" icon="puzzle">Build a world, screen type, widget, movement mode, integration, or an entirely different shell.</Card>
-  <Card title="Open at the boundaries" icon="open-book">Small repositories and explicit contracts let contributors build independently of compositor internals.</Card>
-</CardGrid>
-
-## Early. Building in the open.
-
-Hyprune is at its foundation stage. These RFCs describe the intended system; they are not a claim that the runtime or extension ecosystem is ready. We are starting with one original world, safe compositor integration, and a small, testable protocol.
+Each workspace gets a home in the world: a wall in a sunlit court, a suspended screen in a hall, a console room in a frozen vault. Switch workspaces and you travel there. Your applications stay real applications: a terminal on the Sun Court wall takes your keystrokes, and a window you carry to another area stays live. The world supplies the setting, the shell supplies the controls, and Super+Tab hands you an ordinary cursor whenever you want one.
 
 <CardGrid>
-  <LinkCard title="The first four milestones" description="From a safe render loop to independently built worlds and shells." href="/roadmap/" />
-  <LinkCard title="Help shape the foundation" description="Code, world art, accessible interaction, documentation and hard questions." href="/contributing/" />
+  <Card title="Workspace homes" icon="laptop">The world runs on workspace 20, and each area is a home at 20 + its slot. Hyprland binds, the Director and travel all lead to the same places.</Card>
+  <Card title="Move your way" icon="rocket">Walk, sprint, fly or climb. Set waypoints, travel along routes or let autodrive take you. Playable bounds keep you out of the scenery.</Card>
+  <Card title="Hands-on windows" icon="puzzle">Carry, resize and turn live windows, pin them to surfaces, or pocket one and take it to the next area. Tools share one Primary/Secondary/Alternate/Cycle layout.</Card>
+  <Card title="Fast on a laptop" icon="star">Dynamic resolution with FSR 1, render on demand when nothing moves, and an optional, supervised dGPU worker that is off by default.</Card>
+</CardGrid>
+
+## Lumen Reach
+
+The official release world is a working settlement on the terraces of a mountain watershed. It has four homes: **Sun Court** for arrival and field work, **Array Hall** for making and testing, **Rime Vault** for maintenance and archives, and **Signal Rise** for communications. Geometry and materials are original; the package is CC-BY-4.0.
+
+<div class="shot-grid">
+  <Shot name="array-hall-0.7.0" alt="Array Hall: a large screen suspended under a glass roof between timber balconies." caption="Array Hall" version="0.7.0" sizes="(min-width: 72rem) 24rem, 50vw" />
+  <Shot name="rime-vault-0.7.0" alt="Rime Vault: a dark service hall with rows of consoles and an orange instrument wall." caption="Rime Vault" version="0.7.0" sizes="(min-width: 72rem) 24rem, 50vw" />
+  <Shot name="signal-rise-0.7.0" alt="Signal Rise at night: a dish antenna, a console and a lit tower under snowy peaks." caption="Signal Rise" version="0.7.0" sizes="(min-width: 72rem) 24rem, 50vw" />
+  <Shot name="home-array-hall-0.7" alt="Array Hall with a live terminal window filling its suspended wall screen." caption="A live terminal on workspace 22" version="0.7" sizes="(min-width: 72rem) 24rem, 50vw" />
+</div>
+
+## Early, and honest about it
+
+Hyprune is an early preview, built in three days of focused work since 7 October 2026. Core, shell, SDK, schemas and two worlds work together end to end in isolated nested sessions, and they have run in short supervised sessions on real hardware. Hardware-cursor sign-off on a real DRM session, an extension host and outside contributors are still ahead. The component repositories are not public yet; these docs, the RFCs and the schemas are.
+
+<CardGrid>
+  <LinkCard title="Progress" description="Dated milestones, Lumen Reach release by release, and how 4K frame rates went from about 15 to 60." href="/progress/" />
+  <LinkCard title="Roadmap" description="Which milestones are done, which are partial, and what comes next: playable first." href="/roadmap/" />
+  <LinkCard title="Schema reference" description="Every world, IPC and keymap contract version, with diffs and raw JSON." href="/reference/schema/" />
+  <LinkCard title="Contribute" description="Code, original world art, accessible interaction, documentation and hard questions." href="/contributing/" />
 </CardGrid>

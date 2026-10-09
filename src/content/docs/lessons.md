@@ -27,7 +27,7 @@ The prototype's capture integration had to keep participating hidden-workspace c
 
 ## Input must agree with the image
 
-`src/HyprlandCompat/WindowCapture.*` stores geometry alongside the snapshot. `TODO.md` records third-person picking, thick-window front faces, natural scrolling and focus/workspace interaction as real failure cases. Hyprune uses the actual rendered camera, matching capture transforms, separate pointer and keyboard intent, and balanced releases on cancellation. Hidden-workspace keyboard interaction is rejected until proven safe.
+`src/HyprlandCompat/WindowCapture.*` stores geometry alongside the snapshot. `TODO.md` records third-person picking, thick-window front faces, natural scrolling and focus/workspace interaction as real failure cases. Hyprune uses the actual rendered camera, matching capture transforms, separate pointer and keyboard intent, and balanced releases on cancellation. Keyboard input to a window on a still-hidden workspace is rejected; using a wall window (E) first activates that window's native workspace, then routes the keyboard to it.
 
 ## A watched state file makes a poor animation clock
 

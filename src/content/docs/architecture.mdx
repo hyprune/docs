@@ -9,7 +9,7 @@ The compositor owns the desktop. Core provides the world runtime and brokers its
   <title id="arch-title">Hyprune process and repository boundaries</title>
   <desc id="arch-desc">Shell and extension processes connect over public Unix IPC to hypruned. The daemon uses a private bridge to the Hyprland plugin. World packages supply validated scene data. Schemas and SDK define the public boundary.</desc>
   <rect className="box" x="28" y="28" width="220" height="85" rx="12"/><text x="52" y="62" font-size="20">Shell</text><text x="52" y="88" font-size="14">Quickshell or your own UI</text>
-  <rect className="box" x="290" y="28" width="220" height="85" rx="12"/><text x="314" y="62" font-size="20">Extensions</text><text x="314" y="88" font-size="14">Supervised processes</text>
+  <rect className="box" x="290" y="28" width="220" height="85" rx="12"/><text x="314" y="62" font-size="20">Extensions</text><text x="314" y="88" font-size="14">Processes · planned</text>
   <rect className="box" x="552" y="28" width="220" height="85" rx="12"/><text x="576" y="62" font-size="20">Worlds</text><text x="576" y="88" font-size="14">Data, glTF, provenance</text>
   <path className="line" d="M138 113v49h262v42M400 113v91M662 113v135h-82"/>
   <text x="42" y="149" font-size="13">Public IPC · JSON-RPC</text><text x="611" y="196" font-size="13">Validate</text>
@@ -46,9 +46,16 @@ The plugin reads immutable frame state and draws prepared resources. Capture ref
 | Extension hosts and SDK | [RFC-0007](/rfcs/0007-extensions/) |
 | Replaceable shells | [RFC-0008](/rfcs/0008-shell/) |
 | Optional world-rendering process and power policy | [RFC-0009](/rfcs/0009-offload-renderer/) |
+| World-supplied HUD styles (proposed) | [Amendment to RFC-0004/0008](/rfcs/0004-0008-world-hud-style/) |
+
+## Rendering on a laptop
+
+The world renders below output resolution and is upscaled with FSR 1; dynamic resolution adjusts the scale in 1/16 steps to hold the frame rate. When nothing in view changes, core re-presents the last world frame instead of rendering a new one. On machines with a discrete GPU, an optional worker supervised by `hypruned` can render the world there and return frames over DMA-BUF, under a power budget and with immediate local fallback. It is off by default ([RFC-0009](/rfcs/0009-offload-renderer/)). Native application windows are always composited locally. The [progress page](/progress/#frame-rate-power-and-memory) has the measurements.
 
 ## Honest failure boundaries
 
-A shell crash releases overlay input. An extension crash cannot execute inside the compositor. A daemon crash triggers the plugin's desktop recovery watchdog. A malformed world fails staging before activation. A plugin bug can still crash Hyprland: keeping that boundary small and testing it against an exact compositor build is essential.
+A shell crash releases overlay input, and a restarted shell renews its credentials and resyncs from a snapshot. A daemon crash triggers the plugin's desktop recovery watchdog. A malformed world fails staging before activation. Extensions will run as separate supervised processes and can't execute inside the compositor; the host isn't built yet. A plugin bug can still crash Hyprland, which is why that boundary stays small and is tested against an exact compositor build (Hyprland 0.56.2).
 
-The schema repository owns machine-readable definitions. The [world schema](/schema/v0/world.schema.json), [IPC schema](/schema/v0/ipc.schema.json), [extension schema](/schema/v0/extension.schema.json) and [screen descriptor](/schema/v0/screen-type.schema.json) are mirrored here for authoring tools; runtime validation uses pinned local copies.
+## Machine-readable contracts
+
+The schema repository owns the machine-readable definitions. The [schema reference](/reference/schema/) renders every published version of the [world manifest](/reference/schema/world/), [IPC protocol](/reference/schema/ipc/), [input keymap](/reference/schema/input/), [extension manifest](/reference/schema/extension/) and [screen type descriptor](/reference/schema/screen-type/), with diffs between versions and the raw JSON to download. Runtime validation uses pinned local copies, never the network.

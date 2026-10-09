@@ -1,44 +1,55 @@
 ---
-title: "First real session"
-description: "Run Switchyard, real core and shell in an isolated nested Hyprland."
+title: "Try Hyprune"
+description: "Install paths, a developer nested session, and your first ten minutes in Lumen Reach."
 ---
 
-Core 0.2.0, shell 0.2.0 and SDK/schema 0.3.0 provide the first real session over
-authenticated IPC 0.3. Build core and install shell requirements using their
-READMEs, then build Switchyard according to the worlds README. The launcher
-consumes its package unchanged. Require Quickshell, kitty, btop, wtype and grim;
-Chromium is optional. Recording also requires wf-recorder and FFmpeg.
+Hyprune is an early preview. It targets **Hyprland 0.56.2** exactly, because the core plugin is built against that compositor's ABI. The component repositories (core, shell, SDK, schemas, worlds and the installer) are **not public yet**. The paths below are for people with access, and show what the experience will look like once the repositories open.
 
-From the core checkout:
+## Install paths
+
+The meta repository `hyprune/hyprune` is the front door. It bundles core, shell, SDK and worlds into **kits**:
+
+| Kit | What you get |
+| --- | --- |
+| `lumen-reach` | The four Lumen Reach homes with terminals on their walls; High graphics, or the `intel` tier for an iGPU |
+| `minimal` | One quiet home with a terminal and a workspace wall; 12 triangles, no textures, reduced motion |
+| `dev` | The Switchyard test world plus a debug home and SDK tools |
+
+- **Nix profile** (any Linux): `nix profile install github:hyprune/hyprune#kit-minimal`, then `hyprune-setup install`, log out, and start `hyprune-session` from a TTY.
+- **NixOS or Home Manager:** import the module and set `programs.hyprune = { enable = true; kit = "lumen-reach"; };`. The module pins the same compositor the plugin was built for, plus its matching portal.
+- **Arch:** `./install.sh --kit minimal --dry-run`, then without `--dry-run`. The script checks the compositor and header versions, builds the pinned components and never edits your Hyprland config without showing the diff and asking first. `--uninstall` reverses it.
+
+Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.7.1 and Switchyard 0.1.1 are the current releases.
+
+## A nested developer session
+
+Core's developer tools run everything inside a nested Hyprland window, so your real session is never touched. From a core checkout:
 
 ```sh
-dev/hyprune-dev up
-dev/hyprune-dev smoke
-dev/hyprune-dev record
-node tests/validate-session.mjs
+dev/hyprune-dev up      # build, run acceptance, keep the nested session open
+dev/hyprune-dev smoke   # acceptance only
+dev/hyprune-dev record  # acceptance with a screen recording
 ```
 
-`up` runs acceptance and leaves the visible nested session open. Hold Tab to open
-the Director; Escape closes it and F12 returns to the desktop. Workspace 10 is
-Switchyard; 11 is the original CC0 Quiet observatory fixture. Workspaces uses
-real compositor activation and core's loading/warp lifecycle. Map delivers the
-world package's SVG and named places for waypoint, travel and autodrive. Docked
-terminal/btop/browser windows remain live and receive ordinary application input.
+Each nested session holds an exclusive lock, and its controller only targets the child compositor. Test new core builds this way first. Some failures can only appear on real hardware, such as hardware-cursor and DRM output transitions. These need a supervised live session, with a checklist in core.
 
-Every nested lifetime holds `flock /tmp/worldshell-nested.lock`. A verified
-controller targets only the child compositor and its Wayland display. Never
-invoke bare owner-session hyprctl/Quickshell or load the plugin into the owner's
-desktop. Tokens are inherited through FDs. No SDK mock participates.
+## Your first ten minutes
 
-[RFC-0003](/rfcs/0003-ipc/) defines the new versioned state and methods;
-[RFC-0008](/rfcs/0008-shell/) defines verified Wayland association, passive HUD,
-exclusive Director and core-published screen projections;
-[RFC-0004](/rfcs/0004-world-format/) defines the safe affine map profile and
-Switchyard compatibility adapter. Frozen 0.1/0.2 contracts remain available.
+With the `lumen-reach` kit:
 
-The core report `docs/FIRST-SESSION.md` records reproduction, test evidence and
-remaining limits. The reviewed gallery video is `videos/hyprune-first-session.mp4`
-(61 seconds, 1080p H.264/yuv420p, fast start, under 60 MB) with adjacent metadata.
-Nested verification covers actual walking, hold/input ownership, Map, travel,
-warp, live window typing, workspace transitions and clean exit. Hardware-cursor
-verification still requires a dedicated DRM session; cursor lifecycle is unchanged.
+1. **Enter the world** with **Super+F12**. **F12** always returns to the ordinary desktop.
+2. **Walk and look.** Use **WASD**, **HJKL** or the arrows, and move the mouse to look. **Shift** sprints, **Space** and **Ctrl** move up and down, **V** toggles noclip and **F4** flight.
+3. **Hold Tab for one second** to open the Director: Map (waypoints, travel, autodrive), Workspaces, Settings and Performance. **Escape** closes it.
+4. **Go home.** **Super+1** takes you to Sun Court, the home of workspace 21. **Super+2** to **Super+4** reach Array Hall, Rime Vault and Signal Rise. Windows on a workspace appear on its home's main wall.
+5. **Use a window in place.** Aim at it and press **E**. Keystrokes go to the app. **F** brings it to native 2D. **Super+Tab** or **Back** returns to the world.
+6. **Carry and pocket.** Hold **Super+left mouse** to carry an aimed window, then **Super+wheel** to change its distance. Tool **5** (Placement) pockets windows with the middle button and places them ahead with the left button or onto a surface with the right.
+7. **Free cursor.** From the world, **Super+Tab** gives you a real cursor while the camera freezes. Press it again to return.
+
+The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto) and the optional dGPU offload are in **Performance**.
+
+## When something goes wrong
+
+- **F12** leaves the world from any mode except free cursor. In free cursor, press **Super+Tab** or **Back** first.
+- If the daemon dies, the plugin restores the desktop by itself (in 0.052 s in tests).
+- If the shell crashes or restarts, it reconnects, renews its credentials and resyncs.
+- **U** writes a private capture (a screenshot plus a JSON state dump) under `~/.local/state/hyprune/captures/` for bug reports.

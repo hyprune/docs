@@ -22,4 +22,4 @@ Use the Contributor Covenant and organization security policy. The conduct conta
 
 ## Decisions awaiting owner review
 
-Ratify the eight RFCs and repository license choices; confirm the first exact Hyprland target with core's implementation; activate conduct@hyprune.com and GitHub private vulnerability reporting; and configure GitHub Pages/domain settings. These are review items, not blockers for developing the local foundations.
+Ratify the nine RFCs (0001–0009, many with implemented amendments) and the proposed HUD-style amendment, moving each to accepted or implemented with linked evidence; confirm repository license choices; activate conduct@hyprune.com and GitHub private vulnerability reporting; and decide when to open the component repositories. The Hyprland target (0.56.2) and the hyprune.com deployment are settled. These are review items, not blockers for development.

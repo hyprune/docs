@@ -278,3 +278,30 @@ world-units-per-logical-pixel independently. Placement records may add
 placements inherit the normal configured world scale; older IPC hides this field.
 Reset restores the baseline logical size, player-facing orientation and configured
 spawn distance, with collision recovery. Repeated resets emit fresh feedback.
+
+## Amendment: wall backgrounds and tool-mount snapping (no wire change)
+
+**Workspace walls show what the user sees on that workspace.** A wall composes
+the output's background and bottom layer-shell surfaces (wallpaper daemons, a
+shell's wallpaper) behind the workspace's windows, at their real output
+rectangles and in the compositor's own layer order, honouring viewporter source
+crops. Background commits recompose the wall; an unchanged wall is not redrawn.
+A workspace with no windows, or an output without any background surface, shows
+the Hyprune placeholder: brand navy `#0f1a27` with the Bold lockup centred in
+lettering mint `#d4ffe6`. Compositor-drawn backgrounds (not layer surfaces) are
+not sampled.
+
+**Tool mounts are snap targets.** While a client is being placed (carried,
+selected in the pocket queue with tool 5, or tagged with tool 2), the nearest
+free, compatible `tool-mount` anchor under the aim is highlighted in the HUD
+theme's prompt colour. The aim test uses the authored frame plus a 15 cm rim
+and must not be hidden by other geometry. Homed clients only target mounts in
+their own area, and the pocket ghost previews the fitted result. Placing or
+releasing fits the client into that frame: aspect-fit, centred, same
+orientation and flush with the face (5 cm proud, just past the collision
+margin). Never accept an intersecting result: the fit shrinks by up to 12%, or
+uses ordinary collision recovery only if that moves the client at most 30 cm.
+Otherwise the mount is not a target. The placement is an ordinary anchored
+placement `{worldId, areaId, anchorId, rule}`. Unhomed room clients may use any
+area's mount, and the placement names that area. Aiming elsewhere keeps the
+existing free-space and surface placement.

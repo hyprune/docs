@@ -9,7 +9,7 @@ import Shot from '../../components/media/Shot.astro';
 import Evolution from '../../components/media/Evolution.astro';
 import Video from '../../components/media/Video.astro';
 
-Work on Hyprune started on **7 October 2026**. As of 9 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.15 and the release world has shipped seven versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
+Work on Hyprune started on **7 October 2026**. As of 10 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.16 and the release world has shipped eight versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
 
 All images and clips on this page are in-engine captures of **Lumen Reach**, the official release world (Hyprune contributors, CC-BY-4.0).
 
@@ -46,8 +46,9 @@ The same camera across releases. Pick a version:
 | **0.7.0** | 9 Oct | 47.9 MB | 244,312 | 373 MiB | Closed sky dome and mountain basin; flight passes over the perimeter; 56-view any-angle sweep and full route traversal |
 | **0.7.1** | 9 Oct | 46.9 MB | 244,526 | 373 MiB | Fixes from the first live walk: sky seam, a capped stair, the night sky |
 | [**0.7.2**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.7.2) | 9 Oct | 46.8 MB | 245,330 | 373 MiB | A walkable, clear roof route |
+| [**0.8.0**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.8.0) | 10 Oct | 39.4 MB | 245,330 | 150 MiB\* | First release on world format 0.7: KTX2 textures, meshopt geometry and lightmap mips; same look and frame time |
 
-GPU memory is the package checker's upload estimate at full texture resolution. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
+GPU memory is the package checker's upload estimate at full texture resolution. \*For 0.8.0 it is core's measured `upload.gpuBytes`, because compressed textures stay compressed on the GPU; on the same measure 0.7.2 uses 270.5 MiB. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
 
 <div class="shot-grid">
   <Shot name="signal-rise-reflector-0.6.0" alt="Signal Rise reflector dish against snowy peaks at night." caption="Signal Rise reflector" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />
@@ -86,13 +87,38 @@ A window updating at about 30 Hz now costs 28.9 world frames per second instead 
 
 ### FSR 1 upscaling (9 October)
 
-The world renders below output resolution and is upscaled. AMD FidelityFX Super Resolution 1 (EASU + RCAS) is now the default upscaler, with bilinear plus sharpening as the fallback. It costs about 2 ms of GPU time per frame at 0.375–0.5 scale, which dynamic resolution absorbs. It keeps edges and screen text crisper:
+The world renders below output resolution and is upscaled. AMD FidelityFX Super Resolution 1 (EASU + RCAS) is now the default upscaler, with bilinear plus sharpening as the fallback; since [IPC 0.16](/reference/schema/ipc/0.16/) the shell's Graphics settings can choose either. It costs about 2 ms of GPU time per frame at 0.375–0.5 scale, which dynamic resolution absorbs. It keeps edges and screen text crisper:
 
 <Shot name="fsr1-vs-bilinear-stairs" alt="Two crops of the same stairs and railing at 0.375 render scale. Left: bilinear upscaling with blocky edges. Right: FSR 1 with cleaner edges." caption="Arrival stairs at 0.375 render scale: bilinear plus sharpen (left), FSR 1 (right)." version="0.7.0" />
 
-### Compressed assets: world format 0.7 (9 October)
+### Compressed assets: Lumen Reach 0.8.0 (10 October)
 
-World format 0.7 lets packages use KTX2/Basis textures, meshopt compression and quantised meshes. Core supports all three. A trial conversion of Lumen Reach 0.7.0 shrank the package from **72 to 42 MiB** and GPU memory from **269.5 to 148.9 MiB**, at 36.8–39.2 dB PSNR. Lightmaps stay PNG. No published Lumen Reach release uses the format yet.
+World format 0.7 (9 October) lets packages use KTX2/Basis textures, meshopt compression and quantised meshes; lightmaps stay PNG. Lumen Reach 0.8.0 is the first release built this way. The optimiser is deterministic and a verifier checks that every manifest index, collision and UV layout survives. Measured against 0.7.2 in the same nested session (4K, Intel, Medium, fixed 0.5 scale):
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">Package</span><span class="stat-value">41.4 MiB</span><span class="stat-delta">from 70.5 MiB (−41%)</span></div>
+  <div class="stat"><span class="stat-label">GPU memory</span><span class="stat-value">149.8 MiB</span><span class="stat-delta">from 270.5 MiB (−45%)</span></div>
+  <div class="stat"><span class="stat-label">Load to ready (warm)</span><span class="stat-value">2.06 s</span><span class="stat-delta">from 2.68 s (−23%)</span></div>
+  <div class="stat"><span class="stat-label">GPU frame time</span><span class="stat-value">9.40 ms</span><span class="stat-delta">from 9.43 ms (unchanged)</span></div>
+</div>
+
+The 4K Intel frame is limited by fill rate, so compression saves memory, load time and download size, not frame time. The images stay close: 36.2–41.3 dB PSNR and a mean CIEDE2000 difference of 0.53–0.87 against 0.7.2. The release build now includes a **performance gate**. It renders 400 poses along every route edge against the previous release and fails if median GPU time grows more than 8% or p95 more than 12%. 0.8.0 passed at +0.4% / −0.4%.
+
+### Shader work (10 October)
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">World shading, Intel Low</span><span class="stat-value">1.66 ms</span><span class="stat-delta">from 2.11 ms (−21%)</span></div>
+  <div class="stat"><span class="stat-label">Shader instructions, Low</span><span class="stat-value">316</span><span class="stat-delta">from 677</span></div>
+  <div class="stat"><span class="stat-label">Longest upload job, cold</span><span class="stat-value">31 ms</span><span class="stat-delta">from 51 ms</span></div>
+</div>
+
+The world shader is now compiled per effect preset, so features a preset turns off are removed at compile time instead of being skipped at run time. The stills are identical or within ±5 on a few dozen of 8.3 million pixels. Shaders also compile in parallel with the asset upload (`KHR_parallel_shader_compile`), so first loads stall less. Medium and above should gain less; they weren't measured. Two other ideas were measured and dropped because they didn't help on Intel: sorting opaque draws front to back, and blitting depth in the upscale pass.
+
+### Derived visibility (prototype)
+
+A new tool derives visibility regions from the navmesh and the scene, instead of authoring them by hand. On Lumen Reach it produced 160 regions in about 51 seconds. Across 64 test views and 5 targeted probes it changed no pixels, and it culled more than the hand-written regions (mean batches submitted 44.7 → 40.5). It is tooling for now; no release uses it yet.
+
+One open item: with nothing moving, the nested compositor's GPU is busy 2.0–2.2% of the time, against 1.2% when render on demand landed. No world frames are rendered while idle, so the extra load is on the compositor's presentation side. It hasn't been bisected yet.
 
 ### Optional dGPU offload (RFC-0009, 8 October)
 
@@ -144,4 +170,15 @@ Times are CEST (UTC+2). Contract versions link to their [schema reference](/refe
   <li><span class="when">18:58–19:50</span><span class="what">FSR 1 becomes the default upscaler</span></li>
   <li><span class="when">19:38</span><span class="what">Lumen Reach 0.7.1</span><p>Fixes from the first live walk of 0.7.0.</p></li>
   <li class="major"><span class="when">19:21–20:16</span><span class="what">World format 0.7</span><p><a href="/reference/schema/world/0.7/">Compressed and optimised scene assets</a>: KTX2, meshopt and quantised meshes.</p></li>
+  <li><span class="when">23:08</span><span class="what">Lumen Reach 0.7.2</span><p>A walkable, clear roof route.</p></li>
+  <li><span class="when">23:33</span><span class="what">Optional capture watermark</span><p>Saved captures can carry the Hyprune lockup; off by default and never drawn live.</p></li>
+</ol>
+
+<p class="timeline-day">Friday 10 October: compressed release, faster shaders</p>
+<ol class="timeline">
+  <li><span class="when">00:06</span><span class="what">Selectable upscaler</span><p><a href="/reference/schema/ipc/0.16/">IPC 0.16</a>: FSR 1 or bilinear from the shell's Graphics settings.</p></li>
+  <li><span class="when">00:23</span><span class="what">Parallel shader compile</span><p>The longest upload job drops from 51 to 31 ms.</p></li>
+  <li><span class="when">00:25–02:10</span><span class="what">Derived visibility prototype</span><p>Visibility regions generated from the navmesh and scene.</p></li>
+  <li><span class="when">01:21</span><span class="what">World shader specialisation</span><p>World shading is 21% faster on Intel Low.</p></li>
+  <li class="major"><span class="when">11:05</span><span class="what">Lumen Reach 0.8.0</span><p>The first release on world format 0.7: 41% smaller, 45% less GPU memory, same frame time.</p></li>
 </ol>

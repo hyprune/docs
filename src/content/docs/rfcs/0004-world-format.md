@@ -4,7 +4,7 @@ description: "Data-only glTF worlds with explicit spatial metadata and asset pro
 ---
 
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through [world format 0.7](/reference/schema/world/0.7/): core loads formats 0.1–0.7. Lumen Reach 0.7.2 uses format 0.5.
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through [world format 0.7](/reference/schema/world/0.7/): core loads formats 0.1–0.7. Lumen Reach 0.8.0 is the first release on format 0.7.
 
 ## Decision and package layout
 

@@ -19,7 +19,7 @@ The meta repository `hyprune/hyprune` is the front door. It bundles core, shell,
 - **NixOS or Home Manager:** import the module and set `programs.hyprune = { enable = true; kit = "lumen-reach"; };`. The module pins the same compositor the plugin was built for, plus its matching portal.
 - **Arch:** `./install.sh --kit minimal --dry-run`, then without `--dry-run`. The script checks the compositor and header versions, builds the pinned components and never edits your Hyprland config without showing the diff and asking first. `--uninstall` reverses it.
 
-Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.7.2 and Switchyard 0.1.1 are the current releases.
+Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.8.0 (world format 0.7, compressed textures) and Switchyard 0.1.1 are the current releases.
 
 ## A nested developer session
 
@@ -45,11 +45,11 @@ With the `lumen-reach` kit:
 6. **Carry and pocket.** Hold **Super+left mouse** to carry an aimed window, then **Super+wheel** to change its distance. Tool **5** (Placement) pockets windows with the middle button and places them ahead with the left button or onto a surface with the right.
 7. **Free cursor.** From the world, **Super+Tab** gives you a real cursor while the camera freezes. Press it again to return.
 
-The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto) and the optional dGPU offload are in **Performance**.
+The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto), the upscaler (FSR 1 or bilinear) and the optional dGPU offload are in **Performance**.
 
 ## When something goes wrong
 
 - **F12** leaves the world from any mode except free cursor. In free cursor, press **Super+Tab** or **Back** first.
 - If the daemon dies, the plugin restores the desktop by itself (in 0.052 s in tests).
 - If the shell crashes or restarts, it reconnects, renews its credentials and resyncs.
-- **U** writes a private capture (a screenshot plus a JSON state dump) under `~/.local/state/hyprune/captures/` for bug reports.
+- **U** writes a private capture (a screenshot plus a JSON state dump) under `~/.local/state/hyprune/captures/` for bug reports. With `capture={watermark=true}` in the plugin config, captures carry the Hyprune lockup in a corner; it is never drawn live.

@@ -3,7 +3,7 @@ title: "RFC-0006 — Interaction and movement modes"
 description: "A fixed-step movement contract with a permanent route back to the desktop."
 ---
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through the [IPC 0.15 adventure exits and declarative tool inputs amendment](#amendment-adventure-exits-and-declarative-tool-inputs-ipc-015).
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through the [IPC 0.19 player settings and reticle amendment](#amendment-ipc-019-player-settings-and-reticle).
 
 
 ## Decision
@@ -197,3 +197,114 @@ its quaternion. `content.scale` defaults Super+Shift+Wheel, `rotate` moves to
 Super+Ctrl+Wheel, and `window.reset` defaults Super+Shift+MMB. Modifier gestures
 apply regardless of selected tool. HUD concepts are selected in Settings;
 `hud.cycle` has no default binding and key 5 selects Placement.
+
+## Amendment: IPC 0.19 player settings and reticle
+
+### Player settings
+
+IPC 0.19 adds two methods for the settings that shape how moving and aiming feel:
+
+| Method | Required grant | Parameters | Result |
+| --- | --- | --- | --- |
+| player.get | state.read | `{}` | player settings snapshot |
+| player.set | movement.control | `{patch: playerPatch}` | player settings snapshot |
+
+A snapshot is `{config, defaults, overrides, options, ranges, path, error}`.
+`config` holds the effective values (Lua config plus persisted overrides),
+`defaults` the built-in values and `overrides` only the persisted keys (never
+null; empty when nothing is saved). `options` lists the choices for `view_bob` and
+`reticle_style`; `ranges` gives `[min, max]` for every numeric key, so a settings
+page needs no copy of these bounds. `path` (at most 4096 bytes) names the
+overrides file and `error` (at most 4096 bytes, `""` when fine) reports the last
+failure to read or write it.
+
+| Key | Type | Range or values | Default | Meaning |
+| --- | --- | --- | --- | --- |
+| walk_speed | number | 0.5–20 | 4.0 | m/s; walking and the flight base speed |
+| run_speed | number | 0.5–30 | 10.0 | m/s while run (Shift) is held; flight scales by run/walk |
+| view_bob | enum | `off`, `subtle`, `normal` | `subtle` | walking view bob |
+| reticle_style | enum | `cross_dot`, `t_dot`, `circle_dot`, `dot`, `cross`, `chevron` | `cross_dot` | reticle shape |
+| reticle_size | number | 6–64 | 18 | logical px, full extent |
+| reticle_thickness | number | 1–6 | 2 | logical px |
+| reticle_gap | number | 0–20 | 4 | logical px from the centre to where the arms start |
+| reticle_opacity | number | 0.2–1 | 0.9 | |
+| reticle_outline | boolean | | true | dark 1 px contrast outline |
+| reticle_colour | `"theme"` or `[r,g,b]` (0–1) | | `"theme"` | `"theme"` uses the overlay style's `reticleColor` |
+| reticle_dynamic | boolean | | true | the reticle opens up while moving or turning |
+| reach_grab | number | 1–100 | 15 | m; Super+button window gestures (carry, resize, roll) |
+| reach_mount | number | 1–100 | 8 | m; snapping into tool-mount frames (tool 2, tool 5, carry release) |
+| reach_placement | number | 1–100 | 12 | m; tool 5 place on a surface and pocket, tool 2 mount on a wall, tool 3 path points |
+
+`playerPatch` is a closed object with any of these keys (at least one). Changes
+apply live and the overrides are persisted to `$HYPRUNE_PLAYER_FILE`, else
+`$XDG_CONFIG_HOME/hyprune/player.json`, else `~/.config/hyprune/player.json`. A
+`null` value removes that override, returning the key to its default (or Lua)
+value. An invalid value fails the whole patch with -32602 and nothing is applied.
+Peers below 0.19 get method-not-found (-32601).
+
+`hl.plugin.hyprune.config({player = {...}})` accepts the same keys; persisted
+overrides win over Lua. `player.run_multiplier` is no longer a core setting: Lua
+still accepts it as a deprecated alias that sets `run_speed = walk_speed ×
+multiplier`.
+
+`graphics.reduced_motion` always wins: it turns off the view bob (whatever
+`view_bob` says) and the dynamic reticle, like the climbing bob above.
+
+### Reach
+
+Reach limits are enforced by core. A Super+button gesture aimed at a window beyond
+`reach_grab` does nothing. Tool 5 surface placement and pocketing beyond
+`reach_placement`, and mount snaps beyond `reach_mount`, are refused with a
+`runtime.notice` (code `placement.out_of_range`, level `info`, for example "Too
+far: 18 m (reach 12 m)"). The pointer tool's click into a window has no reach
+limit.
+
+### Reticle state
+
+`state.interaction` gains the required `reticle: {state, action}`, published with
+the rest of `interaction` whenever either value changes (no distances on the
+wire):
+
+| state | Meaning |
+| --- | --- |
+| `hidden` | free cursor; no reticle is drawn |
+| `typing` | typing mode; the reticle follows the pointer |
+| `neutral` | nothing actionable under the reticle |
+| `target` | the primary button clicks into the aimed window (pointer tool), action `click` |
+| `valid` | the current action has a valid target within its reach |
+| `out_of_range` | the same kind of target, beyond its reach |
+| `invalid` | aimed at something that can't take the action (no free space, a locked window) |
+| `holding` | carrying a window, and releasing it just leaves it where it is |
+
+"The current action" is a held Super gesture, the selected tool's placement or
+mount action, or the release of a carried window. `action` is one of `""`,
+`click`, `grab`, `pocket`, `place`, `mount`, `select`, `path` or `drop`. Peers
+below 0.19 receive `interaction` without `reticle`.
+
+Core draws the reticle itself, at native output resolution in the final present
+pass (never in the scaled world pass). Each state changes shape as well as colour
+or opacity, so no state depends on colour alone:
+
+- `valid`: theme `validColor` plus four corner brackets.
+- `out_of_range`: dimmed, with a hollow centre and a small "N m" distance hint.
+- `invalid`: `invalidColor`, with the arms turned 45° into an x.
+- `holding`: corner brackets in the reticle colour.
+- `target`: a slightly tighter gap.
+
+### Overlay colours and field of view
+
+`overlayStyle` gains three colours, RGB arrays 0–1 like `promptColor`:
+`reticleColor` (default `[0.95, 0.95, 0.95]`), `validColor` (default
+`[0.35, 0.95, 0.6]`) and `invalidColor` (default `[1.0, 0.62, 0.35]`). In 0.19
+they are required in the `overlay.style` result and optional in the style patch.
+Results to older peers omit them and older peers cannot send them. The reference
+shell sends them from the active HUD theme (foreground for the reticle, the
+positive colour for valid, the warning colour for invalid) whenever it sends
+`promptColor`.
+
+`graphics.fov` accepts 30–120 degrees in 0.19 (was 30–110) and now defaults to
+65 (was 60). Replies to older peers clamp `fov` to 110 in `config`, `effective`
+and `overrides`, and an older peer's `graphics.set` with `fov` above 110 is
+rejected ("setting requires IPC 0.19").
+
+All other 0.18 state, events, grants and methods are inherited unchanged.

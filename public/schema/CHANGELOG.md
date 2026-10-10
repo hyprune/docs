@@ -122,3 +122,23 @@ definition exists in 0.16 and the graphics properties differ only by the new key
   unchanged. Inheritance test: every 0.17 definition is identical except the
   graphics properties (only the two offload keys differ), `performance` (only
   the two new keys) and the hello protocol constant.
+
+## IPC 0.19: player settings, view bob and reticle
+
+- `player.get {}` (state.read) and `player.set {patch}` (movement.control) return
+  `playerSettings {config, defaults, overrides, options, ranges, path, error}`.
+  `playerConfig` keys: `walk_speed`, `run_speed`, `view_bob`
+  (`off|subtle|normal`), `reticle_style`, `reticle_size`, `reticle_thickness`,
+  `reticle_gap`, `reticle_opacity`, `reticle_outline`, `reticle_colour`
+  (`"theme"` or RGB), `reticle_dynamic`, `reach_grab`, `reach_mount`,
+  `reach_placement`. `playerPatch` takes any subset (at least one key); `null`
+  removes a persisted override. `overrides` uses `playerOverrides` (the same
+  keys, never null, may be empty).
+- `graphics` `fov` accepts 30..120 (was 30..110) in config and patches.
+- `overlayStyle` gains `reticleColor`, `validColor` and `invalidColor` (RGB
+  0..1; required in the result, optional in the params patch).
+- `interaction.reticle {state, action}` (required): what the reticle shows
+  (`hidden|neutral|typing|target|valid|out_of_range|invalid|holding`) and the
+  action it would take (`""|click|grab|pocket|place|mount|select|path|drop`).
+- Everything else is inherited from 0.18 unchanged, including the offload cap
+  and device keys; `session.hello` reports `0.19`.

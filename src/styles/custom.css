@@ -189,3 +189,4 @@
   .brand-mono { display: block; max-width: 100%; background: currentColor; -webkit-mask: var(--src) center / contain no-repeat; mask: var(--src) center / contain no-repeat; }
   .swatch { display: inline-block; width: .9rem; height: .9rem; border-radius: .25rem; background: var(--c); vertical-align: -.1rem; margin-right: .3rem; border: 1px solid var(--sl-color-gray-5); }
 }
+@layer hyprune { .shot-narrow { max-width: 34rem; margin-inline: auto; } }

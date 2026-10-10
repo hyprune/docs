@@ -57,7 +57,7 @@ The Director's **Settings** tab holds the player settings. They apply immediatel
 
 The graphics setting **Reduced motion** turns off view bob and the moving reticle. All defaults and ranges are on the [keymap](/keymap/#player-settings) page.
 
-<figure class="shot"><img src="/media/core/reticle-styles.webp" width="1400" height="1588" loading="lazy" alt="A grid of the six reticle styles (cross with dot, T with dot, circle with dot, dot, cross, chevron) in each state: neutral, target, valid, out of range with a distance, invalid, holding and typing." /><figcaption>The six reticle styles in each state, with the Adventure HUD colours, shown large and at the default size.</figcaption></figure>
+<figure class="shot shot-narrow"><img src="/media/core/reticle-styles.webp" width="1400" height="1588" loading="lazy" alt="A grid of the six reticle styles (cross with dot, T with dot, circle with dot, dot, cross, chevron) in each state: neutral, target, valid, out of range with a distance, invalid, holding and typing." /><figcaption>The six reticle styles in each state, with the Adventure HUD colours, shown large and at the default size.</figcaption></figure>
 
 ## When something goes wrong
 

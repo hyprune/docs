@@ -3,7 +3,7 @@ title: "RFC-0009 — Optional offload renderer"
 description: "A supervised world renderer, explicit cross-GPU frames, power admission and local fallback."
 ---
 
-**Status: accepted · proposed 2026-10-08, accepted 2026-10-09 · phase 1 implemented, default off.** Phase 1 is on core main and verified in nested sessions; physical power-profile qualification is pending (see the [phase 1 amendment](#phase-1-implementation-amendment-hot-switching-and-performance-010) and the [roadmap](/roadmap/)). The buffer protocol remains private to core.
+**Status: accepted · proposed 2026-10-08, accepted 2026-10-09 · phase 1 implemented, default off.** Phase 1 is on core main and verified in nested sessions; physical power-profile qualification is pending (see the [phase 1 amendment](#phase-1-implementation-amendment-hot-switching-and-performance-010) and the [roadmap](/roadmap/)). The [IPC 0.18 amendment](#amendment-ipc-018-device-scaled-offload-power-and-device-selection) scales the power cap to the offload GPU on systems without a battery and adds device selection. The buffer protocol remains private to core.
 
 This amends [RFC-0002](/rfcs/0002-runtime/) without moving compositor or input
 authority. Its buffer protocol is private to core, not a public provider API.
@@ -561,3 +561,69 @@ synchronised scene edits are implemented; carrying/resizing windows stays suppor
 Both copies and local depth reconstruction are intentional phase-1 costs. Resource
 residency doubles world GPU storage. These nested results do not qualify physical
 outputs, real-session cursor behavior, arbitrary drivers or hardware power changes.
+
+## Amendment: IPC 0.18 device-scaled offload power and device selection
+
+Phase 1 sized its power policy for a laptop. On a desktop with two RTX 3090s
+(37–45 W idle, 90–200 W while rendering the world) the fixed 80 W full-AC cap
+always tripped the watchdog. Such a desktop has no battery and often no
+power-supply entries at all, so it was also reported as "power supply unknown"
+and offload failed closed. The run also found that an NVIDIA compositor GPU
+imports the worker's LINEAR buffers only as external textures; core now imports
+them through `GL_TEXTURE_EXTERNAL_OES` when the driver reports LINEAR as
+external-only (no contract change). Evidence:
+[core `docs/evidence/offload/nvidia-consumer/README.md`](https://github.com/hyprune/core/blob/main/docs/evidence/offload/nvidia-consumer/README.md).
+
+**Mains detection.** A system with no power supply of type `Battery` runs on
+mains power: the profile is `full-ac`, `auto` is admitted and the frame-rate
+ceiling is 60 FPS. With a battery present nothing changes: 50 W / 45 FPS, or
+80 W / 60 FPS on qualified full AC (reported capacity at least 150 W, no battery
+discharge), and the user's cap can only lower that ceiling.
+
+**Cap.** `offload_power_cap_w` is 20–1000 W or `null`; `null` is the new
+default and means automatic. Without a battery the cap is scaled to the offload
+GPU's enforced power limit as read through NVML:
+
+| Case | Cap | `capSource` |
+| --- | --- | --- |
+| Battery, `null` | Profile ceiling: 50 W, or 80 W on qualified full AC | `profile` |
+| Battery, a number | The configured value clamped to the profile ceiling | `configured` |
+| No battery, `null` | 75 % of the GPU's enforced power limit | `device` |
+| No battery, a number | The configured value clamped to [20, enforced limit] | `configured` |
+| No battery, enforced limit unknown | 80 W | `fallback` |
+
+The 75 °C temperature ceiling, the NVML freshness rules (missing or stale
+readings withdraw admission) and the 500 ms lease watchdog are unchanged. As
+before, this is a monitored software budget: core makes no hardware
+power-limit or clock writes.
+
+**Device.** `offload_device` is `"auto"` (default) or the lowercase PCI address
+`domain:bus:device.function` (for example `0000:65:00.0`) of the GPU that runs
+the offload renderer. `auto` considers the NVIDIA render nodes the daemon can
+open, prefers one that is not the GPU the compositor renders with, then the
+least utilised one by NVML. An explicit address selects that GPU or stops
+offload with reason `offload device unavailable`; core never substitutes
+another GPU for an explicit choice. EGL, Vulkan and NVML identities must still
+match the selected render node.
+
+**Performance.** `graphics.get/set` `performance` records gain two required
+keys. `capSource` is one of `profile`, `device`, `configured` or `fallback` (the
+table above). `device` is `null` when no offload GPU is chosen yet or none is
+available, otherwise `{pci, node, name, enforcedLimitW, selection,
+drivesCompositor}`: the PCI address, render node (`renderD<n>`), the driver's
+product name or null, the enforced power limit in watts or null when unknown,
+whether the GPU was chosen by `auto` or `explicit`ly, and whether it is the GPU
+the compositor renders with. `profile` keeps its five values; systems without a
+battery report `full-ac`. `capW` remains the effective cap.
+
+**Reasons.** When the supervisor stops the worker (power or temperature
+watchdog, policy or device change), `performance.reason` reports the
+supervisor's reason, not the consumer's resulting transport error such as
+`renderer transport EOF/truncation`.
+
+**Older sessions.** Peers below 0.18 keep their frozen shapes: `offload_device`,
+`capSource` and `device` are omitted; a `null` cap is reported as the effective
+cap clamped to [20, 100], and an effective cap above 100 W is reported as 100.
+Writing `offload_device`, a `null` cap or a cap above 100 from such a session is
+an invalid-params error ("setting requires IPC 0.18"). All earlier capabilities
+are inherited.

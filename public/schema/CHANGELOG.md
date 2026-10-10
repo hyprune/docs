@@ -104,3 +104,21 @@ definition exists in 0.16 and the graphics properties differ only by the new key
   shells when U (or the mode's capture binding) snapshots the world, before the
   files are written.
 - Everything else is inherited from 0.16 unchanged.
+
+## IPC 0.18: device-scaled offload power cap and offload device selection
+
+- `offload_power_cap_w` in `graphicsConfig`/`graphicsPatch` is a number 20–1000
+  or `null` (was 20–100). `null`, the new default, is automatic: the battery
+  profile ceiling with a battery, otherwise 75 % of the offload GPU's enforced
+  power limit (80 W when the limit is unknown).
+- New `offload_device`: `"auto"` (default) or the lowercase PCI address
+  (`domain:bus:device.function`, e.g. `0000:65:00.0`) of the GPU that runs the
+  offload renderer.
+- `performance` (graphics.get/set) gains required `capSource` (`profile` |
+  `device` | `configured` | `fallback`) and `device` (`null` or `{pci, node,
+  name, enforcedLimitW, selection, drivesCompositor}`). `profile` is unchanged;
+  systems without a battery report `full-ac`.
+- `session.hello` reports `0.18`. Everything else is inherited from 0.17
+  unchanged. Inheritance test: every 0.17 definition is identical except the
+  graphics properties (only the two offload keys differ), `performance` (only
+  the two new keys) and the hello protocol constant.

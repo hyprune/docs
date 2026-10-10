@@ -9,7 +9,7 @@ import Shot from '../../components/media/Shot.astro';
 import Evolution from '../../components/media/Evolution.astro';
 import Video from '../../components/media/Video.astro';
 
-Work on Hyprune started on **7 October 2026**. As of 10 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.16 and the release world has shipped nine versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
+Work on Hyprune started on **7 October 2026**. As of 10 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.16 and the release world has shipped ten versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
 
 All images and clips on this page are in-engine captures of **Lumen Reach**, the official release world (Hyprune contributors, CC-BY-4.0).
 
@@ -48,8 +48,9 @@ The same camera across releases. Pick a version:
 | [**0.7.2**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.7.2) | 9 Oct | 46.8 MB | 245,330 | 373 MiB | A walkable, clear roof route |
 | [**0.8.0**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.8.0) | 10 Oct | 39.4 MB | 245,330 | 150 MiB\* | First release on world format 0.7: KTX2 textures, meshopt geometry and lightmap mips; same look and frame time |
 | [**0.8.1**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.8.1) | 10 Oct | 39.7 MB | 245,330 | 150 MiB\* | Closes a Rime Vault ceiling slot that showed sky; the build now fails on sky leaks through enclosure roofs and walls |
+| [**0.9.0**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.9.0) | 10 Oct | 39.7 MB | 245,330 | 150 MiB\* | Visibility derived at build time (184 regions); per-area playable volumes with a 60 m fly ceiling; backstops only where a walker can reach (pieces over 15 m: 71 → 17); canonical areas contract |
 
-GPU memory is the package checker's upload estimate at full texture resolution. \*For 0.8.x it is core's measured `upload.gpuBytes` for 0.8.0, because compressed textures stay compressed on the GPU; on the same measure 0.7.2 uses 270.5 MiB. 0.8.1's package estimate is the same as 0.8.0's. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
+GPU memory is the package checker's upload estimate at full texture resolution. \*From 0.8.0 on it is core's measured `upload.gpuBytes` for 0.8.0, because compressed textures stay compressed on the GPU; on the same measure 0.7.2 uses 270.5 MiB. The package estimates for 0.8.1 and 0.9.0 match 0.8.0's. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
 
 <div class="shot-grid">
   <Shot name="signal-rise-reflector-0.6.0" alt="Signal Rise reflector dish against snowy peaks at night." caption="Signal Rise reflector" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />
@@ -86,6 +87,16 @@ A world frame is rendered only when its inputs change: the camera, a window's co
 
 A window updating at about 30 Hz now costs 28.9 world frames per second instead of 60. The first frame after idle took 32 ms. The memory saving comes from one colour upload, a uniform buffer, frustum culling and indexed draws.
 
+On 10 October idle got cheaper again. Workspace walls had been recomposed on every tick even when nothing on them changed, and the default workspace homes made most area walls into such composites, so idle cost had crept up to about 2%. Walls now recompose only when their windows, popups or stacking order change:
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">Nested GPU busy, at rest</span><span class="stat-value">0.07%</span><span class="stat-delta">from 1.5–2.0%</span></div>
+  <div class="stat"><span class="stat-label">Whole session, at rest</span><span class="stat-value">0.08%</span><span class="stat-delta">from 2.17%</span></div>
+  <div class="stat"><span class="stat-label">With a ~30 Hz client</span><span class="stat-value">44%</span><span class="stat-delta">from 52% GPU busy</span></div>
+</div>
+
+A wall showing a live app still updates as it changes. Walls also draw windows in Hyprland's own stacking order now, so raising a window shows on the wall too.
+
 ### FSR 1 upscaling (9 October)
 
 The world renders below output resolution and is upscaled. AMD FidelityFX Super Resolution 1 (EASU + RCAS) is now the default upscaler, with bilinear plus sharpening as the fallback; since [IPC 0.16](/reference/schema/ipc/0.16/) the shell's Graphics settings can choose either. It costs about 2 ms of GPU time per frame at 0.375–0.5 scale, which dynamic resolution absorbs. It keeps edges and screen text crisper:
@@ -115,11 +126,9 @@ The 4K Intel frame is limited by fill rate, so compression saves memory, load ti
 
 The world shader is now compiled per effect preset, so features a preset turns off are removed at compile time instead of being skipped at run time. The stills are identical or within ±5 on a few dozen of 8.3 million pixels. Shaders also compile in parallel with the asset upload (`KHR_parallel_shader_compile`), so first loads stall less. Medium and above should gain less; they weren't measured. Two other ideas were measured and dropped because they didn't help on Intel: sorting opaque draws front to back, and blitting depth in the upscale pass.
 
-### Derived visibility (prototype)
+### Derived visibility (10 October)
 
-A new tool derives visibility regions from the navmesh and the scene, instead of authoring them by hand. On Lumen Reach it produced 160 regions in about 51 seconds. Across 64 test views and 5 targeted probes it changed no pixels, and it culled more than the hand-written regions (mean batches submitted 44.7 → 40.5). It is tooling for now; no release uses it yet.
-
-One open item: with nothing moving, the nested compositor's GPU is busy 2.0–2.2% of the time, against 1.2% when render on demand landed. No world frames are rendered while idle, so the extra load is on the compositor's presentation side. It hasn't been bisected yet.
+A new tool derives visibility regions from the navmesh and the scene, instead of authoring them by hand. On Lumen Reach it produced 160 regions in about 51 seconds. Across 64 test views and 5 targeted probes it changed no pixels, and it culled more than the hand-written regions (mean batches submitted 44.7 → 40.5). Lumen Reach 0.9.0 runs it as a build step: 805 cells merge into 184 regions, and none of 29,781 eye samples hides anything it should see. Across the same 72 test views as 0.8.1, batches submitted dropped from 44.2 to 40.4, and culled frames matched unculled ones in 72 of 72 views (0.8.1: 71 of 72).
 
 ### Optional dGPU offload (RFC-0009, 8 October)
 
@@ -182,5 +191,9 @@ Times are CEST (UTC+2). Contract versions link to their [schema reference](/refe
   <li><span class="when">00:25–02:10</span><span class="what">Derived visibility prototype</span><p>Visibility regions generated from the navmesh and scene.</p></li>
   <li><span class="when">01:21</span><span class="what">World shader specialisation</span><p>World shading is 21% faster on Intel Low.</p></li>
   <li class="major"><span class="when">11:05</span><span class="what">Lumen Reach 0.8.0</span><p>The first release on world format 0.7: 41% smaller, 45% less GPU memory, same frame time.</p></li>
+  <li><span class="when">11:15</span><span class="what">Autodrive climbs stairs and ramps</span><p>Autodrive walks routes with the same walker as the keyboard instead of a straight line that stopped at every stair foot.</p></li>
+  <li class="major"><span class="when">12:02</span><span class="what">Idle GPU from 2% to 0.07%</span><p>Workspace walls recompose only when their windows change.</p></li>
   <li><span class="when">13:45</span><span class="what">Lumen Reach 0.8.1</span><p>A Rime Vault ceiling slot no longer shows sky; a new check catches sky leaks through enclosures.</p></li>
+  <li><span class="when">13:54</span><span class="what">Walls follow native stacking order</span><p>Raising a window in Hyprland raises it on its world wall too.</p></li>
+  <li class="major"><span class="when">15:22</span><span class="what">Lumen Reach 0.9.0</span><p>Derived visibility, per-area playable volumes with a 60 m ceiling, walking-only backstops and canonical areas.</p></li>
 </ol>

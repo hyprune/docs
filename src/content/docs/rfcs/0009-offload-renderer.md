@@ -572,7 +572,7 @@ and offload failed closed. The run also found that an NVIDIA compositor GPU
 imports the worker's LINEAR buffers only as external textures; core now imports
 them through `GL_TEXTURE_EXTERNAL_OES` when the driver reports LINEAR as
 external-only (no contract change). Evidence:
-[core `docs/evidence/offload/nvidia-consumer/README.md`](https://github.com/hyprune/core/blob/main/docs/evidence/offload/nvidia-consumer/README.md).
+[core `docs/evidence/offload/nvidia-consumer/README.md`](https://github.com/hyprune/core/blob/e0defa18e53bcfef98c758ef70c804f8972cfcf6/docs/evidence/offload/nvidia-consumer/README.md).
 
 **Mains detection.** A system with no power supply of type `Battery` runs on
 mains power: the profile is `full-ac`, `auto` is admitted and the frame-rate

@@ -9,9 +9,9 @@ import Shot from '../../components/media/Shot.astro';
 import Evolution from '../../components/media/Evolution.astro';
 import Video from '../../components/media/Video.astro';
 
-Work on Hyprune started on **7 October 2026**. As of 10 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.19 and the release world has shipped ten versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
+Work on Hyprune started on **7 October 2026**. As of 11 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.19 and the release world has shipped eleven versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
 
-All images and clips on this page are in-engine captures of **Lumen Reach**, the official release world (Hyprune contributors, CC-BY-4.0).
+All images and clips on this page are in-engine captures of **Lumen Reach**, the official release world (Hyprune contributors, CC-BY-4.0), except the reticle clip, which uses core's original nested test world.
 
 ## Lumen Reach, release by release
 
@@ -49,8 +49,9 @@ The same camera across releases. Pick a version:
 | [**0.8.0**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.8.0) | 10 Oct | 39.4 MB | 245,330 | 150 MiB\* | First release on world format 0.7: KTX2 textures, meshopt geometry and lightmap mips; same look and frame time |
 | [**0.8.1**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.8.1) | 10 Oct | 39.7 MB | 245,330 | 150 MiB\* | Closes a Rime Vault ceiling slot that showed sky; the build now fails on sky leaks through enclosure roofs and walls |
 | [**0.9.0**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.9.0) | 10 Oct | 39.7 MB | 245,330 | 150 MiB\* | Visibility derived at build time (184 regions); per-area playable volumes with a 60 m fly ceiling; backstops only where a walker can reach (pieces over 15 m: 71 → 17); canonical areas contract |
+| [**0.9.1**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.9.1) | 11 Oct | 39.3 MB | 251,506 | 150 MiB\* | Fixes from live testing: the four primary walls are true 16:9 frames, signs clear the roofs, rails on the rooftop walkway, bridge and raised landings, a terrain shading fix; new checks for all three |
 
-GPU memory is the package checker's upload estimate at full texture resolution. \*From 0.8.0 on it is core's measured `upload.gpuBytes` for 0.8.0, because compressed textures stay compressed on the GPU; on the same measure 0.7.2 uses 270.5 MiB. The package estimates for 0.8.1 and 0.9.0 match 0.8.0's. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
+GPU memory is the package checker's upload estimate at full texture resolution. \*From 0.8.0 on it is core's measured `upload.gpuBytes` for 0.8.0, because compressed textures stay compressed on the GPU; on the same measure 0.7.2 uses 270.5 MiB. Later package estimates stay within 0.4 MiB of 0.8.0's. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
 
 <div class="shot-grid">
   <Shot name="signal-rise-reflector-0.6.0" alt="Signal Rise reflector dish against snowy peaks at night." caption="Signal Rise reflector" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />
@@ -130,6 +131,29 @@ The world shader is now compiled per effect preset, so features a preset turns o
 
 A new tool derives visibility regions from the navmesh and the scene, instead of authoring them by hand. On Lumen Reach it produced 160 regions in about 51 seconds. Across 64 test views and 5 targeted probes it changed no pixels, and it culled more than the hand-written regions (mean batches submitted 44.7 → 40.5). Lumen Reach 0.9.0 runs it as a build step: 805 cells merge into 184 regions, and none of 29,781 eye samples hides anything it should see. Across the same 72 test views as 0.8.1, batches submitted dropped from 44.2 to 40.4, and culled frames matched unculled ones in 72 of 72 views (0.8.1: 71 of 72).
 
+### Motion feel and clarity (10 October)
+
+Two things made moving around feel heavier than the frame rate suggested. The simulation ticked on its own 16 ms timer, which beats against the 60 Hz display, so a shown frame moved by zero, one or two steps. And when the GPU fell behind, new and repeated frames mixed at random. Now a tick runs on each presented frame, and movement and look use that frame's real time. A frame-rate target below the display rate renders on every second (or nth) presentation, evenly. Measured in nested 4K on the Intel iGPU, with the same scripted walk and turn before and after (lower variation is smoother):
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">Frame interval variation, default</span><span class="stat-value">0.004</span><span class="stat-delta">from 0.087</span></div>
+  <div class="stat"><span class="stat-label">Turning unevenness, default</span><span class="stat-value">0.022</span><span class="stat-delta">from 0.182</span></div>
+  <div class="stat"><span class="stat-label">Frame interval variation, GPU-bound</span><span class="stat-value">0.002</span><span class="stat-delta">from 0.339, now a steady 30</span></div>
+  <div class="stat"><span class="stat-label">Wall text sharpness vs native</span><span class="stat-value">0.889</span><span class="stat-delta">from 0.477</span></div>
+</div>
+
+Input to first new frame stays at 8–10 ms at the default 60 FPS. A steady 30 FPS target adds one frame (22–29 ms). Two approaches were tried and dropped: interpolating between fixed steps, which made walking worse, and automatic slowdowns, which let the GPU clock down and never recover.
+
+<Video name="feel-pacing-ab" title="Motion before and after frame pacing" width={1280} height={400} caption="The same scripted turn and walk in Lumen Reach, before (left) and after (right): default dynamic resolution, then a GPU-bound native 4K High preset at 60 and at 30 FPS targets. Nested 4K, Intel iGPU." />
+
+Workspace walls used to be composed into a fixed 1280×720 texture, which a large wall magnified almost three times at a normal viewing distance. Walls with windows are now composed at the monitor's own resolution with mipmaps, and sampled with trilinear and anisotropic filtering. They are regenerated only when the windows change, and cost about 44 MB per wall at 4K.
+
+<figure class="shot"><img src="/media/core/wall-text-clarity.webp" width="1820" height="240" loading="lazy" alt="Three crops of the same terminal text: crisp native text, a blurry wall from before, and a crisp wall from after." /><figcaption>The same terminal text at 8 m: native (left), wall before (middle), wall after (right).</figcaption></figure>
+
+Starting a carry on a window seen from behind used to stall the compositor for about 239 ms, because the turn-around sweep tested every world triangle at every step. With a broad phase and the world's collision index, it now takes 0.16 ms. Other small changes the same day: world geometry is static to gestures and tools; a window carried from behind turns to face you; empty walls show the wallpaper or a placeholder; placed windows snap into tool-mount frames; and render-pass tracking recovers when the compositor skips the end of a pass.
+
+<Video name="reticle-states" title="The reticle's states" width={1920} height={1080} caption="IPC 0.19's contextual reticle at native pixels (enlarged for the clip): neutral, opening while moving, a valid grab, out of reach with the distance, an invalid spot and holding. Core's nested test world." />
+
 ### Optional dGPU offload (RFC-0009, 8 October)
 
 On laptops with a discrete GPU, a supervised Vulkan worker can render the world there and hand frames back over DMA-BUF. It runs under a power budget: 50 W / 45 FPS on USB-C or battery, 80 W / 60 FPS on qualified mains power. Phase 1 is merged and **off by default**. Performance → Offload switches it at runtime, and the renderer falls back to local rendering immediately if the worker stalls. At native 4K on USB-C the worker held 45 FPS at a 32.8 W peak.
@@ -137,6 +161,8 @@ On laptops with a discrete GPU, a supervised Vulkan worker can render the world 
 <Video name="dgpu-quality" title="Intel Auto compared with NVIDIA Ultra at 4K" width={1280} height={498} caption="Prototype quality comparison at 4K, Sun Court and Rime Vault: Intel Auto (Low, dynamic scale) against an NVIDIA laptop GPU at native 4K with 4× MSAA, capped at 45 FPS. World only; no application windows." />
 
 The Intel iGPU already reaches 60 FPS at 4K with dynamic resolution, so offload is about quality headroom, not reaching 60. It has not been qualified on physical power profiles yet.
+
+On 10 October offload also started working when the compositor itself runs on an NVIDIA GPU. A desktop with two RTX 3090s was tested at 1080p and 4K, both same-GPU and cross-GPU. In all five configurations offload stayed active at 60 FPS. [IPC 0.18](/reference/schema/ipc/0.18/) picks the offload GPU: by default an NVIDIA GPU that isn't driving the display, then the least busy. It also scales the power cap to that GPU. Without a battery the cap is 75% of the GPU's enforced power limit; laptops keep the 50 W / 80 W profile ceilings.
 
 ## Timeline
 
@@ -196,4 +222,16 @@ Times are CEST (UTC+2). Contract versions link to their [schema reference](/refe
   <li><span class="when">13:45</span><span class="what">Lumen Reach 0.8.1</span><p>A Rime Vault ceiling slot no longer shows sky; a new check catches sky leaks through enclosures.</p></li>
   <li><span class="when">13:54</span><span class="what">Walls follow native stacking order</span><p>Raising a window in Hyprland raises it on its world wall too.</p></li>
   <li class="major"><span class="when">15:22</span><span class="what">Lumen Reach 0.9.0</span><p>Derived visibility, per-area playable volumes with a 60 m ceiling, walking-only backstops and canonical areas.</p></li>
+  <li><span class="when">16:01</span><span class="what">Capture notes</span><p><a href="/reference/schema/ipc/0.17/">IPC 0.17</a>: after U, the shell asks why and saves the note with the capture.</p></li>
+  <li><span class="when">17:23–17:30</span><span class="what">Hands-on fixes</span><p>Static world geometry, carrying a window from behind, wallpaper on empty walls, snapping into tool mounts.</p></li>
+  <li class="major"><span class="when">19:27–20:31</span><span class="what">Frame pacing and wall clarity</span><p>Ticks follow presented frames, targets pace evenly, walls render at native resolution.</p></li>
+  <li><span class="when">19:45</span><span class="what">Robust render-pass tracking</span><p>Recovers when the compositor never signals the end of a pass.</p></li>
+  <li><span class="when">21:21–21:49</span><span class="what">Offload on NVIDIA and device selection</span><p>Cross-GPU offload works with NVIDIA compositors; <a href="/reference/schema/ipc/0.18/">IPC 0.18</a> picks the GPU and scales the power cap to it.</p></li>
+  <li><span class="when">22:24–22:44</span><span class="what">Grab stall fixed</span><p>Starting a carry from behind: 239 ms to 0.16 ms.</p></li>
+  <li class="major"><span class="when">23:02</span><span class="what">Player settings and the reticle</span><p><a href="/reference/schema/ipc/0.19/">IPC 0.19</a>: field of view, walk and run speed, reach limits, view bob, and a contextual reticle in six styles.</p></li>
+</ol>
+
+<p class="timeline-day">Saturday 11 October</p>
+<ol class="timeline">
+  <li class="major"><span class="when">01:31</span><span class="what">Lumen Reach 0.9.1</span><p>Fixes from live testing: 16:9 primary walls, signs clear of roofs, rooftop rails, a shading fix.</p></li>
 </ol>

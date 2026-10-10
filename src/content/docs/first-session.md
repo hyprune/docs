@@ -19,7 +19,7 @@ The meta repository `hyprune/hyprune` is the front door. It bundles core, shell,
 - **NixOS or Home Manager:** import the module and set `programs.hyprune = { enable = true; kit = "lumen-reach"; };`. The module pins the same compositor the plugin was built for, plus its matching portal.
 - **Arch:** `./install.sh --kit minimal --dry-run`, then without `--dry-run`. The script checks the compositor and header versions, builds the pinned components and never edits your Hyprland config without showing the diff and asking first. `--uninstall` reverses it.
 
-Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.9.0 (world format 0.7, compressed textures, playable bounds) and Switchyard 0.1.1 are the current releases.
+Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.9.1 (world format 0.7, compressed textures, playable bounds) and Switchyard 0.1.1 are the current releases.
 
 ## A nested developer session
 
@@ -45,11 +45,23 @@ With the `lumen-reach` kit:
 6. **Carry and pocket.** Hold **Super+left mouse** to carry an aimed window, then **Super+wheel** to change its distance. Tool **5** (Placement) pockets windows with the middle button and places them ahead with the left button or onto a surface with the right.
 7. **Free cursor.** From the world, **Super+Tab** gives you a real cursor while the camera freezes. Press it again to return.
 
-The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto), the upscaler (FSR 1 or bilinear) and the optional dGPU offload are in **Performance**.
+The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto), the field of view (30–120°, default 65°), the upscaler (FSR 1 or bilinear) and the optional dGPU offload are in **Performance**. On machines with more than one GPU, offload picks a discrete GPU that isn't driving the display and scales its power cap to that GPU.
+
+## Player settings
+
+The Director's **Settings** tab holds the player settings. They apply immediately and only changed values are saved, to `~/.config/hyprune/player.json`:
+
+- **Movement:** walk 4.0 m/s and run 10 m/s by default; view bob off, subtle (default) or normal.
+- **Reach:** how far your hands work. Window gestures such as carry and resize reach 15 m, snapping into tool mounts 8 m, and placing, pocketing and path points 12 m. Clicking into a window has no limit.
+- **Reticle:** six styles, with size, thickness, gap, opacity, outline and colour. It opens up while you move and tells you what the current tool would do. A valid target gets corner brackets, a target out of reach dims and shows its distance, and a target that can't take the action shows an x. Every state changes shape as well as colour.
+
+The graphics setting **Reduced motion** turns off view bob and the moving reticle. All defaults and ranges are on the [keymap](/keymap/#player-settings) page.
+
+<figure class="shot"><img src="/media/core/reticle-styles.webp" width="1400" height="1588" loading="lazy" alt="A grid of the six reticle styles (cross with dot, T with dot, circle with dot, dot, cross, chevron) in each state: neutral, target, valid, out of range with a distance, invalid, holding and typing." /><figcaption>The six reticle styles in each state, with the Adventure HUD colours, shown large and at the default size.</figcaption></figure>
 
 ## When something goes wrong
 
 - **F12** leaves the world from any mode except free cursor. In free cursor, press **Super+Tab** or **Back** first.
 - If the daemon dies, the plugin restores the desktop by itself (in 0.052 s in tests).
 - If the shell crashes or restarts, it reconnects, renews its credentials and resyncs.
-- **U** writes a private capture (a screenshot plus a JSON state dump) under `~/.local/state/hyprune/captures/` for bug reports. With `capture={watermark=true}` in the plugin config, captures carry the Hyprune lockup in a corner; it is never drawn live.
+- **U** writes a private capture (a screenshot plus a JSON state dump) under `~/.local/state/hyprune/captures/` for bug reports. The shell then asks **why?** Type a short note and it's saved with the capture and collected in `captures/notes.md`, so a round of testing reads as a list. The capture never waits for the note. With `capture={watermark=true}` in the plugin config, captures carry the Hyprune lockup in a corner; it is never drawn live.

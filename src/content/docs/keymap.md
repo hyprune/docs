@@ -117,9 +117,34 @@ Binding names use XKB keysyms, `Super+Shift+Ctrl+Alt+key`, `LMB`, `RMB`, `MMB`, 
 
 U in world, or Super+U in interactive/focus/menu, writes a private timestamped JSON/PNG capture pair under `$XDG_STATE_HOME/hyprune/captures/` (default `~/.local/state/hyprune/captures/`) and shows the path in a notice. The JSON records the completed world frame camera, age and timings, plus mode, tools, surfaces, placements, recent IPC/events and the bounded input history.
 
-Compositor graphics, movement speed, sensitivity and inertia remain in `hl.plugin.hyprune.config({...})`; input bindings belong in the independent JSON file.
+Compositor graphics, sensitivity and inertia remain in `hl.plugin.hyprune.config({...})`; input bindings belong in the independent JSON file. Walking and running speed, view bob, the reticle and reach limits are [player settings](#player-settings).
 
 Tools save paths, window locks and object transforms in `$XDG_STATE_HOME/hyprune/editor.json`, scoped by world and area. Authored world packages stay read-only.
+
+## Player settings
+
+Movement speed, view bob, the reticle and how far your hands reach are player settings. Change them in the Director’s Settings tab or with `player.set` (IPC 0.19); changes apply immediately. Only changed keys are saved, to `$HYPRUNE_PLAYER_FILE`, else `$XDG_CONFIG_HOME/hyprune/player.json` (default `~/.config/hyprune/player.json`). `hl.plugin.hyprune.config({player = {...}})` accepts the same keys; saved values win. The old `player.run_multiplier` still works in Lua and sets run speed to walk speed × multiplier.
+
+| Setting | Default | Valid range / meaning |
+| --- | --- | --- |
+| walk_speed | 4.0 | 0.5–20 m/s; walking and the flight base speed |
+| run_speed | 10.0 | 0.5–30 m/s while `sprint` is held; flight scales by run/walk |
+| view_bob | subtle | off, subtle or normal walking view bob |
+| reticle_style | cross_dot | cross_dot, t_dot, circle_dot, dot, cross or chevron |
+| reticle_size | 18 | 6–64 px, full extent |
+| reticle_thickness | 2 | 1–6 px |
+| reticle_gap | 4 | 0–20 px from the centre to the arms |
+| reticle_opacity | 0.9 | 0.2–1 |
+| reticle_outline | true | Dark 1 px outline for contrast |
+| reticle_colour | theme | `theme` (the HUD theme) or an RGB colour |
+| reticle_dynamic | true | The reticle opens up while you move or turn |
+| reach_grab | 15 | 1–100 m; Super+button window gestures (carry, resize, roll) |
+| reach_mount | 8 | 1–100 m; snapping into tool-mount frames (tools 2 and 5, releasing a carry) |
+| reach_placement | 12 | 1–100 m; placing on a surface and pocketing (tool 5), mounting on a wall (tool 2), path points (tool 3) |
+
+The graphics `reduced_motion` setting turns off the view bob and the dynamic reticle whatever these settings say. Clicking into a window with the normal tool has no reach limit; beyond the other limits the action is refused and a notice says how far away the target is.
+
+The reticle shows what the current tool or held Super gesture would do: a valid target gets corner brackets in the valid colour, a target out of reach dims the reticle and shows its distance, a target that can't take the action turns the reticle into an x in the warning colour, and carrying a window shows brackets in the reticle colour. Shape changes go with every colour change, so no state relies on colour alone. The reticle is hidden in the free cursor and follows the pointer while typing.
 
 ## Workspaces
 

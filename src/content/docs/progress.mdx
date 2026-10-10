@@ -9,7 +9,7 @@ import Shot from '../../components/media/Shot.astro';
 import Evolution from '../../components/media/Evolution.astro';
 import Video from '../../components/media/Video.astro';
 
-Work on Hyprune started on **7 October 2026**. As of 10 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.16 and the release world has shipped eight versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
+Work on Hyprune started on **7 October 2026**. As of 10 October, core, shell, SDK, schemas and two worlds run together end to end, the IPC protocol is at version 0.16 and the release world has shipped nine versions. This page records how it got there, with the evidence kept in each repository. The [roadmap](/roadmap/) says what is still missing.
 
 All images and clips on this page are in-engine captures of **Lumen Reach**, the official release world (Hyprune contributors, CC-BY-4.0).
 
@@ -47,8 +47,9 @@ The same camera across releases. Pick a version:
 | **0.7.1** | 9 Oct | 46.9 MB | 244,526 | 373 MiB | Fixes from the first live walk: sky seam, a capped stair, the night sky |
 | [**0.7.2**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.7.2) | 9 Oct | 46.8 MB | 245,330 | 373 MiB | A walkable, clear roof route |
 | [**0.8.0**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.8.0) | 10 Oct | 39.4 MB | 245,330 | 150 MiB\* | First release on world format 0.7: KTX2 textures, meshopt geometry and lightmap mips; same look and frame time |
+| [**0.8.1**](https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.8.1) | 10 Oct | 39.7 MB | 245,330 | 150 MiB\* | Closes a Rime Vault ceiling slot that showed sky; the build now fails on sky leaks through enclosure roofs and walls |
 
-GPU memory is the package checker's upload estimate at full texture resolution. \*For 0.8.0 it is core's measured `upload.gpuBytes`, because compressed textures stay compressed on the GPU; on the same measure 0.7.2 uses 270.5 MiB. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
+GPU memory is the package checker's upload estimate at full texture resolution. \*For 0.8.x it is core's measured `upload.gpuBytes` for 0.8.0, because compressed textures stay compressed on the GPU; on the same measure 0.7.2 uses 270.5 MiB. 0.8.1's package estimate is the same as 0.8.0's. Lumen Reach release numbers are independent of [world format](/reference/schema/world/) versions.
 
 <div class="shot-grid">
   <Shot name="signal-rise-reflector-0.6.0" alt="Signal Rise reflector dish against snowy peaks at night." caption="Signal Rise reflector" version="0.6.0" sizes="(min-width: 72rem) 24rem, 50vw" />
@@ -181,4 +182,5 @@ Times are CEST (UTC+2). Contract versions link to their [schema reference](/refe
   <li><span class="when">00:25–02:10</span><span class="what">Derived visibility prototype</span><p>Visibility regions generated from the navmesh and scene.</p></li>
   <li><span class="when">01:21</span><span class="what">World shader specialisation</span><p>World shading is 21% faster on Intel Low.</p></li>
   <li class="major"><span class="when">11:05</span><span class="what">Lumen Reach 0.8.0</span><p>The first release on world format 0.7: 41% smaller, 45% less GPU memory, same frame time.</p></li>
+  <li><span class="when">13:45</span><span class="what">Lumen Reach 0.8.1</span><p>A Rime Vault ceiling slot no longer shows sky; a new check catches sky leaks through enclosures.</p></li>
 </ol>

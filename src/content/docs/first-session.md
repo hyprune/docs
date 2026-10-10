@@ -19,7 +19,7 @@ The meta repository `hyprune/hyprune` is the front door. It bundles core, shell,
 - **NixOS or Home Manager:** import the module and set `programs.hyprune = { enable = true; kit = "lumen-reach"; };`. The module pins the same compositor the plugin was built for, plus its matching portal.
 - **Arch:** `./install.sh --kit minimal --dry-run`, then without `--dry-run`. The script checks the compositor and header versions, builds the pinned components and never edits your Hyprland config without showing the diff and asking first. `--uninstall` reverses it.
 
-Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.8.0 (world format 0.7, compressed textures) and Switchyard 0.1.1 are the current releases.
+Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.8.1 (world format 0.7, compressed textures) and Switchyard 0.1.1 are the current releases.
 
 ## A nested developer session
 

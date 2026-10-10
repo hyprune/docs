@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## v0 / 0.1.0 — 2026-10-07 (proposed)
 
 Initial JSON Schema 2020-12 family: world format `0.1`, IPC `0.1`, extension manifest/API `0.1`, screen descriptor `0.1`. Includes every core method's request and result plus notifications, offline examples and a Node validator. Identifiers are reserved for these contracts; incompatible changes require a new wire/format identifier and migration notes. No runtime compatibility is claimed yet.
@@ -93,3 +94,13 @@ Inheritance test: every valid 0.6 document is valid as 0.7. IPC is unchanged.
 null) in config, effective values, overrides, presets and `graphics.set`
 patches; `session.hello` reports `0.16`. Inheritance test: every 0.15
 definition exists in 0.16 and the graphics properties differ only by the new key.
+
+## IPC 0.17: debug capture notes
+
+- `capture.annotate {captureId, note}` (shell.control): writes an optional note
+  (0..1000 code points, no control characters) into a debug capture's JSON and
+  the captures index. Result `{revision}`.
+- `capture.taken {captureId, timestampMs, mode}` notification, sent to 0.17
+  shells when U (or the mode's capture binding) snapshots the world, before the
+  files are written.
+- Everything else is inherited from 0.16 unchanged.

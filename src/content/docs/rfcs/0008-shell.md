@@ -400,3 +400,40 @@ overrides, options, presets and Performance records; older peers cannot write it
 (`graphics.set` with `upscaler` below 0.16 is an invalid-params error). All
 earlier capabilities remain inherited. Shells show the setting next to
 Sharpening when the session negotiated 0.16 or later.
+
+## Amendment: IPC 0.17 capture notes
+
+A debug capture (U, or the capture binding of the current input mode) is written
+immediately as `capture-<ms>.png` and `capture-<ms>.json`; it never waits for a
+note. Core sends `capture.taken {captureId, timestampMs, mode}` to 0.17 peers
+holding `shell.control` at snapshot time, before the files exist. `mode` is the
+input mode at capture: `world`, `interactive`, `focus`, `cursor` or `menu`.
+
+`capture.annotate {captureId, note}` (`shell.control`) attaches a note to a capture
+taken during the current plugin load (otherwise error -32005). A note is 0–1000
+Unicode code points of UTF-8 with no control characters; an empty note is valid
+and recorded as `""`. Core queues the write behind the capture's own files, then
+sets `note` and `noteTimeMs` in the capture JSON (the latest note wins) and appends
+`{timestampMs, noteTimeMs, capture, screenshot, note}` to `captures/index.jsonl`.
+Non-empty notes are also appended to `captures/notes.md`, one readable line each,
+so all notes can be read in order. Result: `{revision}`. Captures and notes are
+written strictly in order, so rapid captures may queue (at most four waiting
+snapshots) instead of failing while an earlier image is still being written.
+
+The reference shell offers a one-line prompt ("Why? (Enter to skip)") for captures
+taken while navigating (`mode: "world"`), unless the Director is open. It takes
+exclusive keyboard input the same way the Director does, so the world does not
+move while typing:
+
+- Enter writes the typed note (possibly empty) and releases input with a hidden
+  `shell.overlay`; navigation continues, including any autodrive or travel.
+- Escape is the menu-mode exit: the prompt closes and no note is written.
+- The current mode's capture binding (Super+U while the prompt has the keyboard)
+  saves the pending text as-is and moves the prompt to the new capture, so
+  snapshots can be taken and annotated in a row.
+- Opening the Director replaces the prompt; typed text is kept as the note.
+
+Captures taken while typing in an application, in focus or in the free cursor do
+not prompt, so those modes are never interrupted. Peers below 0.17 receive
+neither message and see captures exactly as before; all earlier capabilities are
+inherited.

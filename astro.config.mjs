@@ -35,6 +35,7 @@ export default defineConfig({
         { label: 'IPC protocol', link: '/reference/schema/ipc/' },
         { label: 'Input keymap schema', link: '/reference/schema/input/' },
         { label: 'Default keymap', slug: 'keymap' },
+        { label: 'NPC characters (draft)', slug: 'npc-characters' },
       ] },
       { label: 'Project', items: [
         { slug: 'progress' },

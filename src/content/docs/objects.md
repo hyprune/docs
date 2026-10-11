@@ -126,8 +126,10 @@ All three run the same validator from `@hyprune/schema`. A full check covers the
 and trait rules, the glTF extension rules of the object's format, node, material and
 material-variant names, character clips and their measured speeds, bounds within 1 cm,
 the budgets above, the thumbnail, links and executable files, and that the attribution
-covers every file. `tools/object-check` decodes the geometry for the exact bounds; the SDK
-check also runs the Khronos glTF validator.
+covers every file. `tools/object-check` decodes the geometry for the exact bounds and lists
+build sources kept beside an object (`build.py`, `PROVENANCE`, `README.md`) as ignored; the
+SDK checks a directory exactly as it ships, so it rejects them, and also runs the Khronos
+glTF validator.
 
 ## Licensing and provenance
 

@@ -12,6 +12,8 @@ Movement keys are listed **HJKL first**, then WASD and arrows. E uses a window o
 
 Q holds scope zoom; the wheel changes its magnification. Shift snaps position-tool movement to 0.1 m, rotation to 15°, and scale factors to 0.1. Keys 1–4 select tools; 5 selects the Placement tool. Wheel selects an unplaced window; LMB places ahead and RMB places on a surface. MMB pockets the aimed window for travel. A nonempty queue preselects tool 5 on first entry. HUD concepts (Adventure, Instrument and Minimal) are selected in Settings → Appearance, with Adventure as default. The window tool cycles place/lock; the path tool cycles line/curve/arc and Alternate toggles open/closed; the position tool cycles move/rotate/scale.
 
+Super+LMB on a window’s edge (about 10 cm) resizes it from the nearest corner; anywhere else it carries. The Super window gestures (carry, resize, push/pull, rotate, content scale) also work while using a window (E). A window brought into the world (opened there, moved or dragged in from another output, pulled, recalled, placed or carried off its wall) becomes a floating window at its own size (very large ones are scaled down); back on its home wall it is tiled again.
+
 Carrying: `r` toggles **FACING YOU / KEEP ANGLE**. `Super+Ctrl+Wheel` rotates; `Super+Shift+Wheel` changes content scale. `Super+Shift+MMB` resets the window. The shell reports content scale and client pixel dimensions.
 
 ## Tool input slots
@@ -144,7 +146,7 @@ Movement speed, view bob, the reticle and how far your hands reach are player se
 
 The graphics `reduced_motion` setting turns off the view bob and the dynamic reticle whatever these settings say. Clicking into a window with the normal tool has no reach limit; beyond the other limits the action is refused and a notice says how far away the target is.
 
-The reticle shows what the current tool or held Super gesture would do: a valid target gets corner brackets in the valid colour, a target out of reach dims the reticle and shows its distance, a target that can't take the action turns the reticle into an x in the warning colour, and carrying a window shows brackets in the reticle colour. Shape changes go with every colour change, so no state relies on colour alone. The reticle is hidden in the free cursor and follows the pointer while typing.
+The reticle shows what the current tool or held Super gesture would do: a valid target gets corner brackets in the valid colour, a target out of reach turns the reticle to the warning colour with a hollow centre and a **Too far: N m** label (a refused action also flashes it), a target that can't take the action turns the reticle into an x in the warning colour, and carrying a window shows brackets in the reticle colour. Shape changes go with every colour change, so no state relies on colour alone. The reticle is hidden in the free cursor and follows the pointer while typing.
 
 ## Workspaces
 

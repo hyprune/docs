@@ -181,3 +181,7 @@ definition exists in 0.16 and the graphics properties differ only by the new key
 - `v0.8/common.schema.json` is the 0.7 common definitions under the 0.8 `$id`
   (the directory already held IPC 0.8, which keeps its own references).
   Everything else is inherited from 0.7 unchanged. Inheritance test included.
+
+## @hyprune/schema 0.6.0 (2026-10-11)
+
+Publishes IPC 0.20 and world format 0.8 to npm.

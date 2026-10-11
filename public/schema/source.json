@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/hyprune/schema",
-  "commit": "89fde8ce152ba47c31e19a2e19889f08f67d5137",
+  "commit": "3ce432afd7ff5a82d3a24b5cc74f83b98bd37f15",
   "committed": "2026-10-11",
   "files": {
     "examples/extension.json": "7ef103bfbf43c12ad1db7486827a930a552f41a04ef386a67331123c90af272e",
@@ -78,7 +78,7 @@
     "v0.8/world.schema.json": "cffb36b8b5605b30b1d0d3054ee62f28ffb6757ac017efd01c7fecf2eeb9cde5",
     "v0.9/input.schema.json": "a069cb5db721bf78a3760516b0e6da855b382705eccfa9b41c04d41da5aa6064",
     "v0.9/ipc.schema.json": "4c56a24da3814a9d7e378bb648ef742ea30fb24b6d97cda9dd0384594b478cf3",
-    "CHANGELOG.md": "a7fe313b0e744846546920cafcee4ce71f9b683043e1b921fcdc134eb7c6c636"
+    "CHANGELOG.md": "d7273a17583dcdb1acf19ae459bf24e69b982f5f6b9d94cc50431a07a30c51ab"
   },
   "added": {
     "examples/extension.json": "2026-10-07",

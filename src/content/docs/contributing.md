@@ -4,7 +4,7 @@ description: "Choose a boundary, bring evidence, and keep the desktop recoverabl
 ---
 
 
-Hyprune is early and building in the open. Contributions can be code, original world art, interaction design, documentation, conformance cases or careful RFC review.
+Hyprune is an early preview, building in the open, and every repository is public on [GitHub](https://github.com/hyprune). Contributions can be code, original world art, interaction design, documentation, conformance cases or careful RFC review. Open issues and pull requests in the repository that owns the change: [hyprune](https://github.com/hyprune/hyprune) (install and kits), [core](https://github.com/hyprune/core), [shell](https://github.com/hyprune/shell), [worlds](https://github.com/hyprune/worlds), [sdk](https://github.com/hyprune/sdk), [schema](https://github.com/hyprune/schema) or [docs](https://github.com/hyprune/docs).
 
 ## Start with a small concrete change
 

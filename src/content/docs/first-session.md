@@ -3,11 +3,11 @@ title: "Try Hyprune"
 description: "Install paths, a developer nested session, and your first ten minutes in Lumen Reach."
 ---
 
-Hyprune is an early preview. It targets **Hyprland 0.56.2** exactly, because the core plugin is built against that compositor's ABI. The component repositories (core, shell, SDK, schemas, worlds and the installer) are **not public yet**. The paths below are for people with access, and show what the experience will look like once the repositories open.
+Hyprune is an early preview. It targets **Hyprland 0.56.2** exactly, because the core plugin is built against that compositor's ABI. Everything is public on [GitHub](https://github.com/hyprune) and installs without accounts or tokens. It's an early preview: expect rough edges, and keep the nested session below for testing development builds.
 
 ## Install paths
 
-The meta repository `hyprune/hyprune` is the front door. It bundles core, shell, SDK and worlds into **kits**:
+The meta repository [hyprune/hyprune](https://github.com/hyprune/hyprune) is the front door; its README has every option in detail. It bundles core, shell, SDK and worlds into **kits**:
 
 | Kit | What you get |
 | --- | --- |
@@ -19,7 +19,7 @@ The meta repository `hyprune/hyprune` is the front door. It bundles core, shell,
 - **NixOS or Home Manager:** import the module and set `programs.hyprune = { enable = true; kit = "lumen-reach"; };`. The module pins the same compositor the plugin was built for, plus its matching portal.
 - **Arch:** `./install.sh --kit minimal --dry-run`, then without `--dry-run`. The script checks the compositor and header versions, builds the pinned components and never edits your Hyprland config without showing the diff and asking first. `--uninstall` reverses it.
 
-Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.9.1 (world format 0.7, compressed textures, playable bounds) and Switchyard 0.1.1 are the current releases.
+Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.9.2 (world format 0.7, compressed textures, playable bounds) and Switchyard 0.1.2 are the current releases, on [hyprune/worlds](https://github.com/hyprune/worlds/releases).
 
 ## A nested developer session
 

@@ -18,8 +18,8 @@ Consistent contributions and constructive review can lead to a scoped maintainer
 
 ## Community and security
 
-Use the Contributor Covenant and organization security policy. The conduct contact is **conduct@hyprune.com**, an explicit placeholder to be provisioned and tested by the owner; it is not yet monitored. Do not send sensitive reports to it until activated or post them in public issues. No personal address is published. Enable GitHub private vulnerability reporting on core and propagate a tested reporting route. The initial repository documents these setup steps rather than inventing an unmonitored mailbox.
+Use the Contributor Covenant and organization security policy. The conduct contact is **conduct@hyprune.com** and the security contact is **security@hyprune.com**; both reach the project steward. Report vulnerabilities privately with GitHub's *Report a vulnerability* button, which is enabled on core, shell, sdk, schema, worlds and hyprune ([security policy](https://github.com/hyprune/.github/blob/main/SECURITY.md)). Never post sensitive reports in public issues. No personal address is published.
 
 ## Decisions awaiting owner review
 
-RFC-0001–0009 were accepted on 2026-10-09; each status line records how far it is implemented. The HUD-style amendment remains proposed. Still open: confirm repository license choices, activate conduct@hyprune.com and GitHub private vulnerability reporting, and decide when to open the component repositories. These are review items, not blockers for development.
+RFC-0001–0009 were accepted on 2026-10-09; each status line records how far it is implemented. The HUD-style amendment remains proposed. The repositories went public on 11 October 2026. Still open: confirm repository license choices and enable private vulnerability reporting on docs and .github. These are review items, not blockers for development.

@@ -1,5 +1,7 @@
 # Hyprune docs
 
+> **Hyprune** is an explorable, world-driven desktop environment for Hyprland: your workspaces become places you can walk through, with live windows on the walls. This repository is the source of the **hyprune.com** documentation site. Install Hyprune through the [hyprune](https://github.com/hyprune/hyprune) repository (starter kits, Nix, Arch); learn more at [hyprune.com](https://hyprune.com). Licence: MIT.
+
 An Astro Starlight site for **hyprune.com**: overview, Try Hyprune guide, concepts, architecture, a version-aware schema reference generated from `hyprune/schema`, the default keymap, progress and roadmap, the RFCs and their amendments, contributing and governance. Diagrams are original SVG. Media under `public/media/` are in-engine captures of Lumen Reach (Hyprune contributors, CC-BY-4.0), pre-encoded ahead of time; see `public/media/README.md`. Original prose/code/art are MIT.
 
 ## Local development and verification

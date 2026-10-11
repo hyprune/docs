@@ -330,3 +330,50 @@ Pocket membership remains `editor.unplaced.windows`. The reference shell's Direc
 lists every window with "Put in pocket", marks pocketed ones and offers "Take out /
 place".
 
+
+## Amendment: reachable spawns, home arrivals and world switches (no wire change)
+
+**Spawn poses are reachable.** A newly opened room window (and `surface.unpocket`
+without a durable placement) first tries the pose ahead of the player at the
+configured spawn distance, fanned sideways within the view. The home area's free
+placement zone is the fallback, at the player's viewing height above that zone's
+floor, in one row: a zone's height bounds are never filled upwards. Every candidate
+needs floor (an upward-facing collision surface) under it within 2 m of the
+window's lower edge, and that floor must lie inside the playable volume. Worlds
+without collision skip the floor test. If nothing fits, the window waits in the
+pocket queue as before.
+
+**Windows arriving on a home workspace** (opened there or moved there, including a
+free room window moved onto a home) that have no durable placement rule are placed
+by arrival:
+
+1. The first keeps the area's primary `mounted-workspace` wall.
+2. Later ones take the area's free tool mounts in authored `toolAnchors` order.
+   Mounts that a durable rule restores to are used only when no other mount is free.
+3. With no free mount, the window stays on the wall with the workspace's other windows.
+
+A window the user floats natively on that workspace stays on the wall: it is part of
+the workspace's own layout. `surface.return`, and dropping a carried window onto a
+wall, keep the window on that wall. Arrival assignments are runtime state: they
+follow the window, not the compositor's window order, and never create durable
+rules. They appear in `mounts.instances` like other placed tool windows.
+
+**Occupancy is stable.** A tool mount keeps its holder across refreshes. When two
+live windows match one durable rule, they occupy different free targets (as M2
+specifies) without a `placement.relocated` notice. That notice remains for removed,
+obstructed or otherwise unusable targets.
+
+**Home workspaces on another output.** Windows of a home workspace that lives on a
+different output than the world are composed on their area wall, at their position
+relative to their own output. They are never pulled or floated there.
+
+**Shown windows keep presenting.** Every window on the room or a home workspace has
+the xdg `suspended` state cleared and receives frame callbacks while the world is
+active, including windows not yet captured (for example, without a first buffer).
+Leaving that set, or leaving the world, restores the compositor's own state.
+
+**World workspace switches do not animate.** A workspace switch to or from a
+world-owned workspace finishes the compositor's workspace animation at once. The
+world-owned set is the room workspace, every home binding (explicit and derived)
+and the configured world locations. Other workspace switches keep the user's
+animation settings. No compositor setting is changed.

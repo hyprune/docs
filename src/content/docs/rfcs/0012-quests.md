@@ -3,7 +3,8 @@ title: "RFC-0012 — Quests, markers and focus sessions"
 description: "A TAB-tap marker reveal, a quest model grounded in real work, timed focus sessions and opt-in world progression."
 ---
 
-**Status: draft · proposed 2026-10-11.** Nothing here is implemented. It builds on the
+**Status: draft · proposed 2026-10-11; P1 implemented in IPC 0.21 (see the
+[amendment](#amendment-p1-in-ipc-021)).** P2 and P3 are not implemented. It builds on the
 waypoint, route, location and data-channel contracts of [RFC-0003](/rfcs/0003-ipc/), the
 input model of [RFC-0006](/rfcs/0006-interaction/), the Director and HUD of
 [RFC-0008](/rfcs/0008-shell/), areas, zones and workspace homes from
@@ -737,3 +738,67 @@ P1 acceptance:
    cap?
 7. **Personal quest scope.** Global with markers in any world (proposed), or per world?
 8. **Quests tab position.** Directly after Map (proposed)?
+
+## Amendment: P1 in IPC 0.21
+
+P1 shipped as IPC **0.21** ([schema](/reference/schema/ipc/0.21/), core
+`docs/CHANGELOG.md`). It follows this RFC except where noted here.
+
+**Authority.** hypruned owns personal quests, focus sessions, the guidance settings and
+their files, as proposed. The marker *list* is resolved in the plugin, because every
+target resolves against the loaded world (area walls, zones, places, workspace homes)
+that only the plugin holds; hypruned sends it the quest, focus-target and break markers
+to resolve, the reach objectives to watch and the marker settings, over the private
+bridge. The plugin sends back facts only: the keyboard-focused window as app class and
+workspace (never a title), a last-input timestamp rounded to the second, the session
+lock and which reach targets hold the eye. Budget, stacking and labels are per frame and
+per output, so they run in the plugin's draw path with that frame's camera; the list in
+state is the single answer every shell reads.
+
+**State.**
+- `markers` also carries `coreDraw`. In toggle mode `reveal.holdMs` is 0.
+- `focus` also carries `pausedState`, `phaseMs` (planned length of the current or paused
+  phase), `crediting`, `breakKind` and `countMode`. `creditedMs` and `crediting` are
+  sampled at most every 10 s and at phase changes, so the state is not republished every
+  second; shells count down from `phaseEndsAtMs`.
+- `quests.active[].step` is `{id, title, progress: [done, of]}`; `progress` counts
+  required steps.
+
+**Targets.** 0.21 resolves `position` (optionally with `worldId`, so a personal position
+target shows only in that world), `zoneId`, `areaId`, `placeId` and `workspaceId`. The
+other target kinds arrive with the features they need. A workspace target resolves to its
+home's wall in the loaded world, and as a reach target it means "in that home's area".
+
+**Personal quests.** Objectives are `manual`, `reach` and `focus`. A step may carry a
+`target` (the "do this at the workshop" marker); a reach objective without its own target
+uses the step's. The focus objective's session filter is named `focusTarget`
+(`quest` or `any`), not `target`, so `target` always means a place. Personal quests are
+created active and global; an active quest past its `expires` becomes `failed`; resuming
+a failed quest drops its date. At most 64 personal quests.
+
+**Events.** `focus.phase` names the focus session `focusSessionId`; `sessionId` stays the
+IPC session every event carries. `quest.progress` also carries `title`, and for steps
+`stepTitle` and `nextStepTitle`, so a shell can toast without a `quests.get`.
+
+**Focus sessions.** The running session is also kept in
+`$XDG_STATE_HOME/hyprune/focus/session.json`, so a restarted core resumes it paused. A
+skipped work interval moves on to its break; a waiting break can be skipped into the next
+work interval; `focus.resume` starts the next interval from `ready`. Break suggestions
+pick a place 30-150 m away, else an area home; route-graph reachability is not checked
+yet. `focus.calm_npc_distance` is stored but has no effect until RFC-0010 characters
+honour it. For tests, `HYPRUNE_FOCUS_TIME_SCALE` divides every focus duration.
+
+**Input.** A tap/hold pair on an unmodified chord also works with Shift or Ctrl held, so
+sprinting doesn't block the reveal. A release at or after `longHoldMs` that arrives before
+the hold fired is the hold (releases at 999 and 1001 ms with `longHoldMs = 1000` are a tap
+and a hold).
+
+**Drawing.** The waypoint keeps its own world-locked marker (RFC-0005) and gets only the
+edge arrow from this system. Edge arrows toward the same direction stack like icons. Icons
+are 24 px at 1080p and scale with the output up to 2x. Labels use the overlay font, which
+is ASCII.
+
+**Not in 0.21.** `quests.link`, `quests.confirm`, `quests.provide`/`withdraw` and the
+`quest.provide` grant; `signal`, `discover`, `interact` and `place` objectives; world
+quests (`com.hyprune.quests`), unlocks, world progress and daily caps (P2/P3); compass
+ticks; `iconAtlas.markerIcons`.

@@ -232,3 +232,35 @@ Object manifests use the world format numbering: a world may use objects whose
   `validate('library-releases', record)`. `objectFormats` and `objectLimits` are
   exported. The CLI accepts `object` (with an optional glTF/GLB), `library` and
   `library-releases`.
+
+## IPC 0.21: markers, personal quests and focus sessions
+
+- New grant `quest.control` (hello capabilities): every quest and focus mutation
+  and `guidance.set`.
+- Required state keys: `markers {reveal, persistent, calm, coreDraw, list}`
+  (reveal `holdMs` 0 = toggle or 1000..15000, `fadeMs` 0..600; at most 64
+  markers with tier 1..4, labels up to 48 characters, one target of position,
+  zone, area, place or workspace), `quests {enabled, tracked, active[<=16],
+  counts, world: null}` and `focus {state, pausedState, sessionId,
+  phaseStartedAtMs, phaseEndsAtMs, phaseMs, remainingMs, creditedMs, crediting,
+  cycle, cycles, breakKind, countMode, target, calm}`. Times are monotonic ms.
+- Methods: `markers.reveal {durationMs?}` (shell.control); `guidance.get`,
+  `guidance.set {patch}` returning `{config, defaults, overrides, ranges,
+  options, path, error}` over 21 flat dotted keys; `quests.list {states?,
+  sources?}`, `quests.get {questRef}`, `quests.track {questRef|null}`,
+  `quests.accept/abandon/resume/delete {questRef}`, `quests.create {quest}`
+  (`{revision, questRef}`), `quests.update {questRef, quest}`, `quests.mark
+  {questRef, stepId, objectiveId}`; `focus.start {target?, questRef?,
+  objectiveId?, overrides?}` (`{revision, sessionId}`),
+  `focus.pause/resume/skip/stop {}`, `focus.history {days?}` (at most 512
+  intervals). Personal quests: 1..16 steps, 1..8 `manual`, `reach` or `focus`
+  objectives per step.
+- Events: `quest.progress` and `focus.phase` (`focusSessionId`; every event
+  carries the IPC `sessionId` and `revision`).
+- `inputConfig` world mode gains `markers.reveal`; `overlayStyle` gains
+  required `questColor` (optional in the patch); `spatial.projection` markers
+  gain optional `markerId`.
+- File schemas: `v0.21/quests-personal.schema.json`,
+  `v0.21/guidance.schema.json`, `v0.21/focus-history.schema.json`.
+- Everything else is inherited from 0.20 unchanged; `session.hello` reports
+  `0.21`. Inheritance test included.

@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyprune.com/schema/v0.21/guidance.schema.json",
+  "title": "Hyprune 0.21 guidance settings file (guidance.json)",
+  "description": "Guidance overrides under $XDG_CONFIG_HOME/hyprune/guidance.json: flat dotted keys, every key optional (absent keys use the defaults reported by guidance.get).",
+  "$ref": "#/$defs/guidanceOverrides",
+  "$defs": {
+    "guidanceOverrides": {
+      "type": "object",
+      "properties": {
+        "markers.reveal_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 15000
+        },
+        "markers.reveal_mode": {
+          "enum": [
+            "timer",
+            "toggle"
+          ]
+        },
+        "markers.max_revealed": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 16
+        },
+        "markers.labels": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 8
+        },
+        "markers.persistent": {
+          "enum": [
+            "off",
+            "edge",
+            "always"
+          ]
+        },
+        "markers.core_draw": {
+          "type": "boolean"
+        },
+        "quests.notifications": {
+          "enum": [
+            "all",
+            "important",
+            "off"
+          ]
+        },
+        "focus.work_min": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 120
+        },
+        "focus.short_break_min": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "focus.long_break_min": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 60
+        },
+        "focus.long_break_every": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 12
+        },
+        "focus.cycles": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "focus.auto_start_breaks": {
+          "type": "boolean"
+        },
+        "focus.auto_start_work": {
+          "type": "boolean"
+        },
+        "focus.count_mode": {
+          "enum": [
+            "focus",
+            "wall"
+          ]
+        },
+        "focus.idle_s": {
+          "type": "integer",
+          "minimum": 60,
+          "maximum": 900
+        },
+        "focus.grace_s": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "focus.calm": {
+          "type": "boolean"
+        },
+        "focus.calm_npc_distance": {
+          "type": "number",
+          "minimum": 2,
+          "maximum": 20
+        },
+        "focus.desktop_chip": {
+          "type": "boolean"
+        },
+        "focus.history_days": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 365
+        }
+      },
+      "required": [],
+      "additionalProperties": false,
+      "description": "Persisted guidance overrides (never null; may be empty)."
+    }
+  }
+}

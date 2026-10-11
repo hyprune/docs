@@ -1,0 +1,448 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyprune.com/schema/v0.21/quests-personal.schema.json",
+  "title": "Hyprune 0.21 personal quests file (quests/personal.json, version 1)",
+  "description": "The core daemon's personal quest store under $XDG_STATE_HOME/hyprune/quests/personal.json. Each quest is a personalQuestInput definition (with its id) plus state, progress ({stepId: {objectiveId: count}}) and local timestamps.",
+  "type": "object",
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "tracked": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/questRef"
+        }
+      ]
+    },
+    "quests": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/storedQuest"
+      }
+    }
+  },
+  "required": [
+    "version",
+    "tracked",
+    "quests"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "objectiveInput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/questSlug"
+            },
+            "type": {
+              "const": "manual"
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "label": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 64
+            }
+          },
+          "required": [
+            "id",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/questSlug"
+            },
+            "type": {
+              "const": "reach"
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "label": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 64
+            },
+            "target": {
+              "$ref": "#/$defs/questTarget"
+            },
+            "radius": {
+              "type": "number",
+              "minimum": 0.5,
+              "maximum": 100
+            }
+          },
+          "required": [
+            "id",
+            "type"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/questSlug"
+            },
+            "type": {
+              "const": "focus"
+            },
+            "count": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "label": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 64
+            },
+            "sessions": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            },
+            "minutes": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 120
+            },
+            "focusTarget": {
+              "enum": [
+                "quest",
+                "any"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "type",
+            "sessions"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "manual: the user marks it done. reach: target (default the step target; one of them must exist), radius in metres (default 4; area/zone bounds for area and zone targets). focus: sessions, minutes per session (default 0.8 x focus.work_min), focusTarget (default quest: only sessions started from this quest count)."
+    },
+    "personalQuestInput": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/questSlug"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1000
+        },
+        "sequential": {
+          "type": "boolean"
+        },
+        "expires": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 16,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}$"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepInput"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        }
+      },
+      "required": [
+        "title",
+        "steps"
+      ],
+      "additionalProperties": false,
+      "description": "A personal quest definition. On create, id is derived from the title when absent; on update it is ignored (questRef wins). expires is a local date-time YYYY-MM-DDTHH:MM."
+    },
+    "questRef": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "id": {
+          "$ref": "#/$defs/questSlug"
+        }
+      },
+      "required": [
+        "source",
+        "id"
+      ],
+      "additionalProperties": false,
+      "description": "A quest reference: source (\"personal\", a world ID or a provider ID) and the quest slug."
+    },
+    "questSlug": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+    },
+    "questTarget": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "position": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "worldId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "required": [
+            "position"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "zoneId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "required": [
+            "zoneId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "areaId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "required": [
+            "areaId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "placeId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          },
+          "required": [
+            "placeId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "workspaceId": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            }
+          },
+          "required": [
+            "workspaceId"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Exactly one of position (optionally with worldId), zoneId, areaId, placeId or workspaceId."
+    },
+    "stepInput": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/questSlug"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "optional": {
+          "type": "boolean"
+        },
+        "any": {
+          "type": "boolean"
+        },
+        "target": {
+          "$ref": "#/$defs/questTarget"
+        },
+        "objectives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/objectiveInput"
+          },
+          "minItems": 1,
+          "maxItems": 8
+        }
+      },
+      "required": [
+        "title"
+      ],
+      "additionalProperties": false,
+      "description": "id defaults to step-N; objectives default to [{\"id\": \"done\", \"type\": \"manual\"}]."
+    },
+    "storedQuest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/questSlug"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 1000
+        },
+        "sequential": {
+          "type": "boolean"
+        },
+        "expires": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 16,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}$"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/stepInput"
+          },
+          "minItems": 1,
+          "maxItems": 16
+        },
+        "state": {
+          "enum": [
+            "available",
+            "active",
+            "completed",
+            "failed",
+            "abandoned"
+          ]
+        },
+        "progress": {
+          "type": "object",
+          "maxProperties": 16,
+          "propertyNames": {
+            "$ref": "#/$defs/questSlug"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "maxProperties": 8,
+            "propertyNames": {
+              "$ref": "#/$defs/questSlug"
+            },
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 40,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\\.[0-9]{1,9})?)?(Z|[+-][0-9]{2}:[0-9]{2})?$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 40,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\\.[0-9]{1,9})?)?(Z|[+-][0-9]{2}:[0-9]{2})?$"
+        },
+        "completedAt": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "minLength": 16,
+              "maxLength": 40,
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\\.[0-9]{1,9})?)?(Z|[+-][0-9]{2}:[0-9]{2})?$"
+            }
+          ]
+        },
+        "credited": {
+          "description": "Credited focus minutes per focus objective (display only).",
+          "type": "object",
+          "maxProperties": 16,
+          "propertyNames": {
+            "$ref": "#/$defs/questSlug"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "maxProperties": 8,
+            "propertyNames": {
+              "$ref": "#/$defs/questSlug"
+            },
+            "additionalProperties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000000
+            }
+          }
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "steps",
+        "state",
+        "progress",
+        "createdAt",
+        "updatedAt",
+        "completedAt"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

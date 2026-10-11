@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyprune.com/schema/v0.21/focus-history.schema.json",
+  "title": "Hyprune 0.21 focus history line (focus/history.jsonl)",
+  "description": "One line of $XDG_STATE_HOME/hyprune/focus/history.jsonl: a finished work interval or break. Holds no window titles or contents.",
+  "$ref": "#/$defs/focusInterval",
+  "$defs": {
+    "focusInterval": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 40,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\\.[0-9]{1,9})?)?(Z|[+-][0-9]{2}:[0-9]{2})?$"
+        },
+        "end": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 40,
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\\.[0-9]{1,9})?)?(Z|[+-][0-9]{2}:[0-9]{2})?$"
+        },
+        "phase": {
+          "enum": [
+            "work",
+            "break"
+          ]
+        },
+        "plannedMin": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "creditedMin": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 120
+        },
+        "targetKind": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 32,
+          "pattern": "^[a-z]+$"
+        },
+        "appClass": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 128
+        },
+        "workspaceId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
+        },
+        "questId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 200,
+          "pattern": "^[^/]{1,128}/[a-z0-9][a-z0-9-]{0,63}$"
+        },
+        "outcome": {
+          "enum": [
+            "completed",
+            "skipped",
+            "stopped"
+          ]
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "phase",
+        "plannedMin",
+        "creditedMin",
+        "targetKind",
+        "outcome"
+      ],
+      "additionalProperties": false,
+      "description": "One finished interval (also one line of focus/history.jsonl). Never titles."
+    }
+  }
+}

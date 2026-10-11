@@ -38,18 +38,18 @@ Each nested session holds an exclusive lock, and its controller only targets the
 With the `lumen-reach` kit:
 
 1. **Enter the world** with **Super+F12**. **F12** always returns to the ordinary desktop.
-2. **Walk and look.** Use **WASD**, **HJKL** or the arrows, and move the mouse to look. **Shift** sprints, **Space** and **Ctrl** move up and down, **V** toggles noclip and **F4** flight.
-3. **Hold Tab for one second** to open the Director: Map (waypoints, travel, autodrive), Workspaces, Settings and Performance. **Escape** closes it.
+2. **Walk and look.** Use **WASD**, **HJKL** or the arrows, and move the mouse to look. **Shift** runs, **Space** jumps (or climbs in flight), **Ctrl** crouches (or descends), **V** toggles noclip and **F4** flight.
+3. **Hold Tab for one second** to open the Director. Its tabs are Map (waypoints, travel, autodrive), Places, Surfaces, Workspaces, Help, What's new, Settings and Performance. **Escape** closes it.
 4. **Go home.** **Super+1** takes you to Sun Court, the home of workspace 21. **Super+2** to **Super+4** reach Array Hall, Rime Vault and Signal Rise. Windows on a workspace appear on its home's main wall.
 5. **Use a window in place.** Aim at it and press **E**. Keystrokes go to the app. **F** brings it to native 2D. **Super+Tab** or **Back** returns to the world.
-6. **Carry and pocket.** Hold **Super+left mouse** to carry an aimed window, then **Super+wheel** to change its distance. Tool **5** (Placement) pockets windows with the middle button and places them ahead with the left button or onto a surface with the right.
+6. **Carry and pocket.** Hold **Super+left mouse** to carry an aimed window up to 15 m away, then **Super+wheel** to change its distance. A window grabbed from behind turns to face you. Released over a tool mount such as a lectern, it snaps into the frame, which highlights first. Tool **5** (Placement) pockets windows with the middle button and places them ahead with the left button or onto a surface with the right.
 7. **Free cursor.** From the world, **Super+Tab** gives you a real cursor while the camera freezes. Press it again to return.
 
-The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto), the field of view (30–120°, default 65°), the upscaler (FSR 1 or bilinear) and the optional dGPU offload are in **Performance**. On machines with more than one GPU, offload picks a discrete GPU that isn't driving the display and scales its power cap to that GPU.
+The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto), the upscaler (FSR 1 or bilinear) and the optional dGPU offload are in **Performance**; the field of view (30–120°, default 65°) is in **Settings → Movement**. On machines with more than one GPU, offload picks a discrete GPU that isn't driving the display and scales its power cap to that GPU.
 
 ## Player settings
 
-The Director's **Settings** tab holds the player settings. They apply immediately and only changed values are saved, to `~/.config/hyprune/player.json`:
+The Director's **Settings** tab has Appearance, Input bindings, Movement and Reticle sections; Movement and Reticle hold the player settings (field of view, speeds, view bob, reach and the reticle). They apply immediately and only changed values are saved, to `~/.config/hyprune/player.json`:
 
 - **Movement:** walk 4.0 m/s and run 10 m/s by default; view bob off, subtle (default) or normal.
 - **Reach:** how far your hands work. Window gestures such as carry and resize reach 15 m, snapping into tool mounts 8 m, and placing, pocketing and path points 12 m. Clicking into a window has no limit.
@@ -64,4 +64,4 @@ The graphics setting **Reduced motion** turns off view bob and the moving reticl
 - **F12** leaves the world from any mode except free cursor. In free cursor, press **Super+Tab** or **Back** first.
 - If the daemon dies, the plugin restores the desktop by itself (in 0.052 s in tests).
 - If the shell crashes or restarts, it reconnects, renews its credentials and resyncs.
-- **U** writes a private capture (a screenshot plus a JSON state dump) under `~/.local/state/hyprune/captures/` for bug reports. The shell then asks **why?** Type a short note and it's saved with the capture and collected in `captures/notes.md`, so a round of testing reads as a list. The capture never waits for the note. With `capture={watermark=true}` in the plugin config, captures carry the Hyprune lockup in a corner; it is never drawn live.
+- **U** writes a private capture (a screenshot plus a JSON state dump) under `~/.local/state/hyprune/captures/` for bug reports. In world mode the shell then asks **why?** Type a short note and it's saved with the capture and collected in `captures/notes.md`, so a round of testing reads as a list. The capture never waits for the note. With `capture={watermark=true}` in the plugin config, captures carry the Hyprune lockup in a corner; it is never drawn live.

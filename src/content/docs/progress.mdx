@@ -17,7 +17,7 @@ All images and clips on this page are in-engine captures of **Lumen Reach**, the
 
 ## Lumen Reach, release by release
 
-<Video name="lumen-reach-tour-0.7.2" title="A 33-second tour of Lumen Reach 0.7.2" caption="The current release: a tour of all four homes in Lumen Reach 0.7.2. Rendered in-engine frame by frame in an isolated nested session, High preset." />
+<Video name="lumen-reach-tour-0.7.2" title="A 33-second tour of Lumen Reach 0.7.2" caption="A tour of all four homes in Lumen Reach 0.7.2 (9 October). Rendered in-engine frame by frame in an isolated nested session, High preset." />
 
 The same camera across releases. Pick a version:
 
@@ -117,7 +117,7 @@ The world shader is now compiled per effect preset, so features a preset turns o
 
 ### Derived visibility (10 October)
 
-A new tool derives visibility regions from the navmesh and the scene, instead of authoring them by hand. On Lumen Reach it produced 160 regions in about 51 seconds. Across 64 test views and 5 targeted probes it changed no pixels, and it culled more than the hand-written regions (mean batches submitted 44.7 → 40.5). Lumen Reach 0.9.0 runs it as a build step: 805 cells merge into 184 regions, and none of 29,781 eye samples hides anything it should see. Across the same 72 test views as 0.8.1, batches submitted dropped from 44.2 to 40.4, and culled frames matched unculled ones in 72 of 72 views (0.8.1: 71 of 72).
+A new tool derives visibility regions from the navmesh and the scene, instead of authoring them by hand. On Lumen Reach it produced 160 regions in about 51 seconds. Across 64 test views and 5 targeted probes it changed no pixels, and it culled more than the hand-written regions (mean batches submitted 44.7 → 40.5). Lumen Reach 0.9.0 runs it as a build step: 805 cells merge into 184 visibility areas, and none of 29,781 eye samples hides anything it should see. Across the same 72 test views as 0.8.1, batches submitted dropped from 44.2 to 40.4, and culled frames matched unculled ones in 72 of 72 views (0.8.1: 71 of 72).
 
 ### Motion feel and clarity (10 October)
 
@@ -141,6 +141,25 @@ Workspace walls used to be composed into a fixed 1280×720 texture, which a larg
 Starting a carry on a window seen from behind used to stall the compositor for about 239 ms, because the turn-around sweep tested every world triangle at every step. With a broad phase and the world's collision index, it now takes 0.16 ms. Other small changes the same day: world geometry is static to gestures and tools; a window carried from behind turns to face you; empty walls show the wallpaper or a placeholder; placed windows snap into tool-mount frames; and render-pass tracking recovers when the compositor skips the end of a pass.
 
 <Video name="reticle-states" title="The reticle's states" width={1920} height={1080} caption="IPC 0.19's contextual reticle at native pixels (enlarged for the clip): neutral, opening while moving, a valid grab, out of reach with the distance, an invalid spot and holding. Core's nested test world." />
+
+### View bob and the reticle (10 October)
+
+[IPC 0.19](/reference/schema/ipc/0.19/) adds player settings for field of view (default 65°), walk and run speed (4 and 10 m/s), reach limits and the reticle. View bob is subtle by default: one smooth 1.0 cm dip per footstep at a walking 1.9 Hz, cut to 30% at 2.5 Hz when running. It never rises above standing height, so it can't poke through a low ceiling. It is off in flight, noclip, climbing, typing and scripted driving, and always off with reduced motion. It is view-only, so picking, the reticle and recordings never see it. Measured at 4 m/s, the dip peaks at 0.68–0.98 cm and settles to exactly zero within 1.6 s of stopping.
+
+The reticle has six styles. It opens up while you move and shows what the current tool would do: valid, out of reach (with the distance) or invalid. Every state changes shape as well as colour.
+
+### Fixes from testing (10–11 October)
+
+Most of 10 October's work came from walking the release world on real hardware and replaying what testers captured:
+
+- World geometry is static: tools and gestures can no longer nudge a building.
+- A window can be carried from behind; it turns to face you. Starting that carry stalled the compositor for 234–239 ms because the turn-around sweep tested every triangle at every step. A broad phase and the world's collision index bring it to 0.15–0.17 ms.
+- An empty workspace wall shows your wallpaper, or a Hyprune placeholder, instead of a black panel.
+- A window released over a tool mount snaps into its frame, which highlights first.
+- Windows that already exist when a world loads take their authored docks instead of waiting in the pocket.
+- A tester's capture showed black specks on a roughness-1 surface on Intel. Replaying the capture pose in a nested session traced them to invalid values in the world shader. With guards in place, black pixels at that pose dropped from 7,800 to 5.
+
+A second, headless test machine with two GPUs now runs isolated nested sessions, and every night it runs every automatable suite, the schema, SDK and shell tests and the world builds. In its first day it found a render-pass tracking leak (a pass that starts and never ends after a failed frame), a daemon start-up race, GL errors wrongly blamed on world uploads, and offload refusing NVIDIA compositors and desktops without a battery. All are fixed.
 
 ### Optional dGPU offload (RFC-0009, 8 October)
 

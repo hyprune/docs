@@ -21,7 +21,7 @@ The compositor owns the desktop. Core provides the world runtime and brokers its
 
 ## Keep the render pass predictable
 
-The plugin reads immutable frame state and draws prepared resources. Capture refresh, cursor changes, focus, workspace transitions and uploads run in a verified safe phase after the outer compositor frame. CPU workers decode assets; they never access compositor objects or GL.
+The plugin reads immutable frame state and draws prepared resources. Capture refresh, cursor changes, focus, workspace transitions and uploads run in a verified safe phase after the outer compositor frame. CPU workers decode assets; they never access compositor objects or GL. The simulation tick runs once per presented frame, queued outside the render pass, and moves by that frame's real time. Pass tracking recovers when the compositor starts a pass and never finishes it (for example when a frame fails to allocate after a monitor change).
 
 <svg className="diagram" viewBox="0 0 800 220" role="img" aria-labelledby="frame-title frame-desc">
   <title id="frame-title">Frame ownership and deferred work</title><desc id="frame-desc">Safe after-frame preparation feeds world rendering, then surfaces, then compositor layers. Only after outer endRender does the next deferred phase begin.</desc>
@@ -50,7 +50,7 @@ The plugin reads immutable frame state and draws prepared resources. Capture ref
 
 ## Rendering on a laptop
 
-The world renders below output resolution and is upscaled with FSR 1; dynamic resolution adjusts the scale in 1/16 steps to hold the frame rate. When nothing in view changes, core re-presents the last world frame instead of rendering a new one. On machines with a discrete GPU, an optional worker supervised by `hypruned` can render the world there and return frames over DMA-BUF, under a power budget and with immediate local fallback. It is off by default ([RFC-0009](/rfcs/0009-offload-renderer/)). Native application windows are always composited locally. The [progress page](/progress/#frame-rate-power-and-memory) has the measurements.
+The world renders below output resolution and is upscaled with FSR 1; dynamic resolution adjusts the scale in 1/16 steps to hold the frame rate. When nothing in view changes, core re-presents the last world frame instead of rendering a new one, and workspace walls recompose only when their windows change. A frame-rate target below the display rate renders on every second (or nth) presentation, evenly. Walls with windows are composed at the monitor's resolution with mipmaps, so their text stays sharp. On machines with a discrete GPU, an optional worker supervised by `hypruned` can render the world there and return frames over DMA-BUF, under a power budget scaled to that GPU and with immediate local fallback; it also works when the compositor itself runs on an NVIDIA GPU. It is off by default ([RFC-0009](/rfcs/0009-offload-renderer/)). Native application windows are always composited locally. The [progress page](/progress/#frame-rate-power-and-memory) has the measurements.
 
 ## Honest failure boundaries
 

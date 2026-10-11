@@ -38,6 +38,10 @@ These are outside the original milestone table, but shipped and documented:
 - **Player settings and reticle** ([IPC 0.19](/reference/schema/ipc/0.19/)): field of view, walk and run speed, view bob, reach limits for grabbing, mounting and placing, and a contextual reticle in six styles.
 - **Capture notes** ([IPC 0.17](/reference/schema/ipc/0.17/)): after U, the shell asks why, and notes collect in one file.
 - **Hands-on fixes:** static world geometry, carrying from behind (a 239 ms stall now takes 0.16 ms), wallpaper on empty walls, tool-mount snapping, robust render-pass tracking.
+- **Room windows at their docks:** windows that already exist when a world loads take their authored docks instead of waiting in the pocket.
+- **Black-pixel shader fix:** guards against invalid values in the world shader (7,800 black pixels to 5 at a tester's pose), found by replaying the tester's capture pose.
+- **A second test machine and nightly regression:** a headless two-GPU machine runs isolated nested sessions and, every night, every automatable suite plus the schema, SDK and shell tests and the world builds. It has already found a render-pass tracking leak, a daemon start-up race and offload failing on NVIDIA compositors.
+- **Smaller fixes:** long window titles clamped to protocol limits, and a carried window no longer drops into a wall behind it.
 - **Tool slots and the pocket:** [IPC 0.15](/reference/schema/ipc/0.15/) gives every tool the same Primary/Secondary/Alternate/Cycle bindings.
 - **Free cursor:** Super+Tab or Back hands over a real cursor and freezes the camera.
 - **Recording and replay** of input and camera for deterministic tests: [IPC 0.12](/reference/schema/ipc/0.12/).

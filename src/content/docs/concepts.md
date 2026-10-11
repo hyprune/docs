@@ -7,7 +7,7 @@ Hyprune separates the place you inhabit, the things you interact with, and the s
 
 ## World
 
-A **world** is a data-only package: a glTF scene plus a `world.json` manifest with spawn points, areas, surface anchors and mounts, collision, navigation routes, climbable volumes, playable bounds, visibility regions, atmosphere and provenance. It provides space and atmosphere. It cannot execute commands or grant permissions. Packages declare a format version and are validated before activation; a world that fails validation never replaces the current one. See the [world format RFC](/rfcs/0004-world-format/) and the [world manifest reference](/reference/schema/world/).
+A **world** is a data-only package: a glTF scene plus a `world.json` manifest with spawn points, areas, surface anchors and mounts, collision, navigation routes, climbable volumes, playable bounds, visibility regions, atmosphere and provenance. It provides space and atmosphere. It cannot execute commands or grant permissions. Packages declare a format version and are validated before activation; a world that fails validation never replaces the current one. A world's geometry is static: tools and gestures move windows and placed objects, never the buildings. See the [world format RFC](/rfcs/0004-world-format/) and the [world manifest reference](/reference/schema/world/).
 
 ## Area and workspace home
 
@@ -15,7 +15,7 @@ An **area** is a named part of a world, such as Sun Court or Rime Vault, with a 
 
 ## Surface
 
-A **surface** is a live runtime instance presenting pixels in the world: an application window, workspace view, opted-in layer or custom provider. Its lifetime and focus belong to core, not to the mesh it appears on. A surface anchor is a location waiting for a binding. You can carry a surface, resize and turn it, mount it on a wall, or pocket it and take it elsewhere. A capture lease keeps windows on hidden workspaces producing frames. See [Surfaces](/rfcs/0005-surfaces/).
+A **surface** is a live runtime instance presenting pixels in the world: an application window, workspace view, opted-in layer or custom provider. Its lifetime and focus belong to core, not to the mesh it appears on. A surface anchor is a location waiting for a binding. You can carry a surface, resize and turn it, mount it on a wall, or pocket it and take it elsewhere. A capture lease keeps windows on hidden workspaces producing frames. Windows placed on a tool mount snap into its frame; hand gestures have reach limits (carry 15 m, mount 8 m, place 12 m by default). A workspace wall with no windows shows your wallpaper, or a Hyprune placeholder. See [Surfaces](/rfcs/0005-surfaces/).
 
 ## Screen type
 
@@ -27,11 +27,11 @@ A **tool** is a mode for your hands: Normal (click into apps), Window (tag, moun
 
 ## Movement mode
 
-A **movement mode** interprets navigation and proposes camera or player motion. Walking, sprinting, free flight, climbing (grab, look-to-climb or auto-traverse), waypoint travel and autodrive share one world. Core validates motion, collision and playable bounds, and always keeps the emergency exit. See [Interaction](/rfcs/0006-interaction/).
+A **movement mode** interprets navigation and proposes camera or player motion. Walking, sprinting, free flight, climbing (grab, look-to-climb or auto-traverse), waypoint travel and autodrive share one world. Core validates motion, collision and playable bounds, and always keeps the emergency exit. Movement follows each presented frame and its real time, and walking sub-steps by distance so a fast run can't pass through a thin wall. See [Interaction](/rfcs/0006-interaction/).
 
 ## Shell
 
-A **shell** is the controls and overlays around the experience: the HUD, the Director (hold Tab: Map, Workspaces, Settings, Performance), warp transitions, notices and settings. Quickshell powers the reference shell, which offers three HUD concepts: Adventure, Instrument and Minimal. Another implementation can replace it using the same protocol and lease rules. See the [Shell contract](/rfcs/0008-shell/).
+A **shell** is the controls and overlays around the experience: the HUD, the Director (hold Tab: Map, Places, Surfaces, Workspaces, Help, What's new, Settings, Performance), warp transitions, notices and settings. Quickshell powers the reference shell, which offers three HUD concepts: Adventure, Instrument and Minimal. Another implementation can replace it using the same protocol and lease rules. See the [Shell contract](/rfcs/0008-shell/).
 
 ## Widget
 

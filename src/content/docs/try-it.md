@@ -23,7 +23,7 @@ curl -fsSL https://hyprune.com/check | bash -s -- --json
 `try` runs the same checks first. If something is missing it prints the install commands and stops: it never runs a package manager or `sudo`. Then it downloads into `~/hyprune-try`, verifying every SHA-256:
 
 - **core** (the Hyprland plugin and its helpers), prebuilt for the pinned Hyprland ABI. Until a prebuilt release matches your Hyprland, it builds core from source inside the folder (5-15 minutes; the check lists the build packages);
-- **the shell** (Quickshell HUD and Director) with a private Python venv in the folder;
+- **the shell** (Quickshell HUD and Director) with a private Python venv in the folder, its packages pinned by hash (`pip --require-hashes`);
 - **Lumen Reach**, the release world, checked against [`worlds/releases.json`](https://github.com/hyprune/hyprune/blob/main/worlds/releases.json).
 
 Config, state and caches stay in the folder too. Then it opens a nested Hyprland **window** (1600x900) with Lumen Reach loaded, at Sun Court.
@@ -73,10 +73,10 @@ It opens the same window and keeps its state in `~/hyprune-try-nix` (`rm -rf` it
 `https://hyprune.com/try` and `/check` follow the latest published scripts. To run an exact, verified copy instead, download a versioned one and check its SHA-256 against [`try.sha256`](https://hyprune.com/try.sha256):
 
 ```sh
-curl -fsSLO https://hyprune.com/try-0.1.0.sh
-curl -fsSL https://hyprune.com/try.sha256 | grep ' try-0.1.0.sh$' | sha256sum -c -
-less try-0.1.0.sh                 # it is short: read it first
-bash try-0.1.0.sh --ref try-v0.1.0
+curl -fsSLO https://hyprune.com/try-0.1.1.sh
+curl -fsSL https://hyprune.com/try.sha256 | grep ' try-0.1.1.sh$' | sha256sum -c -
+less try-0.1.1.sh                 # it is short: read it first
+bash try-0.1.1.sh --ref try-v0.1.1
 ```
 
 `--ref` pins the manifest and the world record to the same release, so every download is fixed by hash. The source of both scripts is [`try/`](https://github.com/hyprune/hyprune/tree/main/try) in the meta repository; this site serves byte-identical copies.

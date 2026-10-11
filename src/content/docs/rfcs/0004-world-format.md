@@ -4,7 +4,7 @@ description: "Data-only glTF worlds with explicit spatial metadata and asset pro
 ---
 
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through [world format 0.7](/reference/schema/world/0.7/): core loads formats 0.1–0.7. Lumen Reach 0.8.0 is the first release on format 0.7.
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through [world format 0.8](/reference/schema/world/0.8/): core loads formats 0.1–0.8. Lumen Reach 0.8.0 is the first release on format 0.7; format 0.8 adds placed world objects.
 
 ## Decision and package layout
 
@@ -411,6 +411,181 @@ The value's shape is
 [`extensions/blueprint.schema.json`](/schema/extensions/blueprint.schema.json).
 Ordering, byte budgets and the role vocabulary are enforced by core and the worlds
 checker.
+
+## Amendment: world 0.8 placed world objects
+
+World format **0.8** lets a world place **objects**: reusable glTF assets (an
+armillary, a lantern, a buoy) put into the world by reference with a transform,
+optionally with simple declarative animation. The world stays static otherwise.
+Two optional top-level fields are added; everything else is unchanged from 0.7
+except `formatVersion: "0.8"`. Every valid 0.7 document is valid as 0.8 (the
+inheritance rule); older formats remain frozen and reject both fields. glTF
+`animations` in any glTF of the package remain **ignored**.
+
+```json
+"objectAssets": [
+  {"id": "armillary", "scene": "objects/armillary.gltf",
+   "animations": [
+     {"node": "ring-equator", "type": "spin", "axis": [1, 0, 0], "pivot": [0, 0, 0], "period": 20},
+     {"node": "ring-tilted",  "type": "spin", "axis": [-0.955, 0, 0.295], "pivot": [0, 0, 0], "period": 27, "phase": 0.3},
+     {"node": "moon", "type": "orbit", "axis": [0, 1, 0], "pivot": [0, 0, 0], "period": 60},
+     {"node": "buoy", "type": "bob", "axis": [0, 1, 0], "amplitude": 0.05, "period": 4}
+   ],
+   "collision": {"node": "proxy"},
+   "lighting": {"mode": "probe"}}
+],
+"objects": [
+  {"id": "sun-court-armillary", "asset": "armillary",
+   "pose": {"position": [4, 0, -6], "rotation": [0, 0.383, 0, 0.924]}, "scale": 1,
+   "speed": 1, "phase": 0, "ambient": [0.3, 0.28, 0.25]}
+]
+```
+
+### Object assets
+
+| Field | Rules |
+| --- | --- |
+| `id` | Required slug, unique among assets. |
+| `scene` | Package-relative `.gltf`/`.glb` path, validated like `scene.gltf` with the same glTF extension rules for the world's format (0.7's KTX2/meshopt/quantisation included). |
+| `library` | **Reserved** for a later shared object library (`"id@version"`). Validators and core reject it in 0.8, so a later format can add libraries without breaking 0.8 packages. |
+| `animations` | Optional, at most 16, see below. |
+| `collision` | Optional `{"node": name}`: a static collision proxy. |
+| `lighting` | Optional `{"mode": "probe" \| "unlit"}`, default `probe`. |
+
+At most 32 assets. An asset's **asset space** is its glTF scene's root space
+(metres, +Y up); node transforms are applied as in `scene.gltf`. Only nodes in
+the asset's scene graph are drawn. Nodes are referenced by **glTF node name**;
+a referenced name must belong to exactly one node of the asset.
+
+Assets are **never lightmapped**: `lightmaps[]` binds `scene.gltf` materials only,
+and an asset's `TEXCOORD_1` is unused. Materials are ordinary metallic-roughness
+PBR or `KHR_materials_unlit`; an `occlusionTexture` is treated as baked
+object-space ambient occlusion.
+
+### Animations
+
+Each animation moves a node and its **whole subtree** rigidly in asset space.
+At most one animation per node, and no animated node may lie inside another
+animated subtree (no target is an ancestor of another).
+
+| Field | Rules |
+| --- | --- |
+| `node` | Required node name. |
+| `type` | `spin`: rotate the subtree about the line through `pivot` along `axis`; its orientation turns with it. `orbit`: carry the subtree around that line keeping its orientation (translation only; the node's origin travels on the circle), so an armillary ring can turn on its own axis while a moon circles the centre. `bob`: translate along `axis` by `amplitude`·sin(angle). |
+| `axis` | Required unit vector in asset space (length within 0.001 of 1; core normalises it). Right-hand rule: a positive angle is counter-clockwise looking down the axis toward the pivot. |
+| `pivot` | Point on the axis line, asset space, metres. Required for `spin` and `orbit`; not allowed for `bob`. |
+| `amplitude` | Metres, 0 < amplitude ≤ 10. Required for `bob`; not allowed otherwise. |
+| `period` | Required seconds per cycle, 0.5–3600. |
+| `phase` | Optional fraction of a cycle, 0 ≤ phase < 1, default 0. |
+
+The angle at time *t* is 2π·(*t*·`speed`/`period` + `phase` + instance `phase`).
+*t* is a monotonic world-animation clock that starts when the world loads and
+follows wall-clock time: an object is always at its natural periodic position
+and never jumps when frames resume. Poses are computed from the authored
+(rest) pose, which is the pose at t = 0 when both phases are 0.
+
+### Objects (instances)
+
+| Field | Rules |
+| --- | --- |
+| `id` | Required slug, unique among objects. |
+| `asset` | Required, an `objectAssets[].id`. |
+| `pose` | Required world `position` and unit-quaternion `rotation` (normalised within 0.002). |
+| `scale` | Uniform, 0.01–100, default 1. |
+| `speed` | Animation rate multiplier, 0–10, default 1 (0 holds the t = 0 pose). |
+| `phase` | Added to every animation's phase, 0 ≤ phase < 1, default 0: repeated objects need not move in step. |
+| `ambient` | Optional linear RGB (0–16 each) replacing the probe's ambient term (below). |
+
+At most 256 objects. An object's model is translation · rotation · scale; the
+animation model applies in asset space before it.
+
+### Collision and interaction
+
+Objects are **render-only**: they never collide, are never walkable, are never
+a pick or aim target, and no gesture, tool or editor transform can select or
+move them. The only exception is the asset's optional **collision proxy**: the
+named node's own mesh (not its children) becomes static collision at each
+instance's pose. The proxy never moves; it must have a mesh and must not lie in
+an animated subtree. It is drawn only if it is part of the asset's scene graph
+(keep a hidden proxy outside the scene's node list). Proxy triangles of every
+instance count toward the world's static collision budget (20000 triangles),
+and spawns and climbable endpoints are validated against them.
+
+### Lighting
+
+`unlit` assets are drawn as authored (base colour and emission, no lighting).
+`probe` assets (the default) are lit by the **runtime sun plus a per-instance
+ambient probe** that core derives at load from the world's static lighting:
+
+1. From the centre of the instance's swept bounds, 64 rays (an even Fibonacci
+   sphere) are cast up to 100 m against the world's rendered static geometry.
+2. A ray that hits a lightmapped surface takes that surface's albedo (base
+   colour factor times the average of its base colour texture) times the baked
+   irradiance at the hit (lightmap texel, encoding and intensity applied); an
+   unbaked surface gives albedo × (0.24 + 0.76·max(n·sun, 0)), the world
+   shader's unbaked lighting; an unlit surface its albedo; emission is added.
+   A ray that misses takes the sky gradient (horizon to zenith above, horizon to
+   ground below).
+3. Cosine-weighted averages over the upper and lower hemispheres give
+   **ambient up** and **ambient down**; a fragment uses their mix by its
+   normal's Y.
+4. **Direct sun** = sun colour (normalised to luminance 1) × strength ×
+   visibility × max(N·L, 0). Visibility is the fraction of five shadow rays
+   toward the sun (the centre, and ±min(radius/2, 1 m) along X and Z) that
+   reach the sky. Strength is calibrated from the baked surfaces the probe saw:
+   with at least four sunlit and four shaded hits whose mean baked luminance
+   differs by more than 5%, (sunlit − shaded) ÷ mean cosine; else, with four
+   sunlit hits, 0.76 × sunlit ÷ mean cosine; else 0.76 (the unbaked
+   convention); clamped to 0–16. Specular highlights are scaled by the visibility.
+5. The asset's occlusion texture multiplies the result. An instance's `ambient`
+   replaces both hemisphere terms; the sun term stays.
+
+This is deliberately simple: objects pick up the colour and level of the baked
+light around them, darken under cover and keep a moving sun highlight, without
+per-object bakes. Authors fix the rare bad probe with `ambient`.
+
+### Rendering (normative for core)
+
+- Each asset is uploaded once and counts once toward the world GPU budget,
+  however many objects place it. Repeated objects are drawn **instanced**: one
+  draw per asset primitive for all its visible instances (blended materials per
+  instance, depth-sorted with other transparent geometry).
+- Culling uses each instance's **swept bounds**: a sphere about the asset's
+  rest-pose box centre that holds the asset at every animation pose, scaled and
+  placed by the instance. Visibility regions apply by the sphere centre (the
+  first area whose bounds contain it); outside every area an object is always
+  region-visible.
+- **Render on demand.** While an animated object (speed > 0) is visible and the
+  world view is active, core keeps scheduling frames at the normal target frame
+  rate. When none is visible, or the world view is inactive or idle (desktop,
+  output off, still loading), objects force no frames and an unchanged frame is
+  reused.
+- `graphics.reduced_motion: true` stops animation: every object rests at its
+  t = 0 pose (asset and instance phases applied) and forces no frames.
+- The ink outline, depth and occlusion of native windows work on objects as on
+  static geometry. Render-pass safety rules apply: nothing that makes the
+  compositor render is called inside the render pass, and GL state is saved and
+  restored.
+- The optional offload renderer (RFC-0009) draws scene geometry only: a world
+  with objects uses the in-process renderer, and performance state reports the
+  reason "world objects use local renderer".
+
+### Validation
+
+Schema, the shared validator, core and `hyprune-world-check` reject: objects
+or assets below 0.8; unknown properties; more than 32 assets, 256 objects or
+16 animations per asset; duplicate asset or object ids; an unknown asset; a
+`library` reference; a non-unit axis; a `spin`/`orbit` without `pivot` or with
+`amplitude`, a `bob` the other way round; two animations on one node; a node
+name that is missing or not unique in the asset; an animated node inside
+another animated subtree; a collision node that is animated, inside an animated
+subtree or has no mesh; an asset glTF extension the format forbids; a proxy
+that obstructs a spawn (core and `hyprune-world-check` only: it needs collision). The scene-dependent asset rules are in
+`validate('scene', assetGltf, undefined, '0.8', {world, asset: id})`.
+`hyprune-world-check` lists each asset (swept radius, animation and triangle
+counts) and each object's probe result.
+
+No IPC change. The schema is [0.8](/reference/schema/world/0.8/).
 
 ## Format versions
 

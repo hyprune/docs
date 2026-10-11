@@ -157,3 +157,27 @@ definition exists in 0.16 and the graphics properties differ only by the new key
   the `class` vocabulary are stated in its description and enforced by consumers).
 - Everything else is inherited from 0.19 unchanged; `session.hello` reports
   `0.20` and lists the two methods. Inheritance test included.
+
+## World 0.8: placed world objects
+
+- World format **0.8** adds `objectAssets` (at most 32) and `objects` (at most
+  256). An asset is a package-relative glTF (`scene`, same extension rules as the
+  world's scene.gltf; never lightmapped) with optional declarative node animation
+  (at most 16: `spin` or `orbit` about `pivot`/`axis` in asset space, or `bob`
+  along `axis` by `amplitude` metres; `period` 0.5–3600 s, optional `phase`), an
+  optional static `collision` proxy node and `lighting.mode` (`probe` default, or
+  `unlit`). Nodes are referenced by unique glTF node name. `library` (`id@version`)
+  is reserved for shared object libraries and rejected in 0.8. An object places an
+  asset with a `pose`, uniform `scale` (0.01–100), animation `speed` (0–10, default
+  1), `phase` (0–1) and an optional `ambient` RGB override (0–16).
+- `validate('world')` (from 0.8): unique asset and object ids, known asset
+  references, normalised poses, unit axes, per-type fields (spin/orbit need a
+  pivot and take no amplitude; bob the reverse), one animation per node, collision
+  node not animated, library references rejected. `validate('scene', gltf,
+  undefined, '0.8', {world, asset: id})` checks an asset's glTF: extension rules,
+  referenced node names exist exactly once, no animated node inside another
+  animated subtree, the collision node has a mesh and is outside every animated
+  subtree.
+- `v0.8/common.schema.json` is the 0.7 common definitions under the 0.8 `$id`
+  (the directory already held IPC 0.8, which keeps its own references).
+  Everything else is inherited from 0.7 unchanged. Inheritance test included.

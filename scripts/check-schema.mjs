@@ -8,7 +8,7 @@
 //    recorded commit's files, and that commit's contract tree must equal the
 //    checkout's HEAD. A newer upstream contract therefore fails the check until
 //    `node scripts/sync-schema.mjs` is rerun and committed. CI has no sibling
-//    checkout (the schema repo is private) and checks hashes only.
+//    checkout and checks hashes only.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, join, dirname, relative } from 'node:path';

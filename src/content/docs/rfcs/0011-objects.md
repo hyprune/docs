@@ -8,9 +8,9 @@ placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-wo
 and the M3B path and position tools ([RFC-0006](/rfcs/0006-interaction/#amendment-m3b-keymap-v2)).
 It extends 0.8 objects instead of adding a parallel system: ambient characters
 ([RFC-0010](/rfcs/0010-npcs/)) become one trait of an object, NPC routes become paths, and the
-`library` field that 0.8 reserved is switched on. Two drafts build on it: RFC-0012 (quests,
+`library` field that 0.8 reserved is switched on. Two drafts build on it: [RFC-0012](/rfcs/0012-quests/) (quests,
 markers and focus sessions) supplies the `quest` interaction action and marker targets, and
-RFC-0013 (live objects: data bindings, machines and flows) fills the `machine` trait and the
+[RFC-0013](/rfcs/0013-live-objects/) (live objects: data bindings, machines and flows) fills the `machine` trait and the
 slots reserved below.
 
 ## Goal

@@ -9,8 +9,8 @@ input model of [RFC-0006](/rfcs/0006-interaction/), the Director and HUD of
 [RFC-0008](/rfcs/0008-shell/), areas, zones and workspace homes from
 [RFC-0004](/rfcs/0004-world-format/) and [RFC-0005](/rfcs/0005-surfaces/), and ambient
 characters from [RFC-0010](/rfcs/0010-npcs/). Two drafts are being written alongside it:
-RFC-0011 (world objects: libraries, traits, user placement, paths and NPC interactions) and
-RFC-0013 (live objects: data bindings, machines and flows). This RFC does not define
+[RFC-0011](/rfcs/0011-objects/) (world objects: libraries, traits, user placement, paths and NPC interactions) and
+[RFC-0013](/rfcs/0013-live-objects/) (live objects: data bindings, machines and flows). This RFC does not define
 objects, NPCs, machines or data sources; it says how quests refer to them.
 
 ## Goal

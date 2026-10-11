@@ -6,9 +6,9 @@ description: "Objects that show the state of real systems: declarative bindings 
 **Status: draft · proposed 2026-10-11.** Nothing here is implemented. It builds on world
 format 0.8 placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-world-objects)),
 the extension data channel ([RFC-0003](/rfcs/0003-ipc/#publishing-authority-and-bootstrap),
-[RFC-0007](/rfcs/0007-extensions/)) and two drafts written alongside it: RFC-0011 (world
+[RFC-0007](/rfcs/0007-extensions/)) and two drafts written alongside it: [RFC-0011](/rfcs/0011-objects/) (world
 objects: the object manifest, traits, slots, user placement, paths, tracks and pooled items)
-and RFC-0012 (quests, markers and focus sessions). It fills what those drafts reserve for it,
+and [RFC-0012](/rfcs/0012-quests/) (quests, markers and focus sessions). It fills what those drafts reserve for it,
 the `machine` trait, the meaning of `slots`, what creates items and the keys and events that
 `signal` objectives consume, and does not redefine anything else. [Depends on](#depends-on)
 lists exactly what it uses.
@@ -537,7 +537,7 @@ These extend the 0.8 and RFC-0011 rendering rules; everything there still holds.
   effects of at most 48 particles; items follow RFC-0011's caps. Over a cap the result degrades
   visibly (batch items, `+n` labels, skipped effects) and memory never grows.
 - **Motion** (`live.motion`): `auto` (default: items travel and machines spin while the world
-  is active and the player present, and pause on battery and USB-C power, as RFC-0010 does for
+  is active and the player present, and pause on battery and USB-C power, as [RFC-0010](/rfcs/0010-npcs/) does for
   characters), `always`, `still` (states, labels, counts and flashes only; no spins or travel;
   effects become flashes) and `off` (rest pose and rest state). `graphics.reduced_motion: true`
   forces `still`. States always change, so a reduced-motion user still sees a failure.
@@ -554,7 +554,7 @@ These extend the 0.8 and RFC-0011 rendering rules; everything there still holds.
 
 ```json
 {
-  "formatVersion": "0.11", "id": "conveyor", "version": "1.0.0", "name": "Conveyor",
+  "formatVersion": "0.10", "id": "conveyor", "version": "1.0.0", "name": "Conveyor",
   "category": "machines", "tags": ["ci", "pipeline"], "scene": "object.glb", "license": "CC-BY-4.0",
   "attribution": [{"path": ".", "author": "Hyprune contributors", "license": "CC-BY-4.0"}],
   "bounds": {"min": [-2.2, 0, -0.8], "max": [2.2, 1.9, 0.8]},
@@ -659,7 +659,7 @@ an hour it shows its rest state and `—`.
 
 RFC-0011 defines object manifests and world format 0.9 (P2) and 0.10 (P3: movers and items).
 This RFC needs **no format change for P1**: implicit inputs use 0.9 slots and animations.
-From P2 it needs the next format, written **0.11** here and numbered at acceptance:
+From P2 it needs world format **0.10**, the same format bump as RFC-0011's movers and items (P3), since spawning items onto tracks needs them; the two land together:
 
 | Change | Where |
 | --- | --- |
@@ -668,7 +668,7 @@ From P2 it needs the next format, written **0.11** here and numbered at acceptan
 | `objects[].data`: `defaults` (mappings a user binding starts from) and bindings to `com.hyprune.core.clock` only | `objects[]` |
 | `flows[]` between the world's own instances (P3; this format or the next) | top level |
 
-Every valid 0.10 document is valid as 0.11. The schema, the shared validator, core and
+Every valid 0.9 document is valid as 0.10. The schema, the shared validator, core and
 `hyprune-world-check` check every rule above, the scene-dependent ones (nodes, materials,
 palette ids, map domains) with the asset glTF.
 

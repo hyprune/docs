@@ -25,6 +25,7 @@ export default defineConfig({
     sidebar: [
       { label: 'Guide', items: [
         { label: 'Overview', link: '/' },
+        { label: 'Try it in 5 minutes', slug: 'try-it' },
         { label: 'Try Hyprune', slug: 'first-session' },
         { slug: 'concepts' },
         { slug: 'architecture' },

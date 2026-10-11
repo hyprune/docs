@@ -5,6 +5,8 @@ description: "Install paths, a developer nested session, and your first ten minu
 
 Hyprune is an early preview. It targets **Hyprland 0.56.2** exactly, because the core plugin is built against that compositor's ABI. Everything is public on [GitHub](https://github.com/hyprune) and installs without accounts or tokens. It's an early preview: expect rough edges, and keep the nested session below for testing development builds.
 
+The quickest look needs no install at all: [Try it in 5 minutes](/try-it/) opens Lumen Reach in a window from one folder.
+
 ## Install paths
 
 The meta repository [hyprune/hyprune](https://github.com/hyprune/hyprune) is the front door; its README has every option in detail. It bundles core, shell, SDK and worlds into **kits**:

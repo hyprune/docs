@@ -53,7 +53,7 @@
   "lumen-reach@0.9.0": {
    "gpuMiB": 150,
    "gpuMeasured": true,
-   "summary": "Visibility derived at build time (184 regions); per-area playable volumes with a 60 m fly ceiling; backstops only where a walker can reach; canonical areas contract"
+   "summary": "Visibility derived at build time (184 visibility areas); per-area playable volumes with a 60 m fly ceiling; backstops only where a walker can reach; canonical areas contract"
   },
   "lumen-reach@0.9.1": {
    "gpuMiB": 150,

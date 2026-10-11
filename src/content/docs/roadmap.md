@@ -55,7 +55,7 @@ The priority is **playable before polish**: worlds that hold up from any angle y
 
 1. **Finish M1 on real hardware.** Run the supervised live checklist, including every hardware-cursor transition, and close the app-closes-mid-drag case.
 2. **A staged world pipeline.** Lock a world's metrics first (eye height, stair rise, doorway and screen clearances), walk-test a greybox, and only then add art. Each stage gets cheap, deterministic gates: navmesh and route clearance, any-angle sweeps, sky and leak checks. Several gates already run on Lumen Reach, including a performance gate in its release build.
-3. **A managed object library.** Reusable, instanced props with per-instance lightmap rectangles, so worlds are assembled from tested pieces instead of rebuilt per scene. This needs a world format after 0.7.
+3. **A managed object library.** World format 0.8 places reusable, instanced, probe-lit objects. [RFC-0011](/rfcs/0011-objects/) (draft) adds shared libraries, user placement, paths and seats, so worlds are assembled from tested pieces instead of rebuilt per scene.
 4. **The extension host** and the remaining M2 contracts, and a path for outside contributors now that the repositories are public.
 
 ## What is deliberately later

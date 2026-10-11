@@ -16,23 +16,26 @@ them yet, but you can make and check characters now.
 - **Mesh:** 4,000-8,000 triangles, at most 4 influences per vertex. Name the mesh nodes `body`,
   `head` and `visor` where you have them.
 - **Materials:** the base, an optional `accent` material that the world recolours per area,
-  and an optional emissive material for a visor or eyes. Textures are scaled to 1024 px.
+  and an optional emissive material for a visor or eyes. A single baked material is fine too;
+  colour variants are then separate characters. Textures are scaled to 1024 px.
 - **Mechanical props:** a drone or a turning ring needs no skeleton. Use format 0.8 node
   animation (spin, orbit) for its parts.
 
 ## Animate it
 
 All clips go in the same file at 30 fps, **in place**: no root motion. Core moves the
-character along its route and plays `walk` at the speed the clip was made for.
+character along its route and plays `walk` at the speed the clip was made for (measured
+from the planted foot), so it never slides.
 
 | Clip | | Notes |
 | --- | --- | --- |
-| `idle` | required | loops |
-| `walk` | required | loops; about 1.2-1.4 m/s; set `extras.speed` (m/s) or let the import step measure it |
+| `idle` | required | loops; calm, little arm motion: the character spends most of its time in it |
+| `idle_fidget` | optional | a busier idle, played through once now and then when the player is near |
+| `walk` | required | loops; 0.7-1.4 m/s (stylised characters walk slower than people); set `extras.speed` (m/s) or let the import step measure it |
 | `run` | optional | loops |
 | `turn_left`, `turn_right` | optional | 90 deg on the spot |
 | `look_around`, `wave`, `nod` | optional | |
-| `sit`, `sit_idle` | optional | `sit_idle` loops |
+| `sit`, `sit_idle` | optional | `sit_idle` loops; sitting down needs seat anchors in the world (not yet) |
 
 Characters that share the same skeleton template can share clips (`--clips-from`).
 
@@ -47,7 +50,8 @@ hyprune-npc-check build/my-character.glb
 
 - fixes units and axes and adds `root`;
 - keeps the clips in place;
-- renames clips through a mapping file;
+- renames clips through a mapping file (it can pick the calmest of several idles as `idle`
+  and map a livelier one to `idle_fidget`);
 - limits weights, decimates and compresses;
 - with `--render`, renders a check video: a turntable, then the walk over a floor that
   scrolls at the walk speed. Planted feet should move with the tiles.

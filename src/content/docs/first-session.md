@@ -19,7 +19,7 @@ The meta repository [hyprune/hyprune](https://github.com/hyprune/hyprune) is the
 - **NixOS or Home Manager:** import the module and set `programs.hyprune = { enable = true; kit = "lumen-reach"; };`. The module pins the same compositor the plugin was built for, plus its matching portal.
 - **Arch:** `./install.sh --kit minimal --dry-run`, then without `--dry-run`. The script checks the compositor and header versions, builds the pinned components and never edits your Hyprland config without showing the diff and asking first. `--uninstall` reverses it.
 
-Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.10.1 (world format 0.8: the Sun Court armillary turns as a placed world object, the Map shows its blueprint levels, and Array Hall is enclosed) and Switchyard 0.1.2 are the current releases, on [hyprune/worlds](https://github.com/hyprune/worlds/releases).
+Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.10.2 (world format 0.8: the Sun Court armillary turns as a placed world object, the Map shows its blueprint levels, and Array Hall is enclosed with clerestory light) and Switchyard 0.1.2 are the current releases, on [hyprune/worlds](https://github.com/hyprune/worlds/releases).
 
 ## World and extension authoring tools
 

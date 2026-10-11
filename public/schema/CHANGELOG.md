@@ -185,3 +185,50 @@ definition exists in 0.16 and the graphics properties differ only by the new key
 ## @hyprune/schema 0.6.0 (2026-10-11)
 
 Publishes IPC 0.20 and world format 0.8 to npm.
+
+## Object manifests 0.9, libraries and the library release record (RFC-0011)
+
+New contract files; no IPC or world format change (world formats stay 0.1–0.8).
+Object manifests use the world format numbering: a world may use objects whose
+`formatVersion` is at most its own.
+
+- `v0.9/object.schema.json` (`object.json`): `id` (slug, equals the directory
+  name), SemVer `version`, `name`, `category`, `tags`, a directory-relative
+  `scene`, `license` + `attribution`, rest-pose `bounds`, optional `thumbnail`
+  and `lighting`, `traits` and optional `slots`. Traits: `decorative` (0.8 node
+  animations), `collidable` (0.8 proxy), `movable` (`surfaces`, `upright`,
+  `scale`), `character` (measured `clips` with `walk` and `idle`, `height`,
+  `radius`, `accent`, asset-level `say`/`panel` interactions) and `seat`
+  (anchors, `capacity`). `mover`, `machine`, `mount` and `interactive` are
+  reserved and rejected with a reason. Slots `states`, `labels`, `spawns` and
+  `effects` (at most 8 each) are validated and inert.
+- `v0.9/library.schema.json` (`library.json`): reverse-domain `id`, `version`,
+  `name`, `license` + `attribution` and 1–256 listed `objects`.
+- `v0.9/library-releases.schema.json`: the meta repository's
+  `libraries/releases.json`, one record per `id@version` (`id`, `version`,
+  `formatVersion`, `url`, `sha256`, `nixHash`, `published`).
+- **Draft** `v0.10/object.schema.json` and `v0.10/library.schema.json`: 0.9 plus
+  the `mover` trait, RFC-0013's `machine` trait (typed `inputs` with `repeat`,
+  `drives` in the mapping language, `primary`, `positions`, `recipes`) and the
+  slot additions (`labels` font/align/colour/plate, `spawns` track/items/maxRate,
+  `effects` kind/colour/durationMs, new `tracks`, `stacks`, `toggles`, `ports`).
+  It may change until world format 0.10 is defined.
+- `validate('object', manifest, undefined, format?, options)`: trait
+  combinations, origin conventions (floor, wall and ceiling within 1 cm; a
+  character's rest-pose feet within 5 cm), slot
+  ids, poses inside the bounds grown by 0.5 m, palettes, seat anchors, track
+  points and arcs, stack layouts, machine input references, drive targets and
+  output domains. With `options.gltf`: the format's glTF extension rules, node
+  names (unique, in the scene; the proxy may sit outside it), the 0.8 animation
+  and proxy rules, states-slot materials and nodes (one slot each),
+  `KHR_materials_variants` mappings (variant names of a states slot are palette
+  ids), character skins, clips and `extras.speed` (2%), triangle budgets
+  (50,000; characters 16,000; items 2,000; proxy 2,000) and bounds (exact for
+  axis-aligned meshes, else a containing box). `options.files`, `thumbnail`,
+  `measured` and `directory` add the directory limits, attribution coverage, the
+  256 x 256 thumbnail, the 1 cm bounds check and texture and GPU budgets.
+  Results carry `warnings`.
+- `validate('library', manifest, undefined, format?, {objects, files})` and
+  `validate('library-releases', record)`. `objectFormats` and `objectLimits` are
+  exported. The CLI accepts `object` (with an optional glTF/GLB), `library` and
+  `library-releases`.

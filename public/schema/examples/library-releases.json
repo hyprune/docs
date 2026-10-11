@@ -1,0 +1,11 @@
+{
+  "com.example.street@1.2.0": {
+    "id": "com.example.street",
+    "version": "1.2.0",
+    "formatVersion": "0.9",
+    "url": "https://example.com/releases/street-v1.2.0/com.example.street-1.2.0.tar.zst",
+    "sha256": "f06838d7b0725080016c84ae4f47aa01367ee665e3844637b14ed7f23706c894",
+    "nixHash": "sha256-8Gg417ByUIABbISuT0eqATZ+5mXjhEY3sU7X8jcGyJQ=",
+    "published": false
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "formatVersion": "0.9",
+  "id": "com.example.street",
+  "version": "1.2.0",
+  "name": "Street kit",
+  "license": "CC-BY-4.0",
+  "attribution": [
+    {
+      "path": ".",
+      "author": "Example Author",
+      "license": "CC-BY-4.0"
+    }
+  ],
+  "objects": [
+    "street-lantern",
+    "bench"
+  ]
+}

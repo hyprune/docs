@@ -1,0 +1,338 @@
+{
+  "formatVersion": "0.10",
+  "id": "conveyor",
+  "version": "1.0.0",
+  "name": "Conveyor",
+  "category": "machines",
+  "tags": [
+    "ci",
+    "pipeline"
+  ],
+  "scene": "object.glb",
+  "license": "CC-BY-4.0",
+  "attribution": [
+    {
+      "path": ".",
+      "author": "Example Author",
+      "license": "CC-BY-4.0"
+    }
+  ],
+  "bounds": {
+    "min": [
+      -2.2,
+      0,
+      -0.8
+    ],
+    "max": [
+      2.2,
+      1.9,
+      0.8
+    ]
+  },
+  "traits": {
+    "decorative": {
+      "animations": [
+        {
+          "node": "belt-rollers",
+          "type": "spin",
+          "axis": [
+            1,
+            0,
+            0
+          ],
+          "pivot": [
+            0,
+            0.6,
+            0
+          ],
+          "period": 1.2
+        }
+      ]
+    },
+    "collidable": {
+      "node": "proxy"
+    },
+    "movable": {
+      "surfaces": [
+        "floor"
+      ]
+    },
+    "machine": {
+      "primary": "status",
+      "inputs": [
+        {
+          "id": "status",
+          "type": "enum",
+          "values": [
+            "idle",
+            "running",
+            "ok",
+            "fail"
+          ],
+          "default": "idle",
+          "label": "Pipeline status",
+          "explain": "Lamp colour and belt motion: the belt runs while the pipeline runs."
+        },
+        {
+          "id": "jobStarted",
+          "type": "event",
+          "label": "Job started",
+          "explain": "Each started job drops a crate onto the belt."
+        },
+        {
+          "id": "queued",
+          "type": "int",
+          "min": 0,
+          "max": 64,
+          "default": 0,
+          "label": "Queued jobs",
+          "explain": "Crates waiting beside the entry, one per queued job."
+        },
+        {
+          "id": "lastJob",
+          "type": "text",
+          "maxLength": 24,
+          "label": "Last job",
+          "explain": "The most recent job's name."
+        }
+      ],
+      "drives": [
+        {
+          "input": "status",
+          "target": "state:lamp"
+        },
+        {
+          "input": "status",
+          "target": "animation:belt-rollers",
+          "map": {
+            "cases": [
+              {
+                "equals": "running",
+                "to": 1
+              }
+            ],
+            "else": 0
+          }
+        },
+        {
+          "input": "queued",
+          "target": "count:waiting"
+        },
+        {
+          "input": "lastJob",
+          "target": "label:sign"
+        },
+        {
+          "input": "jobStarted",
+          "target": "spawn:belt-in"
+        },
+        {
+          "input": "status",
+          "target": "effect:confetti",
+          "map": {
+            "becomes": "ok",
+            "from": "running"
+          }
+        }
+      ],
+      "recipes": [
+        {
+          "name": "Pipeline summary JSON",
+          "fields": {
+            "status": "/pipelines/0/status",
+            "jobStarted": "/pipelines/0/jobs_started",
+            "queued": {
+              "countWhere": {
+                "array": "/jobs",
+                "pointer": "/status",
+                "equals": "queued"
+              }
+            },
+            "lastJob": "/pipelines/0/last_job/name"
+          }
+        }
+      ]
+    }
+  },
+  "slots": {
+    "states": [
+      {
+        "id": "lamp",
+        "materials": [
+          "lamp-glass"
+        ],
+        "palette": [
+          {
+            "id": "idle",
+            "colour": [
+              0.35,
+              0.45,
+              0.6
+            ],
+            "emission": 0.5
+          },
+          {
+            "id": "running",
+            "colour": [
+              1.0,
+              0.7,
+              0.2
+            ],
+            "emission": 2
+          },
+          {
+            "id": "ok",
+            "colour": [
+              0.3,
+              1.0,
+              0.45
+            ],
+            "emission": 2
+          },
+          {
+            "id": "fail",
+            "colour": [
+              1.0,
+              0.2,
+              0.15
+            ],
+            "emission": 3
+          },
+          {
+            "id": "stale",
+            "colour": [
+              0.4,
+              0.4,
+              0.4
+            ],
+            "emission": 0.2
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "id": "sign",
+        "pose": {
+          "position": [
+            0,
+            1.75,
+            0.81
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "size": [
+          1.2,
+          0.3
+        ],
+        "maxChars": 24,
+        "font": "mono"
+      }
+    ],
+    "tracks": [
+      {
+        "id": "belt",
+        "speed": 0.6,
+        "points": [
+          {
+            "position": [
+              -2,
+              0.8,
+              0
+            ],
+            "type": "line"
+          },
+          {
+            "position": [
+              2,
+              0.8,
+              0
+            ],
+            "type": "line"
+          }
+        ],
+        "items": {
+          "assets": [
+            "job-crate"
+          ],
+          "max": 24,
+          "spacing": 0.45
+        },
+        "sink": true
+      }
+    ],
+    "spawns": [
+      {
+        "id": "belt-in",
+        "pose": {
+          "position": [
+            -2,
+            0.8,
+            0
+          ],
+          "rotation": [
+            0,
+            0.707,
+            0,
+            0.707
+          ]
+        },
+        "track": "belt",
+        "items": [
+          "job-crate"
+        ],
+        "maxRate": 2
+      }
+    ],
+    "stacks": [
+      {
+        "id": "waiting",
+        "node": "crate",
+        "cap": 64,
+        "layout": {
+          "grid": [
+            4,
+            4,
+            4
+          ],
+          "spacing": [
+            0.35,
+            0.35,
+            0.35
+          ],
+          "fill": "xzy"
+        }
+      }
+    ],
+    "effects": [
+      {
+        "id": "confetti",
+        "pose": {
+          "position": [
+            0,
+            2.0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "kind": "burst",
+        "colour": [
+          1.0,
+          0.8,
+          0.2
+        ],
+        "durationMs": 1500
+      }
+    ]
+  }
+}

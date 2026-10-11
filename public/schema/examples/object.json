@@ -1,0 +1,148 @@
+{
+  "formatVersion": "0.9",
+  "id": "street-lantern",
+  "version": "1.0.0",
+  "name": "Street lantern",
+  "description": "A post lantern with a softly bobbing flame and a bench seat at its foot.",
+  "category": "lighting",
+  "tags": [
+    "lamp",
+    "street"
+  ],
+  "scene": "object.glb",
+  "license": "CC-BY-4.0",
+  "attribution": [
+    {
+      "path": ".",
+      "author": "Example Author",
+      "license": "CC-BY-4.0",
+      "source": "https://example.com/street-lantern"
+    }
+  ],
+  "bounds": {
+    "min": [
+      -0.25,
+      0,
+      -0.25
+    ],
+    "max": [
+      0.25,
+      2.4,
+      0.25
+    ]
+  },
+  "thumbnail": "thumbnail.png",
+  "lighting": {
+    "mode": "probe"
+  },
+  "traits": {
+    "decorative": {
+      "animations": [
+        {
+          "node": "flame",
+          "type": "bob",
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "amplitude": 0.01,
+          "period": 3
+        }
+      ]
+    },
+    "collidable": {
+      "node": "proxy"
+    },
+    "movable": {
+      "surfaces": [
+        "floor"
+      ],
+      "upright": true,
+      "scale": [
+        0.75,
+        1.5
+      ]
+    }
+  },
+  "slots": {
+    "states": [
+      {
+        "id": "status",
+        "materials": [
+          "lamp-glass"
+        ],
+        "palette": [
+          {
+            "id": "idle",
+            "colour": [
+              0.3,
+              0.5,
+              1.0
+            ],
+            "emission": 1
+          },
+          {
+            "id": "busy",
+            "colour": [
+              1.0,
+              0.7,
+              0.2
+            ],
+            "emission": 2
+          },
+          {
+            "id": "fault",
+            "colour": [
+              1.0,
+              0.2,
+              0.2
+            ],
+            "emission": 3
+          }
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "id": "title",
+        "pose": {
+          "position": [
+            0,
+            1.9,
+            0.26
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "size": [
+          0.6,
+          0.15
+        ],
+        "maxChars": 24
+      }
+    ],
+    "effects": [
+      {
+        "id": "vent",
+        "pose": {
+          "position": [
+            0,
+            2.3,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0,
+            1
+          ]
+        }
+      }
+    ]
+  }
+}

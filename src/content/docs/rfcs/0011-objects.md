@@ -39,7 +39,8 @@ moving costs no frames.
 ## Object assets
 
 An object asset is a directory: a manifest next to its glTF. The same directory layout is used
-inside world packages, inside libraries and in the user folder.
+inside world packages, inside libraries and in the user folder. How to make, check and license
+one: [Objects for authors](/objects/).
 
 ```text
 street-lantern/

@@ -21,6 +21,20 @@ The meta repository [hyprune/hyprune](https://github.com/hyprune/hyprune) is the
 
 Fedora and Debian packages aren't available; use Nix there. World packages are published as GitHub releases and pinned by hash. Lumen Reach 0.9.2 (world format 0.7, compressed textures, playable bounds) and Switchyard 0.1.2 are the current releases, on [hyprune/worlds](https://github.com/hyprune/worlds/releases).
 
+## World and extension authoring tools
+
+The SDK and the schemas are published on npm. You don't need a Hyprune session to use them:
+
+```sh
+npm i -g @hyprune/sdk                  # the hyprune and hyprune-mock commands
+hyprune world validate path/to/world   # schema, files, glTF and provenance checks
+hyprune world pack path/to/world       # a deterministic .tar.zst package
+hyprune ext new widget my-widget       # scaffold an extension
+hyprune-mock --demo                    # a development daemon to build a shell or extension against
+```
+
+Just the schemas and validator: `npm i -D @hyprune/schema`, then `npx hyprune-validate world world.json - 0.7`. The [schema reference](/reference/schema/) documents every version.
+
 ## A nested developer session
 
 Core's developer tools run everything inside a nested Hyprland window, so your real session is never touched. From a core checkout:

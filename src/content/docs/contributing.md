@@ -10,7 +10,7 @@ Hyprune is an early preview, building in the open, and every repository is publi
 
 Read [Concepts](/concepts/) and [RFC-0001](/rfcs/0001-umbrella/) to choose a repository. Explain the user-visible problem, link the affected RFC, and keep implementation within that repository's boundary. For contract changes, propose the RFC and schema/fixtures first; link their exact commits from consumer PRs.
 
-For docs: `npm ci && npm run build`, then `npm run check:links`. For schemas: `npm ci && npm test`; run the validator against new examples. Runtime PRs should include the exact Hyprland build and evidence for the relevant failure cases, using a nested session before live DRM testing. Do not claim tests you could not run.
+For docs: `npm ci && npm run build`, then `npm run check:links`. For schemas: `npm ci && npm test`; run the validator against new examples. World and extension authors can work without a checkout: `npm i -g @hyprune/sdk` provides `hyprune world validate`, `hyprune world pack`, `hyprune ext new` and the `hyprune-mock` daemon, and `@hyprune/schema` carries the schemas and validator. Runtime PRs should include the exact Hyprland build and evidence for the relevant failure cases, using a nested session before live DRM testing. Do not claim tests you could not run.
 
 ## Machine-specific settings
 

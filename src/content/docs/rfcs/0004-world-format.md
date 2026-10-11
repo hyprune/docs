@@ -552,9 +552,13 @@ per-object bakes. Authors fix the rare bad probe with `ambient`.
   instance, depth-sorted with other transparent geometry).
 - Culling uses each instance's **swept bounds**: a sphere about the asset's
   rest-pose box centre that holds the asset at every animation pose, scaled and
-  placed by the instance. Visibility regions apply by the sphere centre (the
-  first area whose bounds contain it); outside every area an object is always
-  region-visible.
+  placed by the instance. An object shares the **visibility of the static
+  geometry around it**: the visibility areas owning `scene.gltf` meshes whose
+  bounds the sphere overlaps. It is region-visible while any of them is; with
+  none it is culled by the frustum only. (Correction, 2026-10-11: the first
+  text placed an object in the first area whose *bounds* contained its centre.
+  Derived regions are camera cells that own no nodes and are visible from no
+  other cell, so an object in one was drawn only with the camera in that cell.)
 - **Render on demand.** While an animated object (speed > 0) is visible and the
   world view is active, core keeps scheduling frames at the normal target frame
   rate. When none is visible, or the world view is inactive or idle (desktop,

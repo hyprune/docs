@@ -231,7 +231,7 @@ failure to read or write it.
 | reticle_outline | boolean | | true | dark 1 px contrast outline |
 | reticle_colour | `"theme"` or `[r,g,b]` (0–1) | | `"theme"` | `"theme"` uses the overlay style's `reticleColor` |
 | reticle_dynamic | boolean | | true | the reticle opens up while moving or turning |
-| reach_grab | number | 1–100 | 15 | m; Super+button window gestures (carry, resize, roll) |
+| reach_grab | number | 1–100 | 15 | m; Super+button window gestures (carry, resize) |
 | reach_mount | number | 1–100 | 8 | m; snapping into tool-mount frames (tool 2, tool 5, carry release) |
 | reach_placement | number | 1–100 | 12 | m; tool 5 place on a surface and pocket, tool 2 mount on a wall, tool 3 path points |
 

@@ -3,7 +3,7 @@ title: "RFC-0005 — Surfaces and screen types"
 description: "Pixels, geometry, focus and trusted routing across the desktop/world boundary."
 ---
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through the [IPC 0.15 pocket queue and content sizing amendment](#amendment-pocket-queue-and-client-content-sizing-ipc-015).
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through the [wall backgrounds and tool-mount snapping amendment](#amendment-wall-backgrounds-and-tool-mount-snapping-no-wire-change), with the IPC 0.19 reach limits from [RFC-0006](/rfcs/0006-interaction/#amendment-ipc-019-player-settings-and-reticle).
 
 
 ## Decision and vocabulary
@@ -130,7 +130,8 @@ travel to the same home.
 
 Super+left drag preserves the hit point offset and camera-to-hit distance.
 Wheel motion changes target distance multiplicatively and eases toward it.
-Super+middle press rolls around the surface normal using the signed ray sweep;
+Super+middle press rolled around the surface normal using the signed ray sweep
+(removed 2026-10-11: the gesture could never fire; Super+Ctrl+Wheel rotates);
 Super+right drag configures the native client width/height independently, retaining
 pixel-to-world scale and the client's own minimum/maximum size constraints.
 An OBB sweep rejects motion through geometry. Releasing onto a workspace wall

@@ -3,7 +3,7 @@ title: "RFC-0002 — Core runtime"
 description: "Process ownership, safe render phases, capture scheduling and failure recovery."
 ---
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented in core through the [IPC 0.15 correction](#ipc-015-correction-unzoned-mount-instances-and-reconnects); the optional world renderer ([RFC-0009](/rfcs/0009-offload-renderer/)) is implemented through phase 1, default off.
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented in core through IPC 0.19, including the [presentation-driven tick amendment](#amendment-presentation-driven-simulation-tick-no-wire-change); the optional world renderer ([RFC-0009](/rfcs/0009-offload-renderer/)) is implemented through phase 1, default off.
 
 
 ## Decision: a small plugin and a helper
@@ -44,7 +44,7 @@ The prototype's hardware cursor update re-entered rendering and corrupted the ac
 The diagram on [Architecture](/architecture/) shows the ownership boundary. Per frame:
 
 1. **After previous outer frame:** process bounded deferred compositor operations, update capture leases, unsuspend participating clients, deliver eligible frame callbacks, refresh dirty captures, stage budgeted GPU uploads. Write next immutable frame state.
-2. **Simulation:** fixed 60 Hz trusted movement/physics, at most four catch-up steps, then drop excess elapsed time and report overrun. Input timestamps use a monotonic clock. Late worker results retain the prior valid scene; never block a frame.
+2. **Simulation:** fixed 60 Hz trusted movement/physics, at most four catch-up steps, then drop excess elapsed time and report overrun (for live input, superseded by the [presentation-driven tick](#amendment-presentation-driven-simulation-tick-no-wire-change); recording and replay keep fixed steps). Input timestamps use a monotonic clock. Late worker results retain the prior valid scene; never block a frame.
 3. **World pass:** render opaque geometry to owned color/depth buffers, then transparent geometry, resolve MSAA if enabled. Apply world lighting and tone mapping once.
 4. **Surface pass:** sample compositor-approved window textures with the capture's geometry/UV snapshot; depth-test against world geometry. Preserve desktop color through a separate output transform, with no artistic bloom/exposure on application pixels.
 5. **Composite:** present world + surfaces in the room output/workspace below top/overlay shell layers. Preserve compositor GL state through the adapter's scoped state guard; never clear unrelated outputs or their damage.
@@ -126,3 +126,21 @@ it is restricted to the original launch manifest, at most 8 requests/second,
 4096 per launch and 64 outstanding grants. No public IPC issuance method, token
 file, command-line secret or QML credential is introduced. `down` terminates the
 supervisor and closes both channels.
+
+## Amendment: presentation-driven simulation tick (no wire change)
+
+Implemented in core on 2026-10-10. A fixed 16 ms timer beat against the display's
+presentation rate, so a shown frame advanced by zero, one or two steps, and mouse look
+was applied once per timer tick. The tick is now queued, outside the render pass, on
+each `presented` event of the active monitor; the timer drives ticks only while nothing
+is presented. Movement and look use the frame's measured time, capped at 4/60 s; the
+walker and flight sub-step by distance (at most 2 ms of motion per step), so a fast run
+cannot pass through thin walls. Recording and replay keep exact fixed 60 Hz steps.
+
+A frame-rate target below the display rate renders new frames on every n-th
+presentation (n = round(refresh / target)), evenly; those intentional repeats do not
+count as queue pressure. Interpolating between fixed steps and automatic slowdowns on
+queue depth were tried and rejected. Measurements: frame-interval variation 0.087 to
+0.004 at the default, turning unevenness 0.182 to 0.022, and a steady 30 FPS when
+GPU-bound; input to first new frame stays 8–10 ms at 60 FPS ([progress](/progress/)).
+

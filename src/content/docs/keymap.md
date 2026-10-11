@@ -138,7 +138,7 @@ Movement speed, view bob, the reticle and how far your hands reach are player se
 | reticle_outline | true | Dark 1 px outline for contrast |
 | reticle_colour | theme | `theme` (the HUD theme) or an RGB colour |
 | reticle_dynamic | true | The reticle opens up while you move or turn |
-| reach_grab | 15 | 1–100 m; Super+button window gestures (carry, resize, roll) |
+| reach_grab | 15 | 1–100 m; Super+button window gestures (carry, resize) |
 | reach_mount | 8 | 1–100 m; snapping into tool-mount frames (tools 2 and 5, releasing a carry) |
 | reach_placement | 12 | 1–100 m; placing on a surface and pocketing (tool 5), mounting on a wall (tool 2), path points (tool 3) |
 

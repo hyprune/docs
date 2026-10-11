@@ -3,7 +3,7 @@ title: "RFC-0008 — Shell contract"
 description: "The minimum obligations of any Hyprune shell."
 ---
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented by the reference Quickshell shell through the [IPC 0.16 upscaler amendment](#amendment-ipc-016-upscaler).
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented by the reference Quickshell shell through IPC 0.19: the [IPC 0.17 capture notes](#amendment-ipc-017-capture-notes), the offload GPU and power cap from [RFC-0009's IPC 0.18 amendment](/rfcs/0009-offload-renderer/#amendment-ipc-018-device-scaled-offload-power-and-device-selection), and the Movement and Reticle settings from [RFC-0006's IPC 0.19 amendment](/rfcs/0006-interaction/#amendment-ipc-019-player-settings-and-reticle).
 
 
 ## Decision

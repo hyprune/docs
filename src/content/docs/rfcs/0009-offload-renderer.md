@@ -16,7 +16,7 @@ on another GPU. Keep native application capture, surfaces, overlays and final
 composition on the compositor GPU. `hypruned` supervises the renderer; the
 plugin never becomes its production process supervisor.
 
-The [round-2 spike at core commit 03965ce](https://github.com/hyprune/core/blob/03965ce619c24b2f3734b0ef5ac89d8671cb7479/docs/spikes/dgpu-offload.md#round-2--reverse-allocation-and-vulkan-2026-10-08)
+The [round-2 spike](https://github.com/hyprune/core/blob/6efc878920cbf70ce3935913e2c57c7efd10f949/docs/spikes/dgpu-offload.md#round-2--reverse-allocation-and-vulkan-2026-10-08)
 used Intel Panther Lake/xe for composition and an RTX 5090 Laptop with NVIDIA
 615.71.09 for world rendering. Native 3840×2160, matched Intel-quality preset
 (2× MSAA), the same pinned Lumen Reach world, short sequential nested runs:
@@ -54,8 +54,8 @@ preset without also recording effective resolution and enabled effects.
 The follow-up merged core `origin/main` **ad81f24** into the spike as
 **6412298**, then measured the same pinned world and matched Sun Court/Rime
 Vault viewpoints. It includes presets, dynamic resolution, graphics IPC 0.7/0.8,
-BVHs and incremental uploads. The [full report and raw evidence](https://github.com/hyprune/core/blob/936d962/docs/spikes/dgpu-offload.md#quality-headroom)
-include frame intervals, GPU/copy timing, power logs, 4K stills and a separate
+BVHs and incremental uploads. The [full report](https://github.com/hyprune/core/blob/6efc878920cbf70ce3935913e2c57c7efd10f949/docs/spikes/dgpu-offload.md#quality-headroom)
+summarizes frame intervals, GPU/copy timing, power logs, 4K stills and a separate
 recording-overhead comparison. No core main edits or live-session tests.
 
 | Setting, 3840×2160 output | Sun Court FPS / world scale | Rime Vault FPS / world scale |

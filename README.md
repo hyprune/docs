@@ -43,8 +43,6 @@ Owner steps after reviewing and pushing:
 
 Keep DNS unproxied during verification. Do not add a wildcard record. These values follow [GitHub's custom-domain instructions](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site); recheck those instructions if GitHub changes its hosting setup. `astro.config.mjs` uses `site: https://hyprune.com` at `/`, not `/docs/`, because this is a custom-domain site.
 
-Nothing has been pushed or deployed by this foundation work.
-
 ## Schema mirrors
 
 The Keymap page is generated from core's canonical `config/input.default.json`.

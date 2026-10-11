@@ -12,6 +12,10 @@ Read [Concepts](/concepts/) and [RFC-0001](/rfcs/0001-umbrella/) to choose a rep
 
 For docs: `npm ci && npm run build`, then `npm run check:links`. For schemas: `npm ci && npm test`; run the validator against new examples. Runtime PRs should include the exact Hyprland build and evidence for the relevant failure cases, using a nested session before live DRM testing. Do not claim tests you could not run.
 
+## Machine-specific settings
+
+Repositories never contain machine-specific values such as review directories or build hosts. Developer tools read them from the environment, or from an optional `~/.config/hyprune/dev.env` (one `KEY=VALUE` per line); the environment wins. The keys are `HYPRUNE_GALLERY_DIR` and `HYPRUNE_VIDEO_DIR` (where review stills and videos are published; unset, a tool warns and names its fallback), `HYPRUNE_BUILD_HOST` (remote Nix and test runs) and `HYPRUNE_BAKE_HOST` (Blender bakes for worlds; `local` on that host itself). Each repository's README or CONTRIBUTING lists the ones it uses.
+
 ## Rights and review
 
 Submit only work you have the right to license. Code uses MIT. Official world content uses CC-BY-4.0, with CC0/CC-BY dependencies documented per file or directory. Include source, author, license and modifications. No ripped game assets or derivatives—even as temporary fixtures or screenshots. Original geometric test scenes are preferred.

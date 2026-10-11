@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyprune.com/schema/extensions/blueprint.schema.json",
+  "title": "com.hyprune.blueprint 0.1 world manifest value",
+  "description": "Per-level blueprint SVGs in the frame of the package's com.hyprune.map 0.1 (RFC-0004 amendment). Levels are sorted by minY and must not overlap (maxY[i] <= minY[i+1]); each SVG is at most 65536 bytes, all levels together at most 262144 bytes, using the map SVG subset plus a class attribute from: grid floor wall stair opening screen mount area label route waypoint void outline. Consumers enforce those rules.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "levels"],
+  "properties": {
+    "version": {"const": "0.1"},
+    "levels": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "minY", "maxY", "path"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]{0,31}$"},
+          "name": {"type": "string", "minLength": 1, "maxLength": 64},
+          "minY": {"type": "number"},
+          "maxY": {"type": "number"},
+          "path": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[A-Za-z0-9_./-]+\\.svg$"}
+        }
+      }
+    }
+  }
+}

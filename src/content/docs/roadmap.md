@@ -35,6 +35,7 @@ These are outside the original milestone table, but shipped and documented:
 - **Idle at rest:** workspace walls recompose only when their windows change, taking nested GPU busy at rest from about 2% to 0.07%.
 - **Autodrive on stairs:** autodrive and autopilot walk routes like the player, climbing stairs and ramps.
 - **Frame pacing and clarity:** ticks follow presented frames and use their real time, and frame-rate targets pace evenly; frame interval variation drops from 0.087 to 0.004. Walls render at native resolution, so text on them is nearly as sharp as native (0.89 against 0.48 before).
+- **Director blueprints and pocket actions** ([IPC 0.20](/reference/schema/ipc/0.20/)): each world's map as a per-level blueprint generated at build time (walls, floors, stairs, openings, screens, areas, routes), with level switching, pan and zoom; put windows in the pocket and take them out from the Director; Walk/Fly as a two-way toggle.
 - **Player settings and reticle** ([IPC 0.19](/reference/schema/ipc/0.19/)): field of view, walk and run speed, view bob, reach limits for grabbing, mounting and placing, and a contextual reticle in six styles.
 - **Capture notes** ([IPC 0.17](/reference/schema/ipc/0.17/)): after U, the shell asks why, and notes collect in one file.
 - **Hands-on fixes:** static world geometry, carrying from behind (a 239 ms stall now takes 0.16 ms), wallpaper on empty walls, tool-mount snapping, robust render-pass tracking.

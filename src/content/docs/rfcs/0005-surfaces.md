@@ -306,3 +306,27 @@ Otherwise the mount is not a target. The placement is an ordinary anchored
 placement `{worldId, areaId, anchorId, rule}`. Unhomed room clients may use any
 area's mount, and the placement names that area. Aiming elsewhere keeps the
 existing free-space and surface placement.
+
+## Amendment: pocket actions (IPC 0.20)
+
+The pocket (the Placement queue, IPC 0.15) can also be reached from the shell, not
+only by aiming tool 5. Both methods need `surface.control` and an active world.
+Both refuse child surfaces.
+
+- `surface.pocket {surfaceId}` → `{revision}` puts a captured window into the
+  pocket. It is no longer drawn in the world, and its durable placement is kept.
+  The window becomes the selected pocket item. Already pocketed: no change.
+  Locked windows (editor lock) are refused with -32005.
+- `surface.unpocket {surfaceId}` → `{revision, placed}` takes it out:
+  - With a durable placement, the window returns there.
+  - Otherwise core looks for a free, collision-safe, full-size spot in front of
+    the player, as for a newly opened room window. Either way, `placed: true`.
+  - If no spot fits, the window stays in the pocket, becomes the selected item,
+    and the Placement tool (slot 5) is selected so the user can aim and place it.
+    Core sends `runtime.notice` `placement.blocked` and returns `placed: false`.
+  - A window that is not in the pocket is refused with -32004.
+
+Pocket membership remains `editor.unplaced.windows`. The reference shell's Director
+lists every window with "Put in pocket", marks pocketed ones and offers "Take out /
+place".
+

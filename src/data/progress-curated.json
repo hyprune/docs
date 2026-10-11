@@ -532,6 +532,16 @@
     "release:switchyard@0.1.2"
    ],
    "major": true
+  },
+  {
+   "date": "2026-10-11",
+   "time": "13:00–17:00",
+   "title": "Blueprint maps and pocket actions",
+   "text": "<a href=\"/reference/schema/ipc/0.20/\">IPC 0.20</a>: per-level blueprint maps generated from each world's geometry, and putting windows in the pocket and taking them out from the Director.",
+   "covers": [
+    "ipc:0.20"
+   ],
+   "major": true
   }
  ]
 }

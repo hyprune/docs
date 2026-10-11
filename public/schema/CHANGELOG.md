@@ -142,3 +142,18 @@ definition exists in 0.16 and the graphics properties differ only by the new key
   action it would take (`""|click|grab|pocket|place|mount|select|path|drop`).
 - Everything else is inherited from 0.18 unchanged, including the offload cap
   and device keys; `session.hello` reports `0.19`.
+
+## IPC 0.20: pocket actions and blueprint map levels
+
+- `surface.pocket {surfaceId}` and `surface.unpocket {surfaceId}` (surface.control).
+  Pocket: the window leaves the world for the Placement queue, its placement kept;
+  idempotent. Unpocket: placed at a free spot in front of the player
+  (`placed: true`) or left in the pocket, selected for the Placement tool
+  (`placed: false`). Results `{revision}` / `{revision, placed}`.
+- `map.levels` (optional, 1..6): `{id, name, minY, maxY, svg, sha256}` per
+  blueprint level, sorted by `minY`, in the frame of the map (`worldToMap`).
+- New `extensions/blueprint.schema.json`: the `com.hyprune.blueprint` 0.1 world
+  extension (levels with package-relative SVG paths; byte budgets, ordering and
+  the `class` vocabulary are stated in its description and enforced by consumers).
+- Everything else is inherited from 0.19 unchanged; `session.hello` reports
+  `0.20` and lists the two methods. Inheritance test included.

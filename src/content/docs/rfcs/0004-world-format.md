@@ -368,6 +368,50 @@ The schema is [0.7](/reference/schema/world/0.7/). The shared validator also
 checks `scene.gltf`'s `extensionsRequired` and lightmap textures against the
 world's `formatVersion` (`validate('scene', gltf, undefined, worldVersion, {world})`).
 
+## Amendment: blueprint map levels, `com.hyprune.blueprint` 0.1 (IPC 0.20)
+
+The map should read as a plan of the place, not just its paths. A package that
+carries `com.hyprune.map` 0.1 may also carry the optional extension
+`com.hyprune.blueprint` version `0.1`:
+
+```json
+"com.hyprune.blueprint": {"version": "0.1", "levels": [
+  {"id": "ground", "name": "Ground", "minY": -2, "maxY": 4.5, "path": "blueprint/ground.svg"},
+  {"id": "upper", "name": "Upper decks", "minY": 4.5, "maxY": 40, "path": "blueprint/upper.svg"}]}
+```
+
+- `levels` holds 1–6 entries sorted by `minY`. Each `id` is a slug
+  (`[a-z][a-z0-9-]{0,31}`, unique) and each `name` has 1–64 characters. A level
+  shows the band of feet heights `minY ≤ y < maxY`, so `minY < maxY` and bands do
+  not overlap.
+- Each `path` is a package-relative safe path to an SVG drawn in the map's frame:
+  the same `viewBox`, with `worldToMap` mapping world XZ onto it.
+- Each SVG is at most 64 KiB, and all levels together at most 256 KiB.
+- The SVGs use the map SVG subset (RFC-0008), plus a `class` attribute naming a
+  drawing role: `grid floor wall stair opening screen mount area label route
+  waypoint void outline`. Elements with a role and no `fill`/`stroke` take the
+  consumer's theme colours for that role. Other elements keep their own colours.
+- The drawing is a top-down technical plan of the level with north at −Z:
+  - walkable floor;
+  - wall outlines from collision;
+  - stairs and ramps with treads, doors and openings;
+  - mounted-workspace screens with their facing side, tool and data mounts;
+  - area outlines and names;
+  - the walking routes and waypoints;
+  - a drawing grid and title block.
+- A blueprint without `com.hyprune.map` is an error. Cores that predate IPC 0.20
+  ignore the extension, so packages that carry it load everywhere.
+- Core validates the levels and publishes them to IPC 0.20 clients as
+  `spatial.map.levels` (`{id, name, minY, maxY, svg, sha256}`). The reference shell
+  draws them in the Director's Map with level switching, pan and zoom.
+- Worlds generate them at build time from collision, the navmesh, areas, anchors
+  and routes: `worlds/tools/derive-blueprint.py`.
+
+The value's shape is
+[`extensions/blueprint.schema.json`](/schema/extensions/blueprint.schema.json).
+Ordering, byte budgets and the role vocabulary are enforced by core and the worlds
+checker.
+
 ## Format versions
 
 World format 0.5 (optional ink outline style and authored visibility regions) is specified in [RFC-0005](/rfcs/0005-surfaces/#amendment-world-05-ink-and-authored-visibility). The [world manifest reference](/reference/schema/world/) lists every format version with its diff and the amendment that introduced it.

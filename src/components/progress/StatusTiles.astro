@@ -1,0 +1,14 @@
+---
+// Home page status tiles from the schema mirror and generated release data.
+import data from '../../data/progress.json';
+import { catalog } from '../../lib/schema/catalog';
+const ipc = catalog.ipc.at(-1)!.version;
+const world = catalog.world.at(-1)!.version;
+const lumen = data.releases.filter(r => r.world === 'lumen-reach').at(-1)!;
+---
+<div class="stats">
+  <a class="stat" href="/reference/schema/ipc/"><span class="stat-label">IPC protocol</span><span class="stat-value">{ipc}</span><span class="stat-delta">{catalog.ipc.length} frozen versions</span></a>
+  <a class="stat" href="/reference/schema/world/"><span class="stat-label">World format</span><span class="stat-value">{world}</span><span class="stat-delta">compressed assets</span></a>
+  <a class="stat" href="/progress/#lumen-reach-release-by-release"><span class="stat-label">Lumen Reach</span><span class="stat-value">{lumen.version}</span><span class="stat-delta">world format {lumen.formatVersion}</span></a>
+  <a class="stat" href="/architecture/"><span class="stat-label">Hyprland target</span><span class="stat-value">0.56.2</span><span class="stat-delta">exact-version plugin</span></a>
+</div>

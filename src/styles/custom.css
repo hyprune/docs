@@ -190,3 +190,11 @@
   .swatch { display: inline-block; width: .9rem; height: .9rem; border-radius: .25rem; background: var(--c); vertical-align: -.1rem; margin-right: .3rem; border: 1px solid var(--sl-color-gray-5); }
 }
 @layer hyprune { .shot-narrow { max-width: 34rem; margin-inline: auto; } }
+@layer hyprune {
+  .release-table { font-size: .85rem; }
+  .release-table td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .release-table tr.current td { background: color-mix(in srgb, var(--sl-color-accent-low) 45%, transparent); }
+  .rt-badge { margin-left: .4rem; font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; color: var(--sl-color-text-accent); font-weight: 700; }
+  .rt-note { font-size: .82rem; color: var(--sl-color-gray-2); }
+  .release-table .nowrap { white-space: nowrap; }
+}

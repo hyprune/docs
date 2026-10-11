@@ -20,6 +20,7 @@ hero:
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 import Shot from '../../components/media/Shot.astro';
 import Video from '../../components/media/Video.astro';
+import StatusTiles from '../../components/progress/StatusTiles.astro';
 
 <figure class="home-shot">
   <picture>
@@ -29,12 +30,7 @@ import Video from '../../components/media/Video.astro';
   <figcaption>Sun Court terrace, Lumen Reach 0.7.2 (a frame from the tour below), rendered in-engine. World by Hyprune contributors, CC-BY-4.0.</figcaption>
 </figure>
 
-<div class="stats">
-  <a class="stat" href="/reference/schema/ipc/"><span class="stat-label">IPC protocol</span><span class="stat-value">0.19</span><span class="stat-delta">19 frozen versions</span></a>
-  <a class="stat" href="/reference/schema/world/"><span class="stat-label">World format</span><span class="stat-value">0.7</span><span class="stat-delta">compressed assets</span></a>
-  <a class="stat" href="/progress/#lumen-reach-release-by-release"><span class="stat-label">Lumen Reach</span><span class="stat-value">0.9.1</span><span class="stat-delta">world format 0.7</span></a>
-  <a class="stat" href="/architecture/"><span class="stat-label">Hyprland target</span><span class="stat-value">0.56.2</span><span class="stat-delta">exact-version plugin</span></a>
-</div>
+<StatusTiles />
 
 ## Your desktop becomes a place.
 

@@ -58,6 +58,14 @@ After committing schema changes, run `npm run sync:schema` (default source `../s
 
 The [schema reference](https://hyprune.com/reference/schema/) is generated from the mirror at build time (`src/lib/schema/`, `src/pages/reference/schema/`): one page per contract version with readable field tables, a structural diff against the previous version, the changelog paragraphs and RFC headings that mention it, examples, and a collapsible highlighted raw view with download. New versions appear automatically after a sync.
 
+## Progress data
+
+The Progress page's release table, its timeline and the home page status tiles are generated, so they can't fall behind silently.
+
+- `src/data/progress-curated.json` is hand-written: release summaries, figures early release reports lack, day subtitles and the curated timeline entries (CEST). An entry's `covers` names the generated events it already describes (`release:lumen-reach@0.9.1`, `ipc:0.19`, `world:0.7`).
+- `npm run progress:update` (`scripts/progress-data.mjs`) rebuilds `src/data/progress.json` from GitHub releases of hyprune/worlds (via an authenticated `gh`), the sibling `../worlds` tags and each tag's `lumen-reach/reports/release.json`, and the schema mirror (`public/schema`, with times from `../schema`). Release and IPC/world-format events the curated timeline doesn't cover are added automatically. Commit the result.
+- `npm run build` first runs `npm run check:progress`. With `../worlds` or `gh` available, it fails when a published release or the mirrored IPC version is missing from the data. Without them, as in CI, it checks the committed data against the schema mirror and the pages that quote the current release. After publishing a world release or syncing a new schema, run `npm run progress:update`, add a curated summary if it warns, and commit.
+
 ## Foundation review
 
 RFC-0001–0009 are **accepted** (2026-10-09) with implementation status on each; the HUD-style amendment is proposed. Licenses still need ratifying. Community setup remains: provision **conduct@hyprune.com** (placeholder, not yet monitored) and enable/test GitHub private vulnerability reporting. Do not publish a personal address.

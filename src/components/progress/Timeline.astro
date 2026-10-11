@@ -1,0 +1,22 @@
+---
+// Dated timeline: curated entries plus generated release/contract events.
+import data from '../../data/progress.json';
+const byDay = new Map<string, typeof data.timeline>();
+for (const e of data.timeline) byDay.set(e.date, [...(byDay.get(e.date) || []), e]);
+const heading = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+const days = data.days as Record<string, string>;
+---
+{[...byDay].map(([date, entries]) => (
+  <>
+    <p class="timeline-day">{heading(date)}{days[date] && <>: {days[date]}</>}</p>
+    <ol class="timeline">
+      {entries.map(e => (
+        <li class:list={{ major: e.major, generated: e.generated }}>
+          <span class="when">{e.time ?? ''}</span>
+          <span class="what">{e.href ? <a href={e.href}>{e.title}</a> : e.title}</span>
+          {e.text && <p set:html={e.text} />}
+        </li>
+      ))}
+    </ol>
+  </>
+))}

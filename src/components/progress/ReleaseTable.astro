@@ -1,0 +1,28 @@
+---
+// Lumen Reach release table, generated data (src/data/progress.json).
+import data from '../../data/progress.json';
+const releases = data.releases.filter(r => r.world === 'lumen-reach');
+const latest = releases.at(-1);
+const day = (d: string) => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const mb = (b: number | null) => (b ? `${(b / 1e6).toFixed(1)} MB` : '—');
+const n = (x: number | null) => (x ? x.toLocaleString('en') : '—');
+---
+<div class="ft-wrap">
+<table class="release-table">
+  <thead><tr><th>Release</th><th>Published</th><th>Format</th><th>Archive</th><th>Triangles</th><th>GPU memory</th><th>What changed</th></tr></thead>
+  <tbody>
+    {[...releases].reverse().map(r => (
+      <tr class:list={{ current: r === latest }}>
+        <td class="nowrap"><a href={r.url}><strong>{r.version}</strong></a>{r === latest && <span class="rt-badge">current</span>}</td>
+        <td class="nowrap">{day(r.date)}</td>
+        <td>{r.formatVersion ?? '—'}</td>
+        <td class="num">{mb(r.archiveBytes)}</td>
+        <td class="num">{n(r.triangles)}</td>
+        <td class="num nowrap">{r.gpuMiB ? `${Math.round(r.gpuMiB)} MiB${r.gpuMeasured ? '*' : ''}` : '—'}</td>
+        <td>{r.summary}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+</div>
+<p class="rt-note">GPU memory is the package checker's upload estimate at full texture resolution. *From 0.8.0 on, textures stay compressed on the GPU, so the figure is core's measured <code>upload.gpuBytes</code> for 0.8.0; on that measure 0.7.2 uses 270.5 MiB, and later package estimates stay within 0.4 MiB of 0.8.0's. Release numbers are independent of <a href="/reference/schema/world/">world format</a> versions. Table generated from the release reports; see <a href="https://github.com/hyprune/docs/blob/main/scripts/progress-data.mjs">progress-data.mjs</a>.</p>

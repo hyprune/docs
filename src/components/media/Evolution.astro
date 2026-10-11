@@ -1,8 +1,9 @@
 ---
 // Same camera, successive Lumen Reach releases. Radio buttons switch the frame
 // without JavaScript; without CSS every frame is shown in order.
-interface Props { id: string; title: string; frames: { version: string; name: string; alt: string; note?: string }[]; }
-const { id, title, frames } = Astro.props;
+interface Props { id: string; title: string; frames: { version: string; name: string; alt: string; note?: string }[]; single?: boolean; }
+// single: one <name>-1280.webp per frame instead of the 800/1600 pair.
+const { id, title, frames, single = false } = Astro.props;
 const last = frames.length - 1;
 // One show/highlight rule per frame, scoped to this stepper (any number of frames).
 const css = frames.map((_, i) => `#evo-${id} .evo-r${i}:checked ~ .evo-frames .evo-f${i}{visibility:visible;opacity:1}` +
@@ -14,8 +15,10 @@ const css = frames.map((_, i) => `#evo-${id} .evo-r${i}:checked ~ .evo-frames .e
   <div class="evo-frames">
     {frames.map((f, i) => (
       <div class={`evo-frame evo-f${i}`}>
-        <img src={`/media/lumen-reach/${f.name}-1600.webp`} srcset={`/media/lumen-reach/${f.name}-800.webp 800w, /media/lumen-reach/${f.name}-1600.webp 1600w`}
-          sizes="(min-width: 72rem) 50rem, 100vw" width="1600" height="900" alt={f.alt} loading="lazy" decoding="async" />
+        {single
+          ? <img src={`/media/lumen-reach/${f.name}-1280.webp`} width="1280" height="720" alt={f.alt} loading="lazy" decoding="async" />
+          : <img src={`/media/lumen-reach/${f.name}-1600.webp`} srcset={`/media/lumen-reach/${f.name}-800.webp 800w, /media/lumen-reach/${f.name}-1600.webp 1600w`}
+              sizes="(min-width: 72rem) 50rem, 100vw" width="1600" height="900" alt={f.alt} loading="lazy" decoding="async" />}
         {f.note && <p class="evo-note"><strong>{f.version}</strong> · {f.note}</p>}
       </div>
     ))}

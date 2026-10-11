@@ -1,9 +1,9 @@
 ---
 // A pre-encoded Lumen Reach still (public/media/lumen-reach/<name>-{800,1600}.webp).
 // Images are optimised ahead of time, not at site build time; see public/media/README.md.
-interface Props { name: string; alt: string; caption?: string; version?: string; eager?: boolean; wide?: boolean; sizes?: string; }
-const { name, alt, caption, version, eager = false, wide = false, sizes = '(min-width: 72rem) 50rem, 100vw' } = Astro.props;
-const base = `/media/lumen-reach/${name}`;
+interface Props { dir?: string; name: string; alt: string; caption?: string; version?: string; eager?: boolean; wide?: boolean; sizes?: string; }
+const { dir = 'lumen-reach', name, alt, caption, version, eager = false, wide = false, sizes = '(min-width: 72rem) 50rem, 100vw' } = Astro.props;
+const base = `/media/${dir}/${name}`;
 ---
 <figure class:list={['shot', { 'shot-wide': wide }]}>
   <a href={`${base}-1600.webp`} class="shot-link">
@@ -11,6 +11,6 @@ const base = `/media/lumen-reach/${name}`;
       width="1600" height="900" alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
   </a>
   {(caption || version) && (
-    <figcaption>{version && <span class="shot-version">Lumen Reach {version}</span>}{caption}</figcaption>
+    <figcaption>{version && <span class="shot-version">{dir === 'lumen-reach' ? `Lumen Reach ${version}` : version}</span>}{caption}</figcaption>
   )}
 </figure>

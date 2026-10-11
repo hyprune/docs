@@ -131,14 +131,10 @@
   .evo-note { margin: .5rem 0 0; font-size: .85rem; color: var(--sl-color-gray-2); }
   .evolution figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; }
   .evo-title { font-weight: 650; color: var(--sl-color-white); }
-  .evo-steps { display: inline-flex; border: 1px solid var(--sl-color-gray-5); border-radius: 999px; overflow: hidden; }
+  .evo-steps { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--sl-color-gray-5); border-radius: 999px; overflow: hidden; }
   .evo-steps label { padding: .2rem .75rem; cursor: pointer; font-size: .82rem; font-variant-numeric: tabular-nums; color: var(--sl-color-gray-2); }
   .evo-steps label + label { border-left: 1px solid var(--sl-color-gray-5); }
   .evo-steps label:hover { color: var(--sl-color-white); }
-  .evo-r0:checked ~ .evo-frames .evo-f0, .evo-r1:checked ~ .evo-frames .evo-f1, .evo-r2:checked ~ .evo-frames .evo-f2,
-  .evo-r3:checked ~ .evo-frames .evo-f3, .evo-r4:checked ~ .evo-frames .evo-f4, .evo-r5:checked ~ .evo-frames .evo-f5 { visibility: visible; opacity: 1; }
-  .evo-r0:checked ~ figcaption .evo-l0, .evo-r1:checked ~ figcaption .evo-l1, .evo-r2:checked ~ figcaption .evo-l2,
-  .evo-r3:checked ~ figcaption .evo-l3, .evo-r4:checked ~ figcaption .evo-l4, .evo-r5:checked ~ figcaption .evo-l5 { background: var(--sl-color-accent); color: var(--sl-color-text-invert); font-weight: 650; }
   .evo-radio:focus-visible ~ figcaption .evo-steps { outline: 3px solid var(--sl-color-accent); outline-offset: 3px; }
 
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr)); gap: .75rem; margin: 1.25rem 0; }

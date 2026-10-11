@@ -1,15 +1,15 @@
 {
   "repository": "https://github.com/hyprune/hyprune",
-  "commit": "eea04b4d65bbe864ea3209b8abcec2ead344230c",
+  "commit": "32c2a80e8ec7e7beb6d6ebf76e4d694ae9ed7890",
   "committed": "2026-10-12",
   "tryVersion": "0.1.0",
   "files": {
-    "check": "7651979a8d1cf066bb405b8e91a0b9e077494c8449ea1b154a7b2b76414fdf58",
+    "check": "3298253398cec7ca1da40de62afefb9937a5746212ec1b67bed80612a77b8fdc",
     "try": "1bf3d56b836800a2891d0b0d6eb70f7a9e6fa8445409c30d95e2641b5bfac1ef"
   },
   "versions": {
     "0.1.0": {
-      "check-0.1.0.sh": "7651979a8d1cf066bb405b8e91a0b9e077494c8449ea1b154a7b2b76414fdf58",
+      "check-0.1.0.sh": "3298253398cec7ca1da40de62afefb9937a5746212ec1b67bed80612a77b8fdc",
       "try-0.1.0.sh": "1bf3d56b836800a2891d0b0d6eb70f7a9e6fa8445409c30d95e2641b5bfac1ef"
     }
   }

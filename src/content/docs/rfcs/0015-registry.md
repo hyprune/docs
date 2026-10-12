@@ -3,7 +3,7 @@ title: "RFC-0015 — Registry and sources: publishing, discovering, installing a
 description: "Creator-owned releases, one index format for the official, community and custom sources, link-only listing with automated checks, and install, update, rollback and pinning through core, the CLI and the Director."
 ---
 
-**Status: draft · proposed 2026-10-12.** Nothing here is implemented. It builds on the
+**Status: draft · proposed 2026-10-12; decisions recorded 2026-10-12 (below).** Nothing here is implemented. It builds on the
 world package and archive rules of [RFC-0004](/rfcs/0004-world-format/), the libraries,
 library install and `<id>@<version>` layout of [RFC-0011](/rfcs/0011-objects/) (IPC 0.22),
 the extension host and grant approvals of [RFC-0007](/rfcs/0007-extensions/) and the grant
@@ -11,10 +11,17 @@ model of [RFC-0003](/rfcs/0003-ipc/). [RFC-0014](/rfcs/0014-builder/) (draft: th
 import, git-versioned world folders, Make world and Release) produces the package directories
 this RFC publishes; its Release pushes a tag and creates the GitHub release in this RFC's format.
 
+**Decisions (2026-10-12).** The version is the git tag: releases are built from tags, and
+indexes and installs refer to the tag. An installed world stays in `worlds/<id>/`, and only the
+previous version is kept, for one-step rollback; update means a newer tag exists, pin means
+staying on a tag, and installs fetch the tag's release asset, never a clone. System-managed
+content is read-only without an explicit override. The official licence bar is CC0-1.0,
+CC-BY-3.0 or CC-BY-4.0.
+
 ## Goal
 
 Anyone who makes a world or a library can publish it from their own repository, and anyone
-running Hyprune can find it, install it, keep it up to date and go back to an earlier
+running Hyprune can find it, install it, keep it up to date and go back one
 version, from the Director or the command line. Creators own and host their content;
 Hyprune only links to it. Every package is pinned by hash and installed by the same safe
 extractor, whatever its source, and worlds and libraries stay data only: installing one
@@ -45,21 +52,22 @@ never runs code.
 | Term | Meaning |
 | --- | --- |
 | Package | A world or a library: one root directory with its manifest (`world.json` or `library.json`), distributed as a `.tar.zst` archive. |
-| Release | One published version of one package: the archive, its `.sha256` file and its release record, as assets of a GitHub Release (or files at stable URLs). |
+| Tag | The git tag a release is built from (`v1.2.0`). The tag names the version everywhere: in indexes, installs, updates and pins. |
+| Release | One published version of one package: the GitHub Release for a tag, with the archive, its `.sha256` file and its release record as assets. |
 | Release record | `<id>-<version>.release.json`: the machine-readable description of one release (below). |
 | Index | A JSON document listing entries, in the format defined here. Anyone can publish one. |
 | Entry | One package in an index: id, type, creator, repository, and its versions with URL, hash, size, licence and format. |
 | Source | Something a user's Hyprune reads entries from: a built-in index (official, community registry) or a custom source (an index URL, a GitHub repository or a direct package URL). |
-| Install | One `<id>@<version>` extracted, validated and recorded on this machine. |
-| Selection | For each installed id, the version core uses. |
-| Pin | A selection the user fixed; updates skip it. |
+| Install | The current release of one package on this machine: extracted, validated and recorded with its source, tag and hash. A world has one install, in `worlds/<id>/`. |
+| Previous | The install an update or rollback replaced, kept for one-step rollback. |
+| Pin | Staying on the installed tag; updates skip it. |
 | Job | An asynchronous install, update or refresh in core, with stages and progress. |
 
 ## Sources
 
 | Source kind | What it is | Who curates | Label shown | Checks before listing | Removal |
 | --- | --- | --- | --- | --- | --- |
-| **Official** | Packages built by the hyprune organisation from its own repositories (today `hyprune/worlds`), CC0-1.0 or CC-BY-4.0 content only. Index generated from the meta repository's pins. | Hyprune builds and reviews every release (the RFC-0004 rights policy, the worlds release gates). | `Official` | The full release gates of the building repository, plus the registry's automated checks. | Ordinary bug and rights work in the building repository; a fixed release replaces the pin. |
+| **Official** | Packages built by the hyprune organisation from its own repositories (today `hyprune/worlds`), CC0-1.0, CC-BY-3.0 or CC-BY-4.0 content only. Index generated from the meta repository's pins. | Hyprune builds and reviews every release (the RFC-0004 rights policy, the worlds release gates). | `Official` | The full release gates of the building repository, plus the registry's automated checks. | Ordinary bug and rights work in the building repository; a fixed release replaces the pin. |
 | **Community registry** | The hyprune-managed index of third-party packages, `hyprune/registry`. Entries added by pull request; link only. | Nobody reviews content. Automated checks run on every pull request and on a schedule; maintainers merge entries that pass. | `Community registry`, with "licence declared by the creator" | The automated checks below. | The takedown process below: the link is removed at the first credible report. |
 | **Custom** | Any index URL in this format, any GitHub repository that publishes releases by the convention below, or a direct package URL, added by the user with a display label. | The user. Hyprune does not police custom sources. | `Custom: <label>` (for example `Custom: Frank's stuff`) | None by Hyprune. The install checks still apply. | The user removes or disables the source. |
 
@@ -76,8 +84,13 @@ This convention applies to every package a built-in source lists and is what
 
 ### Repository and tags
 
-A creator publishes from their own GitHub repository. Source files may live in git with or
-without Git LFS, as the creator chooses; **distribution uses Release assets, not LFS**.
+A creator's package is a git repository on GitHub (RFC-0014's builder keeps an author's world
+as one). **Publishing is a tag plus a release:** the creator tags a commit, and the release
+built from that tag carries the package. Source files may live in git with or without Git
+LFS, as the creator chooses; **distribution uses Release assets, never the repository**.
+Installers MUST NOT clone or fetch a source repository: its history holds every binary
+revision and LFS downloads count against the creator's quota. They fetch the release asset
+for the tag and verify its hash.
 Release assets have stable URLs that can be pinned by hash and no per-download billing for
 the creator, whereas LFS bandwidth quotas are small and count every download (including CI
 checkouts of LFS objects). The [repository template](#repository-template) builds releases
@@ -88,7 +101,10 @@ from either layout.
 | One package | `v<version>` | `github:ada/tidepool-world`, tag `v1.2.0` |
 | Several packages | `<name>-v<version>`, where `<name>` is a slug naming the package within the repository | `github:hyprune/worlds/lumen-reach`, tag `lumen-reach-v0.10.2` |
 
-`<version>` is SemVer 2.0 and MUST equal the manifest `version`. A version with a pre-release
+The tag is the version: `<version>` is SemVer 2.0 and MUST equal the manifest `version` at
+the tagged commit, and the release MUST be built from that commit. A published tag MUST NOT
+be moved or deleted; a fix is a new tag. Versions compare by SemVer order of their tags, so
+"newer" always means a higher tag. A version with a pre-release
 part (`1.3.0-rc.1`) MUST be published as a GitHub pre-release; clients never offer
 pre-releases as updates unless the user asks for that version. Build metadata (`+…`) is not
 allowed in published versions.
@@ -175,7 +191,7 @@ RFC-0007 extension host, with its own grant approval.
 | `archive` | Required: asset name, sha256, compressed bytes, expanded bytes and file count. |
 | `requires.libraries` | Exact `id@version` library references from the manifest (RFC-0011); a library lists none. |
 | `thumbnails` | 0-4 assets with their hashes and pixel sizes. |
-| `source` | Repository URL, tag and the full commit the release was built from. |
+| `source` | Required: repository URL, the tag, and the full commit the tag points to and the release was built from. |
 | `tool`, `checks` | Informative: what built it and which local checks passed. Clients never trust `checks`. |
 
 The official worlds' existing release report (`reports/release.json`) is a superset kept in
@@ -225,6 +241,7 @@ use the same schema, `registry-index.schema.json` 0.1.
       "tags": ["water", "station"],
       "versions": [
         {
+          "tag": "v1.2.0",
           "version": "1.2.0",
           "formatVersion": "0.8",
           "published": "2026-11-01",
@@ -267,7 +284,8 @@ use the same schema, `registry-index.schema.json` 0.1.
 | `entries[].repo` | Optional HTTPS URL of the source repository. |
 | `entries[].tags` | At most 8 slugs. |
 | `versions[]` | 1-64 versions, newest first, each unique. |
-| `versions[].version`, `formatVersion`, `license` | SemVer; the package format version; the declared SPDX expression. |
+| `versions[].tag` | Required: the git tag the release was built from. Clients identify, install, update and pin versions by tag. Publishers without git use `v<version>`. |
+| `versions[].version`, `formatVersion`, `license` | SemVer, equal to the version the tag names; the package format version; the declared SPDX expression. |
 | `versions[].published` | ISO date. |
 | `versions[].url`, `sha256`, `bytes`, `expandedBytes`, `files` | The archive URL (HTTPS), its hash, and its sizes; sizes within the [archive limits](#archive). |
 | `versions[].record` | Optional `{url, sha256}` of the release record. Required in the official and community registry indexes. |
@@ -340,7 +358,7 @@ after the download step, a 15-minute timeout and the archive limits enforced whi
 | --- | --- | --- |
 | 1 | Entry schema | The file is not a valid 0.1 entry, its name is not `<id>.json`, or it changes another entry. |
 | 2 | Id and ownership | Reserved or mismatched id; the PR author lacks write access to `repo`; the id is held by another repository. |
-| 3 | Release | The tag or asset doesn't exist, is a draft, or is a pre-release not marked as one; `url` is not an asset of `repo`. |
+| 3 | Tag and release | The tag doesn't exist, doesn't name the entry's version by the [tag convention](#repository-and-tags), or doesn't point to the record's `source.commit`; the release for the tag doesn't exist, is a draft, or is a pre-release not marked as one; `url` is not an asset of that release. |
 | 4 | Download and size | The download fails or exceeds `bytes`; Content-Length disagrees with `bytes`. |
 | 5 | Hashes | The archive's sha256 differs from the entry, the `.sha256` asset or the record; the record's hash differs from the entry. |
 | 6 | Record agreement | Id, version, format, licence, sizes, requirements or thumbnails differ between record, entry and manifest. |
@@ -351,14 +369,14 @@ after the download step, a 15-minute timeout and the archive limits enforced whi
 | 11 | Requirements | A required library `id@version` is not listed in the official or community index. |
 | 12 | Thumbnails | A thumbnail is missing, its hash differs, it is not PNG or JPEG, or it exceeds its limits. |
 | 13 | Removed | The id, a version or the archive hash matches a tombstone in `removed/`. |
-| 14 | Version history | An existing version's `url` or `sha256` changed, or a listed version disappeared without a removal. |
+| 14 | Version history | An existing version's `tag`, `url` or `sha256` changed, or a listed version disappeared without a removal. |
 
 When all checks pass, a maintainer merges. Merging is not a content review; maintainers only
 confirm the checks ran on the final commit. New versions of an existing entry, opened by a
 repository maintainer and passing every check, MAY be merged automatically (open question 2).
 
 `reverify.yml` re-downloads every listed version weekly (rate-limited) and marks a version
-`unavailable` when its asset is gone or its hash changed. An entry whose every version is
+`unavailable` when its asset is gone, its hash changed or its tag was moved or deleted. An entry whose every version is
 unavailable for 30 days is removed with the reason `unavailable`.
 
 ### Official entries
@@ -368,8 +386,9 @@ The official index is generated from the meta repository's pins, `worlds/release
 The sync job checks that each pin's URL, sha256 and Nix hash agree and adds the entry fields
 the pins don't carry (name, summary, creator `hyprune`, thumbnails) from each release record.
 Official entries pass the same automated checks; their review happens earlier, in the
-building repository's release gates and the RFC-0004 rights policy (original, CC0-1.0 or
-CC-BY-4.0 with provenance). Releases made before the release record existed are imported from
+building repository's release gates and the official rights policy: original, CC0-1.0,
+CC-BY-3.0 or CC-BY-4.0, with provenance (RFC-0004's policy, widened by this RFC to CC-BY-3.0;
+RFC-0014's official-publishing check follows it). Releases made before the release record existed are imported from
 the pins without a record.
 
 ### Reports and removal (community registry only)
@@ -413,7 +432,7 @@ Hyprune: they are entirely the user's choice and the source operator's business.
 | Added as | Example | What the client reads | Updates |
 | --- | --- | --- | --- |
 | Index URL | `https://example.org/hyprune/v0.1/index.json` | The index document. | From the index on refresh. |
-| GitHub repository | `github:frank/hyprune-stuff` | The repository's releases (GitHub REST API) that follow the [release convention](#package-release-convention); each release record becomes a version of an entry. Releases without a valid record are skipped. | From new releases on refresh. |
+| GitHub repository | `github:frank/hyprune-stuff` | The repository's release list (GitHub REST API), never the repository itself: each tag whose release follows the [release convention](#package-release-convention) becomes a version of an entry. Releases without a valid record are skipped. | From newer tags on refresh. |
 | Package URL | `https://example.org/tidepool-1.2.0.tar.zst --sha256 <hex>`, or a release record URL | One entry with one version. An archive URL needs `--sha256`; a record URL supplies the hash and is re-read on refresh. | Only for a record URL whose version increases. |
 
 A package URL without a hash is refused: every install is pinned. For `github:` sources the
@@ -460,16 +479,18 @@ source returns. At most 32 custom sources.
 
 Every install, from any source, runs the same stages as one job:
 
-1. **Resolve.** Find the entry and version: the requested `@version`, else the highest
-   non-pre-release `available` version whose `formatVersion` this core supports. A version the
-   core can't load is listed with "needs a newer Hyprune" and is not installable.
+1. **Resolve.** Find the entry and its tag: the requested tag, else the highest
+   non-pre-release `available` tag whose `formatVersion` this core supports. A version the
+   core can't load is listed with "needs a newer Hyprune" and is not installable. For `github:`
+   sources this reads the release list and the tag's release record; nothing is cloned.
 2. **Plan.** Compute what will be installed: the package, the exact library versions it
    requires (from the same source, then the official index, then the community registry),
-   which are already installed, download and expanded sizes, disk space after install.
+   which are already installed, what the install replaces (the current tag, which becomes the
+   previous one), download and expanded sizes, disk space after install.
 3. **Confirm.** Show the plan with provenance and licence (below). Nothing is downloaded
    before confirmation except the index or release metadata.
-4. **Download.** The fetch helper downloads each archive into the cache, refusing more bytes
-   than `bytes`.
+4. **Download.** The fetch helper downloads the tag's release asset into the cache, refusing
+   more bytes than `bytes`.
 5. **Verify.** Core hashes the cached file and compares it with the pinned sha256 before
    reading any archive content. A mismatch fails the job (`hash.mismatch`) and deletes the
    cached file.
@@ -479,14 +500,18 @@ Every install, from any source, runs the same stages as one job:
 7. **Validate.** Core validates the staged package exactly as it validates installed ones:
    the manifest schema, for worlds the world-check rules core implements, for libraries the
    RFC-0011 library and object validation. Id, version and format MUST equal the entry's.
-8. **Commit.** Rename the staging directory into place, write the install record, set the
-   selection (a first install selects it), publish the new content revision.
+8. **Commit.** For a world: delete `worlds/.previous/<id>/`, rename the current
+   `worlds/<id>/` to `worlds/.previous/<id>/`, rename the staging directory to `worlds/<id>/`,
+   then write the install record (tag, hash, previous). For a library: rename the staging
+   directory to `libraries/<id>@<version>/` (RFC-0011) and record it as the current tag. Then
+   publish the new content revision.
 
-Any failure leaves the previous state untouched and removes the staging directory. The same
-`id@version` with the same digest installed again succeeds without change; different content
-under an installed `id@version` is refused (`content.conflict`, as RFC-0011's
-`library.conflict`). Library installs and world installs are the same job; the existing
-`libraries.install` (IPC 0.22) becomes a local-file install through this pipeline.
+Any failure leaves the previous state untouched and removes the staging directory; the commit
+renames are journalled in `content.json` first, so an interrupted commit is completed or
+undone at the next start. The same tag with the same digest installed again succeeds without
+change; a tag whose asset no longer matches the recorded hash is refused (`content.conflict`,
+as RFC-0011's `library.conflict`). Library installs and world installs are the same job; the
+existing `libraries.install` (IPC 0.22) becomes a local-file install through this pipeline.
 
 ### Provenance and licence on install
 
@@ -507,23 +532,30 @@ view and `hyprune world info`.
 
 ### Update, rollback, pin and remove
 
+Each install has one current tag and at most one previous tag. There is no folder per version
+and no version history beyond one step.
+
 | Operation | Semantics |
 | --- | --- |
-| **Check** | On refresh, each install from an enabled source is compared with its source: an update is the highest non-pre-release, `available`, loadable version above the selection. Major-version updates are offered but flagged ("may move or hide things you placed", RFC-0011 dormant overrides). Pinned installs show available updates with a pin badge. |
-| **Update** | Installs the new version alongside the old (the install pipeline), then moves the selection to it. Never automatic in this RFC: the user starts every update (open question 5). |
-| **Rollback** | Moves the selection to the previous retained version and pins it, so the next update doesn't redo the change. If the previous version is not retained, rollback reinstalls it from its source when the source still lists it with the recorded hash. |
-| **Pin** | `pin id@version` selects that installed version and fixes it; `unpin id` lets updates move it again. |
-| **Remove** | `remove id@version` deletes one version; `remove id` deletes all and the record. Refused for the active world's selected version, for system-managed installs, and for a library version an installed world requires (the error lists them) unless forced; RFC-0011 user placements referencing a removed library become `missing`. |
-| **Retention** | Per id, the selected version, the previous selected version and any version an installed world requires are retained; older versions are pruned after an update unless pinned (setting `content.keep_versions`, default 2). `hyprune content prune` removes unreferenced versions now. |
+| **Check** | On refresh, each install from an enabled source is compared with its source: an update exists when the source lists a newer tag (higher SemVer, not a pre-release, `available`, loadable by this core) than the current one. Major-version updates are offered but flagged ("may move or hide things you placed", RFC-0011 dormant overrides). Pinned installs show the newer tag with a pin badge. |
+| **Update** | Installs the newest tag through the install pipeline; the current install becomes the previous one, and the old previous one is deleted. Never automatic in this RFC: the user starts every update (open question 5). |
+| **Rollback** | Swaps the current and previous installs (two renames, no download) and pins the restored tag, so the next update doesn't redo the change. Rolling back again swaps them back. With no previous install, rollback is refused; installing an older tag explicitly (`add <id>@<tag>`) is the way further back, and it replaces the current install like an update. |
+| **Pin** | Stays on the current tag: updates skip it until `unpin`. `add <id>@<tag> --pin` installs a given tag and pins it in one step. |
+| **Remove** | Deletes the current and previous installs and the record. Refused for the loaded world, for system-managed installs, and for a library version an installed world requires (the error lists them) unless forced; RFC-0011 user placements referencing a removed library become `missing`. |
 
-**Active world.** Changing the selection of the loaded world never swaps the scene under the
-user: the Director offers "Load the new version" (`world.load` of the same id), and the next
-`world.load` uses the selection anyway. Overlays are keyed by world id (RFC-0011), so user
-placements carry over and are rechecked as RFC-0011 describes.
+**Active world.** An update or rollback of the loaded world never swaps files under the
+running scene. The new install is staged and validated, and the commit renames wait until the
+world is unloaded; the Director offers "Load the new version", which unloads, commits and
+loads (`world.load` of the same id). Until then the install record shows `pending`. Overlays are
+keyed by world id (RFC-0011), so user placements carry over and are rechecked as RFC-0011
+describes.
 
-**Libraries.** Worlds pin exact library versions, so a library update installs a new version
-alongside and leaves worlds on theirs; user placements follow RFC-0011's same-major
-substitution. A library version required by an installed world is never pruned.
+**Libraries.** RFC-0011 keeps libraries in `<id>@<version>` directories because worlds
+reference exact versions, and that stays. A library's current and previous tags follow the same
+rules as a world's; any other installed version is kept exactly as long as an installed world
+or a user placement requires it, and is deleted with the update or removal that leaves it
+unreferenced. A library update leaves worlds on the versions they reference; user placements
+follow RFC-0011's same-major substitution.
 
 **Update checks.** A refresh downloads whole indexes, so it reveals nothing about what is
 installed; `github:` sources query only their own repository. Setting `content.check_updates`
@@ -533,11 +565,11 @@ is `daily` (default), `weekly` or `off`; the Director and CLI can always refresh
 
 | What | Where | Written by |
 | --- | --- | --- |
-| Installed worlds | `$XDG_DATA_HOME/hyprune/worlds/<id>@<version>/` (immutable) | core, CLI |
-| Unversioned worlds | `$XDG_DATA_HOME/hyprune/worlds/<id>/` (today's installer and session layout) | installer, session |
-| Installed libraries | `$XDG_DATA_HOME/hyprune/libraries/<id>@<version>/` (RFC-0011) | core, CLI |
+| Installed worlds | `$XDG_DATA_HOME/hyprune/worlds/<id>/`: the current tag, as today | core, CLI, installer |
+| Previous worlds | `$XDG_DATA_HOME/hyprune/worlds/.previous/<id>/`: the one install the last update or rollback replaced | core, CLI |
+| Installed libraries | `$XDG_DATA_HOME/hyprune/libraries/<id>@<version>/` (RFC-0011): the current and previous tags and versions installed worlds require | core, CLI |
 | System-managed content | Packaged world directories and `$HYPRUNE_LIBRARY_DIR` entries from the system modules | the system configuration (read-only) |
-| Install records, selections, pins | `$XDG_STATE_HOME/hyprune/content.json` | core, CLI |
+| Install records (source, tag, hash, previous, pin) | `$XDG_STATE_HOME/hyprune/content.json` | core, CLI |
 | Custom sources and built-in source switches | `$XDG_CONFIG_HOME/hyprune/sources.json` | core, CLI; the user may edit it |
 | System-declared sources | Files listed in `HYPRUNE_SOURCES_FILES` (read-only) | the system configuration |
 | Index and record cache | `$XDG_CACHE_HOME/hyprune/sources/<sourceId>/` | fetch helper |
@@ -552,14 +584,15 @@ core is running and a CLI run without a session can't interleave.
 {
   "version": 1,
   "installs": [
-    {"id": "io.github.ada.tidepool", "type": "world", "source": "community",
-     "selected": "1.2.0", "pinned": false,
-     "versions": [
-       {"version": "1.2.0", "sha256": "5d2f0c6e3b9a41d8e7c2b0f4a6d9e1c3b5a7f9e2d4c6b8a0f1e3d5c7b9a2e4f6",
-        "digest": "c41e…", "license": "CC-BY-SA-4.0", "url": "https://github.com/ada/tidepool-world/releases/download/v1.2.0/io.github.ada.tidepool-1.2.0.tar.zst",
-        "installed": "2026-11-02T09:12:44Z"},
-       {"version": "1.1.0", "sha256": "…", "digest": "…", "license": "CC-BY-SA-4.0", "url": "…",
-        "installed": "2026-10-20T18:01:09Z"}]}
+    {"id": "io.github.ada.tidepool", "type": "world", "source": "community", "pinned": false,
+     "current": {"tag": "v1.2.0", "version": "1.2.0",
+       "sha256": "5d2f0c6e3b9a41d8e7c2b0f4a6d9e1c3b5a7f9e2d4c6b8a0f1e3d5c7b9a2e4f6",
+       "digest": "c41e…", "license": "CC-BY-SA-4.0",
+       "url": "https://github.com/ada/tidepool-world/releases/download/v1.2.0/io.github.ada.tidepool-1.2.0.tar.zst",
+       "installed": "2026-11-02T09:12:44Z"},
+     "previous": {"tag": "v1.1.0", "version": "1.1.0", "sha256": "…", "digest": "…",
+       "license": "CC-BY-SA-4.0", "url": "…", "installed": "2026-10-20T18:01:09Z"},
+     "pending": null}
   ]
 }
 ```
@@ -580,19 +613,19 @@ core is running and a CLI run without a session can't interleave.
 `digest` is core's content digest of the extracted tree (the RFC-0011 library digest), used
 for conflict detection and to notice local tampering.
 
-**Core's world catalog** (P1 contract change) lists `worlds/<id>@<version>/` directories
-beside today's `worlds/<id>/`. A versioned directory's manifest id and version MUST match its
-name. For each id, the selection in `content.json` wins; without a record, the unversioned
-directory is used, as today. The first content operation on an id with only an unversioned
-directory **adopts** it: core records it as `{source: "local", version}` from its manifest,
-so an update installs beside it and rollback can return to it. Directories whose names start
-with `.` are ignored (staging), as for libraries.
+**Core's world catalog** keeps today's layout: one `worlds/<id>/` per id. Core MUST ignore
+directories whose names start with `.` in the world root (`.previous/` and staging), as it
+already does for libraries. A `worlds/<id>/` without an install record (installed by an older
+installer or by hand) is recorded on the first content operation as `{source: "local"}` with
+its manifest version and no tag; it gets no updates until the user installs the same id from
+a source, which is a source change (see [Labels](#labels)).
 
-**System-managed content** (installed by the Nix modules or the packaged world directories)
-is listed with `managed: "system"`: no update, remove or pin from the Director or CLI, which
-point to the system configuration. Installing a user copy of a system-managed id requires
-`override: true` ("Install my own copy" in the Director); the user copy takes precedence
-until it is removed.
+**System-managed content is read-only (decided).** Content installed by the Nix modules or
+the packaged world directories is listed with `managed: "system"`: no update, rollback, remove
+or pin from the Director or CLI, which point to the system configuration instead. The only
+way past it is an explicit override: installing a user copy of a system-managed id requires
+`override: true` ("Install my own copy" in the Director, `--override` in the CLI, never
+implied by `--yes`); the user copy takes precedence until it is removed.
 
 ## Fetch helper
 
@@ -620,7 +653,7 @@ source of trust. Offline installs skip it.
 
 `hyprune world add ./io.github.ada.tidepool-1.2.0.tar.zst` installs a downloaded archive. The
 hash is computed locally and checked against `--sha256` when given, else against any cached
-index entry with the same id and version, else recorded as `{source: "file"}` with the
+index entry with the same id and version (whose tag is then recorded), else recorded as `{source: "file"}` with the
 computed hash (the CLI shows it and asks). Everything after the download stage is identical.
 
 ## CLI
@@ -633,30 +666,33 @@ its directory watch.
 
 | Argument | Resolves to |
 | --- | --- |
-| `io.github.ada.tidepool[@1.2.0]` | An id in the enabled sources (official, community registry, then custom in their listed order); several matches ask which, unless `--from SOURCE`. |
-| `github:ada/tidepool-world[@1.2.0]` | The repository's single package, tag `v<version>`, latest non-pre-release by default. |
-| `github:hyprune/worlds/lumen-reach[@0.10.2]` | A package in a multi-package repository, tag `lumen-reach-v0.10.2`. |
+| `io.github.ada.tidepool[@v1.2.0]` | An id in the enabled sources (official, community registry, then custom in their listed order); several matches ask which, unless `--from SOURCE`. |
+| `github:ada/tidepool-world[@v1.2.0]` | The repository's single package at that tag, else its newest non-pre-release tag. |
+| `github:hyprune/worlds/lumen-reach[@lumen-reach-v0.10.2]` | A package in a multi-package repository, tags `lumen-reach-v<version>`. |
 | `https://…/x.release.json` | A release record (supplies URL and hash). |
 | `https://…/x.tar.zst --sha256 HEX` | A direct archive. |
 | `./x.tar.zst [--sha256 HEX]` | A local archive (offline). |
 
-A `github:` or URL argument installs once without adding a source; `--track` also adds it as
+After `@` comes a tag; a bare SemVer (`@1.2.0`) is accepted and mapped to the tag by the
+[tag convention](#repository-and-tags). A `github:` or URL argument installs once without
+adding a source; `--track` also adds it as
 a custom source (with `--label`) so it gets updates.
 
 ### Commands
 
 ```text
-hyprune world add <source> [--from SOURCE] [--sha256 HEX] [--pin] [--track --label TEXT] [--yes]
-hyprune world list [--json] [--updates]
+hyprune world add <source>[@tag] [--from SOURCE] [--sha256 HEX] [--pin] [--override] [--track --label TEXT] [--yes]
+hyprune world list [--json] [--updates]          # id, current tag, previous tag, pin, newer tag
 hyprune world info <id>
 hyprune world update [<id>… | --all] [--dry-run] [--yes]
-hyprune world rollback <id>
-hyprune world pin <id>[@version]
+hyprune world rollback <id>                      # swap with the previous install and pin it
+hyprune world pin <id>                           # stay on the current tag
 hyprune world unpin <id>
-hyprune world remove <id>[@version] [--force]
+hyprune world remove <id> [--force]
 hyprune world pack <dir> --release [--output DIR]
 
-hyprune library add|list|info|update|rollback|pin|unpin|remove   (as above; `library install` stays as an alias of add)
+hyprune library add|list|info|update|rollback|pin|unpin|remove   (as above; `library install` stays as an alias of add;
+                                                                  remove also takes <id>@<version> for one version)
 hyprune library pack <dir> --release [--output DIR]
 
 hyprune source add <url | github:owner/repo> [--label TEXT] [--id SLUG] [--sha256 HEX]
@@ -667,13 +703,12 @@ hyprune source enable|disable <id>
 hyprune source remove <id>
 
 hyprune browse [TEXT] [--type world|library] [--source ID] [--json]
-hyprune registry entry <dir | github:owner/repo@version>   # print the community registry entry for a release
+hyprune registry entry <dir | github:owner/repo@tag>       # print the community registry entry for a release
 hyprune registry check <entry.json>                         # run the registry's checks locally
-hyprune content prune [--dry-run]
 hyprune content lock [--output hyprune-content.lock.json]  # pins for the Nix modules
 ```
 
-`--yes` accepts the plan except for source changes and `override`. Exit codes: 0 success, 1
+`--yes` accepts the plan except for source changes and `--override`. Exit codes: 0 success, 1
 failure, 2 usage, 3 refused by a rule (the rule is printed).
 
 ## Director: Browse
@@ -688,12 +723,14 @@ shell opens without the user pressing "Open repository".
    search over name, summary and tags; sort by name or last published. Official entries
    are listed first by default.
 2. **Entry page.** Thumbnails, summary and description, creator and repository, source label,
-   versions (with format and status), the declared licence with its source-kind wording,
+   versions by tag (with format and status), the declared licence with its source-kind wording,
    requirements, and Install (or Update, Roll back, Pin, Remove for an installed id). Install
    opens the confirmation with the full plan.
-3. **Installed.** Every install (worlds and libraries): selected version, source label (or
-   `system`, `local`, `file`), pinned, update available, `removed from source`; actions Update,
-   Update all, Roll back, Pin/Unpin, Remove, Load (worlds), and the provenance panel.
+3. **Installed.** Every install (worlds and libraries): current tag, previous tag, source
+   label (or `system`, `local`, `file`), pinned, newer tag available, pending, `removed from
+   source`; actions Update, Update all, "Roll back to <previous tag>", Pin/Unpin, Remove, Load
+   (worlds), and the provenance panel. System-managed rows show only Load, the provenance
+   panel and "Install my own copy".
 4. **Sources.** As [above](#adding-listing-refreshing-and-removing).
 
 Jobs show progress in the Director and as a HUD notice while it is closed; a finished install
@@ -726,11 +763,11 @@ trusted shell and the CLI may request it; worlds and extensions can't.
 
 | Method | Params → result | Grant | Phase |
 | --- | --- | --- | --- |
-| `content.install` | `{source, version?, sha256?, from?, override?, autoConfirm?}` → `{jobId}`; `source` is one of `{entry: {sourceId, id}}`, `{github: "owner/repo[/name]"}`, `{url}`, `{file}` | content.control | P1 |
+| `content.install` | `{source, tag?, sha256?, from?, override?, pin?, autoConfirm?}` → `{jobId}`; `source` is one of `{entry: {sourceId, id}}`, `{github: "owner/repo[/name]"}`, `{url}`, `{file}`; without `tag`, the newest installable tag | content.control | P1 |
 | `content.confirm` | `{jobId, accept}` → `{revision}` | content.control | P1 |
 | `content.cancel` | `{jobId}` → `{revision}` | content.control | P1 |
-| `content.pin` | `{id, version}` or `{id, version: null}` → `{revision}` | content.control | P1 |
-| `content.remove` | `{id, version?, force?}` → `{revision}` | content.control | P1 |
+| `content.pin` | `{id, pinned}`: stay on (or release) the current tag → `{revision}` | content.control | P1 |
+| `content.remove` | `{id, force?}`; libraries also `{id, version}` for one referenced version → `{revision}` | content.control | P1 |
 | `sources.list` | `{}` → `{sources}` | state.read | P2 |
 | `sources.add` | `{url}` or `{github}`, `{label?, id?, sha256?}` → `{jobId}` | content.control | P2 |
 | `sources.set` | `{id, label?, enabled?}` → `{revision}` | content.control | P2 |
@@ -738,8 +775,9 @@ trusted shell and the CLI may request it; worlds and extensions can't.
 | `sources.refresh` | `{ids?}` → `{jobId}` | content.control | P2 |
 | `registry.list` | `{query?, type?, sourceIds?, tags?, cursor?, limit?}` (limit at most 100) → `{entries, cursor}` from the cached indexes, no network | state.read | P2 |
 | `registry.entry` | `{sourceId, id}` → `{entry, installed}` | state.read | P2 |
-| `content.update` | `{id}` or `{all: true}` → `{jobId}` | content.control | P3 |
-| `content.rollback` | `{id}` → `{revision}` or `{jobId}` when a reinstall is needed | content.control | P3 |
+| `content.update` | `{id}` or `{all: true}` → `{jobId}` (unpinned installs with a newer tag) | content.control | P3 |
+| `content.rollback` | `{id}` → `{revision}`: swaps current and previous and pins; `-32004` when there is no previous install; for the loaded world it sets `pending` | content.control | P3 |
+| `content.commit` | `{id}` → `{revision}`: applies a `pending` swap of the loaded world by unloading it, committing and loading it again | content.control | P3 |
 
 `autoConfirm` is honoured only for plans without a source change or override.
 `libraries.install`, `libraries.remove` (0.22) remain and map to `content.install {file}` and
@@ -755,14 +793,14 @@ trusted shell and the CLI may request it; worlds and extensions can't.
   "stage": "confirm",
   "plan": {
     "packages": [
-      {"id": "io.github.ada.tidepool", "type": "world", "version": "1.2.0",
-       "sourceLabel": "Community registry", "creator": "ada",
+      {"id": "io.github.ada.tidepool", "type": "world", "tag": "v1.2.0", "version": "1.2.0",
+       "replaces": "v1.1.0", "sourceLabel": "Community registry", "creator": "ada",
        "repo": "https://github.com/ada/tidepool-world",
        "license": "CC-BY-SA-4.0", "licenceNote": "declared",
        "bytes": 48213004, "expandedBytes": 96424960,
        "sha256": "5d2f0c6e3b9a41d8e7c2b0f4a6d9e1c3b5a7f9e2d4c6b8a0f1e3d5c7b9a2e4f6",
-       "action": "install"},
-      {"id": "com.hyprune.street", "type": "library", "version": "1.2.0",
+       "action": "update"},
+      {"id": "com.hyprune.street", "type": "library", "tag": "v1.2.0", "version": "1.2.0",
        "sourceLabel": "Official", "license": "CC-BY-4.0", "licenceNote": "reviewed",
        "bytes": 3108221, "expandedBytes": 7340032, "action": "already-installed"}
     ],
@@ -775,7 +813,10 @@ trusted shell and the CLI may request it; worlds and extensions can't.
 ```
 
 `stage` runs `resolving`, `confirm`, `downloading`, `verifying`, `extracting`, `validating`,
-`committing`, then `done`, `failed` or `cancelled`; finished jobs stay listed for 60 s.
+`committing`, then `done`, `pending` (the loaded world: committed on unload or
+`content.commit`), `failed` or `cancelled`; finished jobs stay listed for 60 s. `action` is
+`install`, `update` (with `replaces`, the tag that becomes the previous install),
+`downgrade` (an explicit older tag) or `already-installed`.
 `licenceNote` is `reviewed` (official), `declared` (community registry) or `unchecked`
 (custom). `error` is `{rule, message}` with `rule` one of `fetch.failed`, `hash.mismatch`,
 `archive.unsafe`, `archive.limit`, `data.executable`, `format.unsupported`,
@@ -783,22 +824,23 @@ trusted shell and the CLI may request it; worlds and extensions can't.
 `source.invalid`, `signature.invalid` (P4).
 
 State gains `content {revision, installs, jobs, updates, sources}`: `installs` are records
-`{id, type, sourceId, sourceLabel, selected, versions, pinned, managed, removedFromSource,
-update}`, `updates` the count for a badge, `sources` the list with `{id, kind, label,
+`{id, type, sourceId, sourceLabel, tag, version, previous: {tag, version} | null, pinned,
+pending, managed, removedFromSource, newerTag}`, `updates` the count for a badge, `sources` the list with `{id, kind, label,
 enabled, lastRefresh, entries, error}`. Older peers receive none of this.
 
 Errors: `-32004` unknown id, job or source; `-32005` system-managed, active world, required
 library, or a source that can't be removed; `-32007` a rule (as `error.rule`, with
 `error.data {rule}`); `-32008` too many jobs or sources. Notices: `content.installed`,
-`content.updated`, `content.rolled-back`, `content.failed`, `content.updates-available`,
+`content.updated`, `content.rolled-back`, `content.pending`, `content.failed`, `content.updates-available`,
 `content.removed-from-source`, `source.added`, `source.failed`.
 
 ### Meta repository and Nix modules
 
 - **Official pins stay in the meta repository.** `worlds/releases.json` and
   `libraries/releases.json` remain the source of truth for what kits and the Nix modules ship
-  by default; the official index is generated from them, never the other way round. An
-  official release is "published" when its pin lands.
+  by default; the official index is generated from them, never the other way round, taking
+  each version's tag from its pinned release URL (`…/releases/download/<tag>/…`). An official
+  release is "published" when its pin lands.
 - **The installer** (`install.sh`) keeps installing kit worlds from the pins into
   `worlds/<id>/` and records them in `content.json` as `{source: "official"}`, so they update
   through the normal pipeline afterwards. It shares the extractor fixtures.
@@ -807,7 +849,7 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
 
   ```nix
   programs.hyprune.content = {
-    lock = ./hyprune-content.lock.json;   # id, version, type, url, sha256, nixHash, source label
+    lock = ./hyprune-content.lock.json;   # id, type, tag, version, url, sha256, nixHash, source label
   };
   ```
 
@@ -817,7 +859,7 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
   world directories or `HYPRUNE_LIBRARY_DIR`. These installs are `managed: "system"`.
   Custom sources declared in the module are written to a read-only file listed in
   `HYPRUNE_SOURCES_FILES`. Derivations set `meta.license` from the SPDX id when nixpkgs knows
-  it (open question 7).
+  it (open question 6).
 
 ## Trust and safety
 
@@ -838,9 +880,9 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
 
 | Phase | Scope | Contract |
 | --- | --- | --- |
-| **P1** | Release convention, release record, `pack --release`, the repository template; the fetch helper; `hyprune world add` / `library add` from `github:`, record URLs, archive URLs with a hash and local files; versioned world directories and adoption; `content.json`; pin and remove; the shared extractor fixtures. | Release record and sources schemas 0.1; IPC `content.install`, `confirm`, `cancel`, `pin`, `remove` and `content` state. |
+| **P1** | Release convention, release record, `pack --release`, the repository template; the fetch helper; `hyprune world add` / `library add` from `github:`, record URLs, archive URLs with a hash and local files; installs by tag into `worlds/<id>/` with the previous install kept in `.previous/`; `content.json`; pin and remove; the shared extractor fixtures. | Release record and sources schemas 0.1; IPC `content.install`, `confirm`, `cancel`, `pin`, `remove` and `content` state. |
 | **P2** | `hyprune/registry` with entries, CI checks, publication, re-verification and the report process; official index sync from the meta repository; the index schema for third-party indexes; custom sources (`hyprune source …`); Director Browse, entry page, Installed (install, remove) and Sources. | Index schema 0.1; IPC `sources.*`, `registry.*`. |
-| **P3** | Update checks, update, rollback and retention in the CLI and the Director; notices; content prune; `hyprune content lock` and the Nix module option. | IPC `content.update`, `content.rollback`; content lock schema. |
+| **P3** | Update checks (newer tags), update, one-step rollback and pending swaps of the loaded world in the CLI and the Director; notices; `hyprune content lock` and the Nix module option. | IPC `content.update`, `content.rollback`, `content.commit`; content lock schema. |
 | **P4** | Optional signatures on release records, verified on install and shown in provenance. | Record and index fields for signatures; `signature.invalid`. |
 
 ## Open questions
@@ -857,12 +899,11 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
    version, which makes version pull requests conflict-free?
 5. **Automatic updates.** Never (proposed for now), or opt-in automatic minor and patch
    updates for official content?
-6. **Retention and disk caps.** Is keeping two versions per id right for worlds near 1 GiB?
-7. **Licences in Nix.** How to map declared SPDX expressions that nixpkgs doesn't know, and
+6. **Licences in Nix.** How to map declared SPDX expressions that nixpkgs doesn't know, and
    whether non-free declared licences need `allowUnfree`.
-8. **Executable extensions in indexes.** A later `extension` type with RFC-0007 approvals, or
+7. **Executable extensions in indexes.** A later `extension` type with RFC-0007 approvals, or
    a separate index?
-9. **Duplicate content.** Should the registry flag an archive whose files match another
+8. **Duplicate content.** Should the registry flag an archive whose files match another
    entry's under a different id (re-uploads of someone else's work), or leave that to reports?
-10. **Popularity.** No download counts or ratings (proposed: nothing is reported back); is a
-    privacy-preserving signal wanted later?
+9. **Popularity.** No download counts or ratings (proposed: nothing is reported back); is a
+   privacy-preserving signal wanted later?

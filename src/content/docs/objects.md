@@ -180,6 +180,30 @@ reproducible `<id>-<version>.tar.zst` and the record that pins it in the meta re
 step, like a world's. Worlds reference library objects by exact `id@version`, and installers
 verify the archive's hash before unpacking it; core never downloads anything.
 
+## Place it in a world
+
+With IPC 0.22 core lists objects from three places in one catalog: the loaded world's
+object assets, installed libraries (`$XDG_DATA_HOME/hyprune/libraries/<id>@<version>/`) and
+your own folder (`$XDG_DATA_HOME/hyprune/objects/<id>/`). Core applies the same checks as
+`hyprune object check` and shows each entry's triangles and GPU estimate, so the numbers
+match.
+
+- **Your folder:** `hyprune object add ./street-lamp` checks a directory (or writes a minimal
+  `object.json` for a bare `.glb` from `--name`, `--license`, `--author` and `--surface`) and
+  copies it in. Core watches the folder and lists the object after a one-second pause; an
+  invalid one appears with its errors.
+- **A library:** `hyprune library install ./com.example.street-1.2.0.tar.zst` (or an
+  `id@version` with a releases record next to the archive) hands core a local archive and its
+  hash; core checks and unpacks it.
+- **Placing:** the Director's **Objects** tab lists the catalog. **Add** puts an object in
+  your pocket and selects tool 5: a ghost shows where it would go (green, or red with the
+  reason), Primary places it ahead on the floor, Secondary on the surface you aim at. Tool 4
+  and the Super gestures move, turn and scale it afterwards; the configure panel locks,
+  resets or removes it. Placements are yours, per world, and never change the package.
+
+Only objects with the `movable` trait can be placed. Characters wait for routes (P2) and
+movers for tracks (P3); the catalog says why an entry can't be placed.
+
 ## Use it in a world today
 
 Until worlds can reference object directories (world format 0.9), copy the glTF into the

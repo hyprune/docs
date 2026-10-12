@@ -264,3 +264,33 @@ Object manifests use the world format numbering: a world may use objects whose
   `v0.21/guidance.schema.json`, `v0.21/focus-history.schema.json`.
 - Everything else is inherited from 0.20 unchanged; `session.hello` reports
   `0.21`. Inheritance test included.
+
+## IPC 0.22: object catalog, user placements and libraries (RFC-0011 P1)
+
+- New grant `objects.control` (hello capabilities): every overlay change and
+  library install/remove.
+- Required state key `objects {catalogRevision, instances[<=512], pocket[<=16],
+  usage, limits}`. An instance is `{id, source (authored|user), ref, name,
+  areaId, pose, scale, state (active|hidden|missing|blocked|loading|suspended),
+  movable, locked, rule, path, activity, seat}`; `path`, `activity` and `seat`
+  are always null until P2. `usage`/`limits` count this world's user
+  placements (placements, assets, triangles, gpuBytes, collisionTriangles).
+- Methods: `objects.catalog {}` (`{revision, entries[<=1024]}`; an entry carries
+  ref, source, id, version, formatVersion, name, description, category, tags,
+  traits, surfaces, scale range, bounds, triangles, gpuBytes,
+  collisionTriangles, an absolute thumbnail path, license, library, other
+  versions, state, placeable, reason and up to 8 errors);
+  `objects.pocket {ref}` (`{revision, itemId}`); `objects.place {ref, pose?,
+  scale?}` (`{revision, id}`); `objects.transform {id, pose, scale?}`;
+  `objects.remove {id}|{all:true}`; `objects.hide {id, hidden}`;
+  `objects.reset {id}|{all:true}`; `objects.configure {id, patch:{locked}}`;
+  `libraries.list {}`; `libraries.install {archive, sha256}` (`{revision, id,
+  version}`); `libraries.remove {id, version}`. Refs are
+  `package/<asset>`, `library/<id>@<semver>/<object>` or `user/<object>`.
+- `editor.selectedKind` gains `node`; `editor.submode` gains `universal`;
+  `editor.unplaced` gains `objects` (pocket items, `count` up to 32); new
+  required `editor.gizmo {space, pivot, snap}`.
+- Error `data` may carry `rule` (the placement rule or limit that refused a
+  method).
+- Everything else is inherited from 0.21 unchanged; `session.hello` reports
+  `0.22`. Inheritance test included.

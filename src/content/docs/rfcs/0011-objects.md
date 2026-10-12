@@ -3,7 +3,7 @@ title: "RFC-0011 — World objects: libraries, traits, user placement and paths"
 description: "One object system for authored, shared and user objects: the object manifest and its traits, three sources in one catalog, user placement, tools on objects, paths, seats and the contract plan."
 ---
 
-**Status: draft · proposed 2026-10-11.** Nothing here is implemented beyond world format 0.8
+**Status: draft · proposed 2026-10-11; P1 shipped in IPC 0.22 (amendment below).** Before P1, nothing here was implemented beyond world format 0.8
 placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-world-objects))
 and the M3B path and position tools ([RFC-0006](/rfcs/0006-interaction/#amendment-m3b-keymap-v2)).
 It extends 0.8 objects instead of adding a parallel system: ambient characters
@@ -776,3 +776,133 @@ of these fields or methods.
 6. **Worlds without collision or playable volumes:** allow user objects there with the support
    rule skipped (proposed), or refuse them as for characters?
 7. **Sharing layouts:** export a world's overlay (refs and poses) for others to import, later?
+
+## Amendment: P1 in IPC 0.22
+
+P1 shipped as IPC **0.22** ([schema](/reference/schema/ipc/0.22/), core `docs/CHANGELOG.md`).
+World formats are unchanged (0.8); object and library manifests are 0.9 and the draft 0.10. It
+follows this RFC except where noted here.
+
+**Catalog.** Core lists the loaded world's object assets (`package/…`), the installed libraries
+(`$XDG_DATA_HOME/hyprune/libraries/<id>@<version>/`, then each `$HYPRUNE_LIBRARY_DIR` entry,
+read-only) and the user folder (`$XDG_DATA_HOME/hyprune/objects/<id>/`). Validation is the shared
+validator's object and library rules, ported to core and checked against it: the manifest schema,
+reserved traits, trait combinations, origin conventions, slots, SPDX licences, attribution
+coverage, the directory and thumbnail limits, the glTF cross-checks and the budgets. A structural
+glTF check (accessor, view and buffer ranges) stands in for the Khronos validator. Triangles, GPU
+bytes and proxy triangles are the SDK's estimates (PNG and JPEG at 4 B/px, KTX2 at 1 B/px, ×4/3
+for mips, plus every buffer's byteLength), so `hyprune object check` and the catalog agree. When
+an asset is first placed, core decodes it and compares the decoded rest bounds with
+`object.json`: more than 1 cm off on a face rejects it. The user folder and the library root are
+watched; scans run off the compositor thread after a 1 s quiet period and are cached by a stat
+signature. Directories whose names start with `.` are ignored (installers stage there).
+
+**Placeable in P1.** An entry is placeable when it is `ready`, has `movable`, and carries no trait
+outside `decorative`, `collidable`, `movable`, `seat` and `machine`. Seat anchors and the RFC-0013
+`machine` trait are inert in P1: such an object places as its static body. Characters (P2),
+movers (P3) and objects without `movable` are listed with `placeable: false` and a reason.
+World 0.8 package assets carry no traits, so they are not placeable and authored 0.8 instances
+stay render-only; the development switch `HYPRUNE_GIZMO_OBJECTS=1` treats them as
+`movable {surfaces: [any]}` until world format 0.9 lets authors say so.
+
+**Libraries.** `libraries.install {archive, sha256}` takes the absolute path of a local
+`.tar.zst`; core hashes it before reading the archive, extracts it off-thread with the world
+archive rules (ustar, one root directory named by the library id, regular files and directories
+only, no traversal, links or unsafe characters, 4,000 files, 512 MiB expanded, 32 MiB per file),
+validates the whole library in a staging directory and renames it into place. The same content
+installed again succeeds; different content under the same `id@version` is refused
+(`-32007`, rule `library.conflict`). `libraries.remove` deletes only libraries in the user root.
+Core never downloads; `hyprune library install` finds the archive next to a releases record.
+
+**Overlay.** `editor.json` is version 2: `placements[]` (`{worldId, id, areaId, ref, pose, scale,
+locked?}`, 128 per world) and `overrides[]` (`{worldId, objectId, areaId?, pose?, scale?, hidden?,
+locked?}`) beside the paths, scene-node transforms and window locks. A version 1 file is migrated
+on load: Gizmo 2.0's `object:<id>` records become overrides keyed by the plain instance id, and a
+copy of the old file is kept as `editor.json.v1`. Overrides and placements of other worlds, or of
+instances a package update removed, stay dormant. A placement is rechecked against the current
+geometry once per pose at load; one that now breaks a rule is `blocked` (not drawn, no collision,
+`object.blocked`), never moved.
+
+**State.** `objects {catalogRevision, instances, pocket, usage, limits}`. Instances are the
+authored ones, then this world's user placements, with `state` `active`, `hidden`, `missing`,
+`blocked` or `loading` (`suspended` waits for P2), `movable` (the asset is movable; tools still
+refuse while `locked`), `locked` and the blocking `rule`. `path`, `activity` and `seat` are null
+until P2. `usage` and `limits` count this world's user placements for the Performance page.
+`editor.unplaced` gains `objects` (object pocket items, `count` covers both kinds),
+`editor.selectedKind` gains `node`, `editor.submode` gains `universal`, and `editor.gizmo` carries
+`{space, pivot, snap}`. Older peers see none of this: nodes read as `object`, the universal mode
+as `move`, and the pocket as windows only.
+
+**Methods.** As the contract plan, with these shapes: `objects.catalog` returns the catalog
+revision (the `catalogRevision` in state); `objects.pocket {ref}` returns the new `itemId`;
+`objects.remove` and `objects.reset` also take `{all: true}` ("Remove my objects", "Show and
+reset authored objects"); `objects.configure {id, patch}` takes only `{locked}` in P1 (the lock
+section); the transform section is `objects.transform`. Errors: `-32004` unknown id or ref (and a
+retryable "still loading"), `-32005` locked, protected, not movable, authored (remove) or user
+(hide), `-32007` a placement rule with `error.data {retryable: false, rule}`, `-32008` a budget
+(`rule: "budget"`, the message names the limit). Every overlay change needs `objects.control`.
+
+**Pocket and tool 5.** Pocket items are dropped when the world unloads and consumed on place
+(open question 3: no stamp mode yet). The ghost is the asset's bounds and feature edges at the
+candidate pose, green when the pose passes, red with the rule's message otherwise. Primary places
+ahead: front toward the player, upright, dropped to the floor under the aim point (backed off a
+wall it hits); Secondary places on the aimed surface when the object may sit on that kind of
+surface (`+Z` along a wall's normal). Either way the bounds touch the surface. Tool 5 Alternate
+pockets an aimed user placement; authored objects are hidden from the Director instead.
+
+**Tools on objects.** Carry (Super+LMB), push/pull, rotate, `content.scale` (×1.12 per step within
+`movable.scale`, about the base) and `window.reset` work on movable instances in every tool;
+scene nodes that own collision stay tool 4 targets. Locked instances keep their handles and
+refuse edits (`object.locked`). Picking tests the swept sphere, then the asset's rest-pose
+triangles at the instance pose; node animation is ignored. Characters are never pick targets.
+
+**Gizmo 2.0 contract points.**
+- *Selection kinds:* `object` for world object instances (`object:<id>`), `node` for scene nodes.
+- *Universal mode:* reported as `universal`; it joins the wheel cycle with
+  `HYPRUNE_GIZMO_UNIVERSAL=1` (unchanged default).
+- *Keys:* undo/redo (Ctrl+Z, Ctrl+Shift+Z or Ctrl+Y), pivot (period), drop (End), align
+  (Shift+End) and numeric entry stay fixed tool 4 keys in 0.22; they become keymap actions with
+  the next keymap version.
+- *Undo:* in memory, per session, 64 edits across windows and objects, including the objects
+  methods. An object edit made in another world is skipped (and dropped) when undone.
+- *Pivot and space:* centre = bounds centre; base = the bounds' bottom centre along world up (a
+  window's lower edge). Scale uses the local axes; objects scale uniformly. Neither is persisted;
+  both are published in `editor.gizmo`.
+- *Refusals:* a gizmo drag shows and releases to its start pose; a carry releases to its last
+  valid pose; wheel gestures, drop, align and tool 5 are refused with `placement.blocked` and the
+  rule's message; methods return `-32007` naming the rule.
+- *Relighting:* a commit recomputes the instance's visibility regions and probe light in the tick
+  (64 rays); off-thread relighting waits until it shows up in frame times.
+
+**Placement rules as implemented.** The shape is the asset's bounds box at the pose, shrunk 2 cm;
+a collidable asset's proxy triangles confirm a wall hit. "Inside solid geometry" means back faces
+in at least 5 of 6 axis rays. Rule 3 (support) applies per `movable.surfaces`: a floor object needs
+an upward surface (normal y ≥ 0.65) within 7 cm below its base centre, a wall object collision
+within 5 cm behind its back, a ceiling object collision within 5 cm above; `any` objects may
+float; scene nodes and world 0.8 instances get the advisory readout only; worlds without
+collision skip it. The approach zone's floor is the first upward surface within 60 m below the
+zone's front; floor and ceiling screens have no approach. Spawn capsules are 1 × 2 × 1 m boxes at
+the spawn feet; climbables are the box around their endpoints and exits grown 0.4 m sideways and
+1.9 m up. `keepClear` volumes wait for world 0.9 (`HYPRUNE_GIZMO_KEEPCLEAR` supplies them for
+development). Soft rules (window, approach, zone, keep-clear) that the start pose already breaks
+are waived for that edit; playable, walls, support and player always apply. Reach applies to tool
+5 (`reach_placement`) and to starting a carry (`reach_grab`); a selected object's gizmo works at
+any distance; methods have no reach.
+
+**Windows and objects.** Collidable objects' proxies are world collision, so window placement,
+carry and spawns already avoid them. Keeping windows out of non-collidable objects' bounds waits
+for P2.
+
+**Budgets.** As provisional, enforced per world for user placements: 128 placements, 32 distinct
+assets, 400,000 triangles, a 192 MiB GPU pool (SDK estimates), 10,000 proxy triangles; at most 16
+object pocket items. Uploads of user assets are staged in the tick (2 MiB, 2 ms per step) and never
+block a frame.
+
+**Notices.** `placement.blocked`, `placement.pocketed`, `editor.undo`, `editor.redo`,
+`editor.budget`, `gizmo.drop`, `gizmo.align`, `gizmo.pivot`, `object.placed`, `object.removed`,
+`object.budget`, `object.blocked`, `object.missing`, `object.substituted`, `object.locked`,
+`object.protected`, `library.installed`, `library.conflict`, `library.invalid`, `catalog.invalid`.
+
+**Not in 0.22.** User characters, paths, seats and sitting (P2); `objects.configure` sections
+beyond the lock; library references from world packages; windows avoiding non-collidable objects;
+a translucent model as the ghost (the ghost is the bounds and edges).

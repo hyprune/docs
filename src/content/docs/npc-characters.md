@@ -3,8 +3,11 @@ title: "NPC characters"
 description: "How to make an ambient character for a Hyprune world: the rig, the clips and the checks."
 ---
 
-Ambient characters are a draft feature ([RFC-0010](/rfcs/0010-npcs/)): worlds can't place
-them yet, but you can make and check characters now.
+Ambient characters follow [RFC-0010](/rfcs/0010-npcs/) and are objects with the `character`
+trait ([RFC-0011](/rfcs/0011-objects/)). World format 0.9 places them: on a route, on a
+standing spot or on a seat, with a few predefined interactions. Users can also spawn
+characters from the object catalog (IPC 0.23). This page covers making a character and
+putting it in a world.
 
 ## Make the character
 
@@ -35,7 +38,7 @@ from the planted foot), so it never slides.
 | `run` | optional | loops |
 | `turn_left`, `turn_right` | optional | 90 deg on the spot |
 | `look_around`, `wave`, `nod` | optional | |
-| `sit`, `sit_idle` | optional | `sit_idle` loops; sitting down needs seat anchors in the world (not yet) |
+| `sit`, `sit_idle` | optional | `sit_idle` loops; the character sits at seat stops and permanent seats ([seats](#seats)) |
 
 Characters that share the same skeleton template can share clips (`--clips-from`).
 
@@ -68,3 +71,138 @@ It needs a `PROVENANCE` note next to the source with these fields:
 `hyprune-npc-check` reports errors (core won't load the character), warnings and notes. It
 exits 1 on errors. `--against base.glb` checks that a variant shares the base's skeleton, and
 `--json` produces machine-readable output.
+
+## Put it in a world (format 0.9)
+
+A world references a character like any other object asset and places instances of it.
+The schema repository's [`examples/world-npcs.json`](/schema/examples/world-npcs.json) is a
+complete synthetic manifest; the excerpt below follows it.
+
+```json
+{
+  "formatVersion": "0.9",
+  "objectAssets": [
+    {"id": "resident", "dir": "characters/resident-blue"},
+    {"id": "porter", "library": "com.hyprune.starter@0.1.0", "object": "porter"},
+    {"id": "court-bench", "scene": "objects/bench.glb", "collision": {"node": "proxy"},
+     "traits": {"movable": {}, "seat": {"capacity": 2, "anchors": [
+       {"id": "left", "position": [-0.4, 0, 0.55], "yaw": 0, "height": 0.45},
+       {"id": "right", "position": [0.4, 0, 0.55], "yaw": 0, "height": 0.45}]}}}
+  ],
+  "objects": [
+    {"id": "bench-east", "asset": "court-bench", "locked": true,
+     "pose": {"position": [3.6, 0, -2], "rotation": [0, -0.7071068, 0, 0.7071068]}},
+    {"id": "porter-1", "asset": "porter", "path": "court-loop", "phase": 0.25, "speed": 1,
+     "accent": [0.9, 0.5, 0.1],
+     "interactions": [
+       {"id": "talk", "label": "Talk", "action": {"type": "say",
+        "lines": ["The desk is on the north side.", "Mind the fountain."]}},
+       {"id": "where", "label": "Where is work?", "prompt": "Mark it",
+        "action": {"type": "waypoint", "target": {"zoneId": "work"}}},
+       {"id": "show-desk", "label": "Show me the desk", "prompt": "Follow me",
+        "action": {"type": "guide", "path": "to-desk"}},
+       {"id": "map", "label": "Open the map", "action": {"type": "panel", "panel": "map"}}]},
+    {"id": "reader", "asset": "resident", "seat": "fountain-ledge",
+     "pose": {"position": [1.5, 0, 1.8], "rotation": [0, 1, 0, 0]}}
+  ],
+  "paths": [
+    {"id": "court-loop", "name": "Court loop", "use": "route", "closed": true, "speed": 1.1,
+     "points": [{"position": [-3.5, 0, 3], "type": "line"}, {"position": [-3.5, 0, -2], "type": "line"},
+                {"position": [3, 0, -2], "type": "curve"}, {"position": [3, 0, 3], "type": "arc"}],
+     "stops": [{"point": 1, "seconds": 3, "clip": "look_around"},
+               {"point": 2, "seconds": 20, "seat": "bench-east/left"},
+               {"point": 3, "seconds": 4, "face": {"anchor": "desk"}}]},
+    {"id": "to-desk", "name": "To the desk", "use": "route",
+     "points": [{"position": [0, 0, 3], "type": "line"}, {"position": [0, 0, -2], "type": "line"}]}
+  ],
+  "seats": [
+    {"id": "fountain-ledge", "height": 0.5, "use": ["sit"], "approach": 0.6,
+     "pose": {"position": [1.5, 0, 1.2], "rotation": [0, 1, 0, 0]}}
+  ],
+  "keepClear": [
+    {"id": "north-door", "min": [-0.8, 0, -4.2], "max": [0.8, 2.4, -3.6]}
+  ]
+}
+```
+
+### Assets
+
+`objectAssets[]` entries have exactly one source:
+
+- **`dir`**: a directory inside the package holding the character's `object.json` and glTF
+  (the output of `tools/object-import --character`). Its `formatVersion` must be at most the
+  world's.
+- **`library`** + **`object`**: an object of an installed library, pinned to an exact
+  `id@version`. A world whose library is not installed fails to load
+  (`world.library.missing`) and the previous world stays.
+- **`scene`** (inline): a package glTF with its `traits` written in `world.json`, as in an
+  `object.json`.
+
+### Instances
+
+An `objects[]` entry of a character asset is an NPC:
+
+- **On a route:** `path` names a `paths[]` entry with `"use": "route"` and replaces `pose`.
+  `phase` (0 to under 1) is where along the route it starts, so several characters can share
+  one route out of step (at most 8 per route); `reverse: true` walks it the other way.
+- **On a standing spot:** `pose` is the spot. Add `seat` (a `seats[]` id, `<objectId>/<anchorId>`
+  or `<objectId>` for any free anchor) to have it sit there permanently.
+- `speed` scales its pace and clip rate together (feet stay planted); `accent` (linear RGB
+  0-1) recolours the `accent` material; `scale` must be 1.
+- `interactions` (1-8) replace the asset's own list: `say` (up to 8 caption lines), `waypoint`
+  (a zone, position, anchor or object), `guide` (the character walks a route ahead of the
+  player and comes back) and `panel` (opens the Director on a panel such as `map`). `travel`
+  and `quest` are reserved and rejected in 0.9.
+
+A world holds at most 16 character instances (users can spawn 8 more).
+
+### Paths and stops
+
+`paths[]` hold up to 64 paths and 1,024 points in total. A point's `type` (`line`, `curve`,
+`arc`) is the segment that arrives at it. Characters only walk `route` paths. A stop pauses
+at a point index for `seconds` (default 3) and does at most one thing: play a `clip`
+(`look_around`, `wave`, `nod`, `idle_fidget`), `face` a position, anchor or object, or sit
+on a `seat`.
+
+Routes must be walkable: every 0.25 m there must be floor within 0.35 m of the last step,
+the character's capsule must be clear of collision and inside the playable volume, and no
+segment may cross the free space in front of a screen. Core suspends the characters of an
+unwalkable route where they stand, and `hyprune-world-check` reports each problem with its
+position.
+
+### Seats
+
+Seats are anchors on a `seat` object (asset space, moving with the object) or world-space
+`seats[]` for benches that are part of the scene. A seat's `pose` (or an anchor's `position`
+and `yaw`) is where the character's root stands at the start of `sit`, in front of the seat
+and facing away from it; `height` (0.2-1 m) is the seat surface above that point;
+`approach` (default 0.6 m) is the free floor in front.
+
+Core lifts the seated character by the seat's height minus the height the `sit` clip was
+made for (`clips.sit.seatHeight`, or measured from the clip), and uses the seat only when
+the feet then end between 3 cm below and 45 cm above the floor; otherwise the stop is a
+plain stop. `hyprune-npc-check` prints the clip's measured seat height and how far its ankles
+sink.
+
+**The starter kit residents** have a sit clip made for a very low seat: the check measures a
+seat height of about -0.06 m with the ankles 0.08-0.13 m below standing. They suit low
+seats. On a 0.45 m bench the fit is accepted but the feet dangle about 0.4 m above the floor;
+for ordinary benches use a character whose `sit` clip was made for that height.
+
+### Keep clear
+
+`keepClear[]` boxes (`min`, `max` in world space) mark doorways, stairs and narrow passages.
+Placed objects may not block them, and route stops and seat approaches must lie outside
+them; a route may pass through.
+
+### Check it
+
+```sh
+npx hyprune-validate world world.json - 0.9
+```
+
+The validator checks references (assets, routes, seats, anchors, zones), character-only
+fields and the limits. Give it the `object.json` of `dir` and `library` assets to check
+their traits too: `validate('world', manifest, undefined, '0.9', {assets: {resident:
+objectJson}})`. `hyprune-world-check` adds what needs the scene: walkability, seat
+reachability, stops outside keep-clear boxes and the navigation mesh.

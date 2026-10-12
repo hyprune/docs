@@ -3,7 +3,7 @@ title: "Objects for authors"
 description: "How to make and check a Hyprune world object: the object directory, its manifest, the import and check tools, libraries, licensing and provenance."
 ---
 
-World objects follow [RFC-0011](/rfcs/0011-objects/). Core's object catalog (IPC 0.22) lists a
+World objects follow [RFC-0011](/rfcs/0011-objects/). Core's object catalog (IPC 0.22; characters, paths and interactions IPC 0.23) lists a
 world's own objects, installed libraries and your object folder
 (`~/.local/share/hyprune/objects/`). The Director's Objects tab adds one to the pocket, tool 5
 places it and the gizmo adjusts it; placements are saved per world. The first official library,
@@ -166,8 +166,9 @@ and describe the change (an `ATTRIBUTION.md` beside the objects is a good place)
 The official **Hyprune starter kit** (`com.hyprune.starter` 0.1.0) holds the Sun Court armillary,
 four ambient residents and five live machines with their job token, under CC-BY-4.0. It is a
 GitHub release on hyprune/worlds (`hyprune-starter-v0.1.0`); install it from the Director's
-Objects tab or with `libraries.install`. Residents become placeable when characters land in the
-world format; machines place as static objects until live data ships.
+Objects tab or with `libraries.install`. The residents are characters: spawn them from the
+Objects tab or reference them from a world 0.9 package ([NPC characters](/npc-characters/));
+machines place as static objects until live data ships.
 
 A library publishes a set of objects with one manifest:
 
@@ -208,11 +209,38 @@ match.
   and the Super gestures move, turn and scale it afterwards; the configure panel locks,
   resets or removes it. Placements are yours, per world, and never change the package.
 
-Only objects with the `movable` trait can be placed. Characters wait for routes (P2) and
-movers for tracks (P3); the catalog says why an entry can't be placed.
+Only objects with the `movable` trait can be placed. Characters are spawned instead (IPC
+0.23): they walk a listed route, a route you draw with tool 3, or stand on a spot in front of
+you, and they can't be carried, scaled or pocketed. Movers wait for tracks (P3); the catalog
+says why an entry can't be placed.
 
-## Use it in a world today
+## Use it in a world
 
-Until worlds can reference object directories (world format 0.9), copy the glTF into the
-package and add a format 0.8 `objectAssets` entry: `scene` (package-relative), `animations`
-from `traits.decorative`, `collision` from `traits.collidable` and `lighting`.
+World format 0.9 references objects directly in `objectAssets[]`, with exactly one source
+each:
+
+```json
+"objectAssets": [
+  {"id": "lamp", "dir": "objects/street-lamp"},
+  {"id": "lantern", "library": "com.example.street@1.2.0", "object": "street-lantern"},
+  {"id": "buoy", "scene": "objects/buoy.glb", "traits": {"decorative": {"animations": [
+    {"node": "buoy", "type": "bob", "axis": [0, 1, 0], "amplitude": 0.05, "period": 4}]}}}
+]
+```
+
+- **`dir`**: an object directory inside the package, `object.json` and all; its
+  `formatVersion` must be at most the world's.
+- **`library`** + **`object`**: an object of an installed library at the exact `id@version`.
+  A world whose library is missing doesn't load (`world.library.missing`).
+- **`scene`**: an inline glTF with optional `traits` and `slots` written in `world.json`. The
+  0.8 `animations` and `collision` fields still work as shorthand for the `decorative` and
+  `collidable` traits; don't give both forms.
+
+`objects[]` instances of a `movable` asset can be rearranged by users unless they set
+`"locked": true`. Characters, paths, seats and keep-clear boxes are on the
+[NPC characters](/npc-characters/#put-it-in-a-world-format-09) page; the format is
+[RFC-0004's world 0.9 amendment](/rfcs/0004-world-format/#amendment-world-09-characters-paths-seats-and-keepclear).
+
+A world on format 0.8 can't reference object directories: copy the glTF into the package and
+add a format 0.8 `objectAssets` entry: `scene` (package-relative), `animations` from
+`traits.decorative`, `collision` from `traits.collidable` and `lighting`.

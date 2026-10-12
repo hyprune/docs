@@ -4,7 +4,7 @@ description: "Data-only glTF worlds with explicit spatial metadata and asset pro
 ---
 
 
-**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through [world format 0.8](/reference/schema/world/0.8/): core loads formats 0.1–0.8. Lumen Reach 0.8.0 is the first release on format 0.7; format 0.8 adds placed world objects.
+**Status: accepted · proposed 2026-10-07, accepted 2026-10-09.** Implemented through [world format 0.9](/reference/schema/world/0.9/): core loads formats 0.1–0.9. Lumen Reach 0.8.0 is the first release on format 0.7; format 0.8 adds placed world objects, and format 0.9 adds characters, paths, seats and keep-clear volumes ([RFC-0011](/rfcs/0011-objects/) P2).
 
 ## Decision and package layout
 
@@ -594,6 +594,105 @@ counts) and each object's probe result.
 
 No IPC change. The schema is [0.8](/reference/schema/world/0.8/).
 
+## Amendment: world 0.9 characters, paths, seats and keepClear
+
+World format **0.9** is the format half of [RFC-0011](/rfcs/0011-objects/)'s P2:
+object assets gain sources and traits, an instance can be a character walking a
+route or standing on a spot, and the manifest gains paths, seats and keep-clear
+volumes. Every valid 0.8 document is valid as 0.9 apart from `formatVersion:
+"0.9"` (the inheritance rule); 0.8 and older formats remain frozen and reject every
+field below. What the fields mean (traits, segment geometry, walkability, sitting,
+interactions, protection) is normative in RFC-0011 and, for characters,
+[RFC-0010](/rfcs/0010-npcs/); this amendment records the format delta and where
+each rule is checked. The IPC side is IPC 0.23
+([RFC-0011 P2 amendment](/rfcs/0011-objects/#amendment-p2-in-world-format-09-and-ipc-023)).
+
+```json
+"objectAssets": [
+  {"id": "resident", "dir": "characters/resident-blue"},
+  {"id": "porter", "library": "com.hyprune.starter@0.1.0", "object": "porter"},
+  {"id": "court-bench", "scene": "objects/bench.glb", "collision": {"node": "proxy"},
+   "traits": {"movable": {}, "seat": {"capacity": 2, "anchors": [
+     {"id": "left", "position": [-0.4, 0, 0.55], "yaw": 0, "height": 0.45},
+     {"id": "right", "position": [0.4, 0, 0.55], "yaw": 0, "height": 0.45}]}}}
+],
+"objects": [
+  {"id": "bench-east", "asset": "court-bench", "locked": true,
+   "pose": {"position": [3.6, 0, -2], "rotation": [0, -0.7071068, 0, 0.7071068]}},
+  {"id": "porter-1", "asset": "porter", "path": "court-loop", "phase": 0.25, "accent": [0.9, 0.5, 0.1],
+   "interactions": [{"id": "where", "label": "Where is work?", "prompt": "Mark it",
+                     "action": {"type": "waypoint", "target": {"zoneId": "work"}}}]},
+  {"id": "reader", "asset": "resident", "seat": "fountain-ledge",
+   "pose": {"position": [1.5, 0, 1.8], "rotation": [0, 1, 0, 0]}}
+],
+"paths": [
+  {"id": "court-loop", "use": "route", "closed": true, "speed": 1.1,
+   "points": [{"position": [-3.5, 0, 3], "type": "line"}, {"position": [-3.5, 0, -2], "type": "line"},
+              {"position": [3, 0, -2], "type": "curve"}, {"position": [3, 0, 3], "type": "arc"}],
+   "stops": [{"point": 1, "seconds": 3, "clip": "look_around"},
+             {"point": 2, "seconds": 20, "seat": "bench-east/left"},
+             {"point": 3, "seconds": 4, "face": {"anchor": "desk"}}]}
+],
+"seats": [{"id": "fountain-ledge", "height": 0.5,
+           "pose": {"position": [1.5, 0, 1.2], "rotation": [0, 1, 0, 0]}}],
+"keepClear": [{"id": "north-door", "min": [-0.8, 0, -4.2], "max": [0.8, 2.4, -3.6]}]
+```
+
+The complete synthetic manifest is the schema repository's
+[`examples/world-npcs.json`](/schema/examples/world-npcs.json).
+
+### The 0.9 delta
+
+| Field | 0.9 delta |
+| --- | --- |
+| `objectAssets[]` | Still at most 32, ids unique; each has **exactly one source**. *Inline* `{id, scene, animations?, collision?, lighting?, traits?, slots?}`: the 0.8 asset plus the object manifest's 0.9 `traits` and `slots` (`decorative`, `collidable`, `movable`, `character` and `seat` allowed; `mover`, `mount`, `machine` and `interactive` rejected). `animations` is shorthand for `traits.decorative.animations` and `collision` for `traits.collidable`; giving both forms of one is invalid. *Directory* `{id, dir}`: a package-relative directory (the common path rules, no trailing slash) holding an `object.json` whose `formatVersion` is at most the world's, and its scene. *Library* `{id, library, object}`: `library` is `<reverse-domain id>@<semver>` (the pattern 0.8 reserved), `object` an object id (slug). Directory and library assets take no other fields. Trait combinations follow RFC-0011 (a character combines with nothing). |
+| `objects[]` | Still at most 256, of which at most **16 character instances**. Adds `path` (a `route` path id; replaces `pose`), `reverse` (only with `path`: start walking towards decreasing arc length), `seat` (a `seats[]` id, `<objectId>/<anchorId>` or `<objectId>` for any free anchor; only characters without a `path`, which sit there permanently), `accent` (linear RGB 0-1; characters), `interactions` (1-8, characters; replaces the asset's list) and `locked` (movable assets). `pose` is required unless `path` is set and forbidden with it; for an unbound character it is the standing spot. On a character, `speed` (0-10, default 1) scales pace and clip rate, `phase` is the start fraction of the route's length, and `scale` must be 1. |
+| Interactions | `{id, label (1-32), prompt? (1-64), action}`, ids unique per list. Actions: `say {lines}` (1-8 lines of 1-160 printable characters), `waypoint {target}` (`{zoneId}`, `{position}`, `{anchor}` or `{object}`), `guide {path}` (a `route`), `panel {panel}` (a shell panel id). `travel` and `quest` are reserved and rejected in 0.9. Asset-level interactions (in `object.json`) stay `say` and `panel` only. |
+| `paths[]` | New. At most 64 paths and 1,024 points in total: `{id, name? (1-64), use? (route, track or generic; default generic), closed? (default false), points (2-256 {position, type: line, curve or arc}), speed? (0.1-30 m/s), stops? (at most 32)}`. A stop is `{point, seconds? (0.5-600, default 3), clip? (look_around, wave, nod, idle_fidget), face? ({position}, {anchor} or {object}), seat?}` with at most one of `clip`, `face` and `seat`, one stop per point and `point` below the point count. Track stops take only `point` and `seconds` (`source`, `sink` and `items` wait for 0.10); generic paths have no stops. At most 8 characters per path. |
+| `seats[]` | New. At most 64 world-space seat anchors `{id, pose, height (0.2-1 m), use? (["sit"]), approach? (0.3-2 m, default 0.6)}`; `pose` is where the sitter's root stands at the start of `sit`, facing the pose's +Z. |
+| `keepClear[]` | New. At most 64 boxes `{id, min, max}`, `min` below `max` on every axis: volumes objects may not block (placement rule 6) and route stops and seat approaches avoid. |
+
+Segment geometry is RFC-0011's: `line` straight; `curve` a cubic Hermite with start
+tangent (*b* − previous point) / 2 and end tangent *b* − *a*; `arc` the straight line
+plus a horizontal offset of 0.3·|*b* − *a*|·sin(π*t*) towards (*b* − *a*) × +Y. An
+`arc` whose horizontal chord is under 0.1 m is invalid. Core and tooling sample 24
+steps per segment.
+
+### Validation
+
+| Where | Checks |
+| --- | --- |
+| Schema ([`v0.9/world.schema.json`](/reference/schema/world/0.9/)) | Shapes, ranges and closed objects; exactly one asset source; the list limits (32 assets, 256 objects, 64 paths of 2-256 points, 32 stops, 8 interactions, 64 seats, 64 keep-clear boxes); the interaction action vocabulary (`travel`, `quest` rejected); at most one of `clip`, `face` and `seat` per stop; track stops with `point` and `seconds` only; no stops on generic paths. |
+| Shared validator (`validate('world', manifest, undefined, '0.9', {assets})`) | Unique ids per list; asset references; one form of animations and collision; trait combinations, with reserved traits and actions named plainly; `objects[].path` and `guide` paths exist and are routes; seat references (a world seat id, else an object id; whether the object is a seat and has the named anchor is checked when its asset is inline or its `object.json` is supplied in `options.assets[assetId]`); stop seat and facing references; waypoint zone, anchor and object references; character-only fields (`path`, `seat`, `accent`, `interactions`) on assets known not to be characters; `locked` only on movable assets; `pose`/`path` exclusivity, `reverse` only with a path, no `seat` with a path; a character's scale of 1; normalised seat rotations; arc chords; the 1,024-point total; one stop per point below the point count; keep-clear ordering; 16 character instances (when the assets are known) and 8 per path. `validate('scene', gltf, undefined, '0.9', {world, asset})` reads an inline asset's animations and proxy from either form and checks an inline character's skin and clips. |
+| Core and `hyprune-world-check` | Directory and library resolution (a library is resolved exactly against the installed `id@version`; a missing one fails activation with `runtime.notice` `world.library.missing` naming it, and the previous scene stays); the object checks of every referenced object; the character spec (`hyprune-npc-check`'s rules) for every character asset; route walkability; seat reachability, including the approach legs; stops and seat approaches outside `keepClear` volumes. |
+| `hyprune-world-check` only | With navigation data, route samples on the default spawn's navmesh island; the release gate's 1.2 m door width along routes. |
+
+**Walkability** (core and `hyprune-world-check`): every 0.25 m along the curve there
+is an upward-facing collision surface (normal Y at least 0.65) under the sample
+within 0.35 m of the previous sample's floor; the character's capsule (its `radius`
+and `height`, default 0.35 m and 1.8 m) is clear of collision; the sample lies
+inside the playable union when the world declares one; and no segment passes
+through an approach zone. Seat approach legs (route point to approach point to
+anchor) are checked the same way. Problems are reported with the sample's
+position.
+
+### Compatibility
+
+- 0.8 and older packages load unchanged; their assets carry no traits, so they stay
+  render-only and unpickable. A 0.9 world declares `movable` (and `locked`) itself.
+- A core that does not support 0.9 rejects a 0.9 package (exact versions), so a world
+  that references library objects never loads half-resolved.
+- RFC-0010's draft fields (`kind: "character"`, an inline `route`) never shipped and
+  are replaced by the trait and `path`, not migrated.
+- Object and library manifests are unchanged (`object.json` 0.9, draft 0.10). An
+  object used by a 0.9 world must have `formatVersion` 0.9.
+- `v0.9/common.schema.json` is the 0.8 common definitions under the 0.9 `$id`; the
+  directory's IPC 0.9, input, object and library schemas are untouched.
+- Loading a 0.9 world needs no IPC change. Characters, paths and interactions over IPC
+  are IPC 0.23; older peers keep their frozen shapes.
+
+The schema is [0.9](/reference/schema/world/0.9/).
+
 ## Format versions
 
-World format 0.5 (optional ink outline style and authored visibility regions) is specified in [RFC-0005](/rfcs/0005-surfaces/#amendment-world-05-ink-and-authored-visibility). The [world manifest reference](/reference/schema/world/) lists every format version with its diff and the amendment that introduced it.
+World format 0.5 (optional ink outline style and authored visibility regions) is specified in [RFC-0005](/rfcs/0005-surfaces/#amendment-world-05-ink-and-authored-visibility). World formats 0.8 and 0.9 are the amendments above. The [world manifest reference](/reference/schema/world/) lists every format version with its diff and the amendment that introduced it.

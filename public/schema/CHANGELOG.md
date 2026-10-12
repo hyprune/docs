@@ -408,4 +408,6 @@ Draft only; no version changes. `v0.10/object.schema.json` and the validator:
   fill node's subtree, no node is moved by two slots, and the collision proxy
   is never moved.
 - `stacks`: `cap` up to 100 (was 64) and an optional `rate` (copies per second,
-  0–1000).
+  0–1000). `layout.spacing` components may be negative (−10 to 10 m; copies fill
+  from the node towards the sign) and must be non-zero where that axis's grid is
+  above 1.

@@ -38,6 +38,8 @@ export default defineConfig({
         { label: 'Default keymap', slug: 'keymap' },
         { label: 'Objects for authors (draft)', slug: 'objects' },
         { label: 'NPC characters (draft)', slug: 'npc-characters' },
+        { label: 'Finding and installing packages', slug: 'packages' },
+        { label: 'Publishing a package', slug: 'publishing' },
       ] },
       { label: 'Project', items: [
         { slug: 'progress' },

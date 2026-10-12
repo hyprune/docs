@@ -3,7 +3,7 @@ title: "RFC-0015 — Registry and sources: publishing, discovering, installing a
 description: "Creator-owned releases, one index format for the official, community and custom sources, link-only listing with automated checks, and install, update, rollback and pinning through core, the CLI and the Director."
 ---
 
-**Status: draft · proposed 2026-10-12; decisions recorded 2026-10-12 (below).** Nothing here is implemented. It builds on the
+**Status: draft · proposed 2026-10-12; decisions recorded 2026-10-12 (below).** Phase 1 is implemented as recorded in the [amendment](#amendment-phase-1-in-the-sdk-without-new-ipc); the rest is not. It builds on the
 world package and archive rules of [RFC-0004](/rfcs/0004-world-format/), the libraries,
 library install and `<id>@<version>` layout of [RFC-0011](/rfcs/0011-objects/) (IPC 0.22),
 the extension host and grant approvals of [RFC-0007](/rfcs/0007-extensions/) and the grant
@@ -907,3 +907,113 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
    entry's under a different id (re-uploads of someone else's work), or leave that to reports?
 9. **Popularity.** No download counts or ratings (proposed: nothing is reported back); is a
    privacy-preserving signal wanted later?
+
+## Amendment: phase 1 in the SDK, without new IPC
+
+Phase 1 implements the release convention, the three schemas, the community registry and
+the client in the SDK's `hyprune` CLI, with a Director **Library** tab on top of the CLI. It
+takes parts of P1, P2 and P3 together so that the third-party path works end to end: a
+creator publishes a release, lists it by pull request, and a user browses, installs, updates,
+rolls back, pins and removes it. It follows this RFC except where noted here.
+
+**Schemas.** `registry/v0.1/index.schema.json` (with `$defs.entry` for entry files),
+`release-record.schema.json` and `sources.schema.json` in the schema package, with
+`validateRegistry(kind, document)` for the checks a schema can't express: unique ids, unique
+versions newest first in SemVer order, the tag naming the version, SPDX licences and no build
+metadata. The content lock schema stays in P3.
+
+**No new IPC; the CLI runs the pipeline.** Core gains no `content.*`, `sources.*` or
+`registry.*` methods in this phase. The CLI runs every job itself, as this RFC's "without a
+session" path, under `$XDG_STATE_HOME/hyprune/content.lock` (taken with an exclusive create
+and the owner's pid; a lock whose process is gone is taken over), because core doesn't take
+the lock yet. With a running session and the `objects.control` grant, a verified library is
+handed to core's `libraries.install {archive, sha256}` (IPC 0.22) after the CLI's own
+extraction and data-only checks; without the grant or a session the CLI commits it into the
+user library root, and core's directory watch picks it up. Worlds are committed by the CLI
+into the world root; core loads `worlds/<id>/` by id, and ids can't start with `.`, so
+`.previous/` and staging directories are never loaded. Core's world root now honours
+`$XDG_DATA_HOME` like the CLI and the installers. The Director's Library tab runs the CLI
+(`$HYPRUNE_CLI`, else `hyprune` on `PATH`) and reads its JSON output; it holds no state of its
+own.
+
+**The fetch helper is part of the CLI.** Downloads run in the CLI process with this RFC's
+transport rules and limits (HTTPS only, at most 5 redirects, 30 s timeouts, byte caps per
+request kind, resumable `.part` files, `GITHUB_TOKEN` sent only to the GitHub API base URL),
+not as a separate `hyprune-fetch` program. Core still never opens a network connection.
+
+**CLI names.** As in [Commands](#commands), plus shortcuts that take the type from the
+resolved entry: `hyprune install|update|rollback|pin|unpin|remove`, `hyprune installed` (also
+`hyprune content list`) and `hyprune sources` as an alias of `hyprune source`. Jobs take
+`--plan` (stop after the plan), `--json` (JSON lines: `stage`, `plan`, `progress`, `done`,
+`error`) and `--accept-source-change`, which the Director passes only after its own explicit
+confirmation. Without `--yes` and without a terminal a job stops after the plan with exit 3
+(`confirm.required`). `library install` keeps its IPC 0.22 forms (a local archive, or
+`id@version --releases`) without a confirmation, and `library list` shows core's list while a
+session runs.
+
+**Update, rollback and pin are in phase 1** with the semantics of
+[Update, rollback, pin and remove](#update-rollback-pin-and-remove). **Pending swaps of the
+loaded world are not:** updating, rolling back or removing the world that a running session
+has loaded is refused (rule `world.active`, exit 3) with "load another world first". World
+commits are journalled in `content.json`; a world rollback (two renames) is not.
+
+**Sources.** `source add` for a direct archive URL downloads the pinned archive once to learn
+its id and version (the cached copy is reused by the install). A `github:` or URL install
+without `--track` records that spec as its source and gets no updates. A refresh caches at
+most 64 card thumbnails. Removing a superseded library version checks installed worlds, not
+user placements. Offline installs extract and validate the archive before the plan, because
+only the archive names the package. A world directory that is a symbolic link into the world
+root counts as system-managed; `--override` replaces only the link.
+
+**Installers and modules.** `install.sh` and `try` preinstall every published pin of the meta
+repository's `libraries/releases.json` (now keyed by `id@version`, as the 0.9 library release
+record schema requires) and record kit worlds and libraries in `content.json` as
+`{source: "official"}`. The NixOS and Home Manager modules turn each pin into a fixed-output
+package and add it to `HYPRUNE_LIBRARY_DIR` (`programs.hyprune.libraries.pinned`, default on,
+and `libraries.extra`), so those libraries are system-managed and read-only. `try` installs
+the CLI when Node.js is present.
+
+### The registry in phase 1
+
+- **Write access.** GitHub shows collaborator permissions only to tokens with push access to
+  the repository, which the registry's read-only token never has on a creator's repository.
+  Check 2 therefore accepts the pull request author when the permission lookup answers write,
+  maintain or admin, **or** the author owns the repository, **or** the author created the
+  GitHub release of every new version (creating a release needs write access). Anyone else is
+  refused.
+- **Trusted checks.** `check.yml` runs on `pull_request` and runs the tools, schemas and the
+  pinned SDK from the base revision; files from the pull request are only read as data. A pull
+  request that changes `tools/`, `schema/` or `.github/` together with an entry, a removal or a
+  bot change is refused; one that changes only those is a maintenance change for code owners.
+  The archive checks run in a network namespace without the token, after a separate download
+  step.
+- **World checks.** CI validates worlds with the SDK's validator and runs `hyprune-world-check`
+  only when it is installed; without it CI prints a warning.
+- **Bot changes as pull requests.** The weekly re-verification and the official sync open or
+  update a pull request on a fixed branch (`reverify/weekly`, `sync-official/pins`) and start
+  the checks on it, instead of pushing to `main`. The dates a version was first found
+  unavailable live in `state/reverify.json`; community entries unavailable for 30 days get an
+  `unavailable` tombstone, official ones are only marked.
+- **Official entries without records.** No official release carries a release record yet, so
+  every official version is imported from the pins without `record` (the exception in
+  [Official entries](#official-entries)); the record becomes required for official releases
+  made after the worlds release tooling writes it.
+- **Serial.** Each publication's `serial` is the number of commits on the registry's `main`.
+
+### Repository naming
+
+A recommended convention, never a requirement: name a package repository
+`<owner>/hyprune-<kind>-<name>`, where `<name>` is a lowercase slug, and give it the GitHub
+topics `hyprune` and `hyprune-<kind>` for discovery.
+
+| Kind | For | Example |
+| --- | --- | --- |
+| `world` | A world package | `hyprune-world-tidepool` |
+| `objects` | An object, character or machine library | `hyprune-objects-garden-kit` |
+| `companion` | A library whose main item is a companion character | `hyprune-companion-drunk-ash` |
+| `extension` | An RFC-0007 process extension | `hyprune-extension-weather` |
+| `shell` | An alternative shell | `hyprune-shell-minimal` |
+
+Repositories with several packages (tags `<name>-v<version>`, like `hyprune/worlds`) are
+exempt. The community registry's checks print a warning for other names and never fail on
+them; custom sources are never checked. `hyprune registry check` prints the same warning.

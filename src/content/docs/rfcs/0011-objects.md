@@ -586,7 +586,7 @@ characters can only be hidden (persisted per world) and shown again.
 
 **Placement (normative).** A spawned character is never mid-air and never inside geometry. A
 standing spot reuses the reachable-floor rule core applies to window spawns
-([RFC-0005](/rfcs/0005-surfaces/#amendment-reachable-spawns-home-arrivals-and-world-switches-no-wire-change)),
+([RFC-0005](/rfcs/0005-surfaces/#amendment-reachable-spawns-home-windows-and-world-switches-no-wire-change)),
 for a body: an upward-facing collision surface under the root within 0.35 m, the character's
 capsule clear of collision, inside the playable union, outside approach zones,
 `placementZones`, `keepClear` volumes and spawn capsules, and, with navigation data, on the

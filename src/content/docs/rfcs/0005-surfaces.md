@@ -331,7 +331,7 @@ lists every window with "Put in pocket", marks pocketed ones and offers "Take ou
 place".
 
 
-## Amendment: reachable spawns, home arrivals and world switches (no wire change)
+## Amendment: reachable spawns, home windows and world switches (no wire change)
 
 **Spawn poses are reachable.** A newly opened room window (and `surface.unpocket`
 without a durable placement) first tries the pose ahead of the player at the
@@ -343,20 +343,24 @@ window's lower edge, and that floor must lie inside the playable volume. Worlds
 without collision skip the floor test. If nothing fits, the window waits in the
 pocket queue as before.
 
-**Windows arriving on a home workspace** (opened there or moved there, including a
-free room window moved onto a home) that have no durable placement rule are placed
-by arrival:
+**Only the room floats.** Windows open as floating world windows only on the room
+workspace (`windows.world_workspace`, default 20). A home workspace's windows (the
+area homes and any other world location) are ordinary tiled windows of that workspace
+and are shown on its wall, however they got there: opened there, opened while the user
+is focused into that wall, or moved there by the user or a script. Core never assigns
+them tool mounts on its own; tool mounts take a window only by an explicit placement
+or a durable rule.
 
-1. The first keeps the area's primary `mounted-workspace` wall.
-2. Later ones take the area's free tool mounts in authored `toolAnchors` order.
-   Mounts that a durable rule restores to are used only when no other mount is free.
-3. With no free mount, the window stays on the wall with the workspace's other windows.
+**Taken into the world, a window moves to the room.** Pulling a window off a wall
+(Director pull or a carry), placing or mounting it, or pocketing it moves it natively
+to the room workspace, where it floats. Core remembers the home it left: the window
+still places on that home area's tool mounts, and `surface.return` or dropping it onto
+a wall moves it back (to the home, or to the wall it is dropped on) and tiles it there.
+Durable placement rules restore windows on the room workspace; a home workspace's own
+windows are never pulled out by a rule. These moves never run inside a render pass.
 
-A window the user floats natively on that workspace stays on the wall: it is part of
-the workspace's own layout. `surface.return`, and dropping a carried window onto a
-wall, keep the window on that wall. Arrival assignments are runtime state: they
-follow the window, not the compositor's window order, and never create durable
-rules. They appear in `mounts.instances` like other placed tool windows.
+The spawn rule above (ahead of the player, else the free zone, else the pocket)
+applies only to new windows that open on the room workspace.
 
 **Occupancy is stable.** A tool mount keeps its holder across refreshes. When two
 live windows match one durable rule, they occupy different free targets (as M2

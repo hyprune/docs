@@ -122,10 +122,11 @@ something the asset authored; nothing sets an arbitrary colour, mesh, path or te
 | `emission:<slot>` | number 0–16 | Multiplies the current palette entry's `emission` for that `states` slot. | P1 |
 | `label:<slot>` | text or number | Text on that `labels` slot, formatted by the drive. | P1 |
 | `visible:<toggle>` | boolean | Shows or hides the nodes of a `toggles` slot. | P2 |
-| `count:<stack>` | integer ≥ 0 | Shows that many copies of the `stacks` slot's node, laid out by the slot, up to its cap; overflow shows the cap and a `+n` label. | P2 |
+| `count:<stack>` | integer ≥ 0 | Shows that many copies of the `stacks` slot's node, laid out by the slot, up to its cap; overflow shows the cap and a `+n` label. With the slot's `rate`, the shown count steps toward the target one copy at a time. | P2 |
 | `spawn:<slot>` | counter or event | Creates items at a `spawns` slot onto its track. | P2 |
 | `effect:<slot>` | event | Plays the `effects` slot's one-shot effect. | P2 |
 | `position:<node>` | number 0–1 | Sets a value-driven animation's pose ([below](#value-driven-animations)). | P2 |
+| `level:<id>` | number 0–1, clamped | Sets a `levels` slot: a fill height or a slide distance ([below](#levels)). | P2 |
 
 **Palette semantics.** A `states` slot applies its current entry to its materials (or to every
 material of its nodes' meshes) per instance: `colour` (linear RGB) replaces the base colour
@@ -144,7 +145,7 @@ and winds down). The 0.8 formula still holds for unbound animations.
 
 A mapping turns an input value into an output value. The same small language is used by
 bindings (data → input) and drives (input → target). It has no variables, loops, string
-operations or arithmetic beyond a linear scale.
+operations or arithmetic beyond a linear scale and a running average.
 
 | Form | Example | Result |
 | --- | --- | --- |
@@ -155,11 +156,25 @@ operations or arithmetic beyond a linear scale.
 | Becomes | `{"becomes": "ok", "from": "running"}` | An event: fires once when the mapped value changes into `ok` (optionally only from `running`). |
 | Counter | `{"counter": true}` | An event: fires once per increase. |
 | Format | `{"format": {"decimals": 0, "compact": true, "unit": "jobs"}}` | For labels: `1234` → `1.2k jobs`. Strings pass through, cut to the slot's `maxChars`. |
+| Average | `{"average": {"windowS": 60, "override": "average"}, "scale": {"from": [0, 100], "to": [0, 1]}}` | A modifier: the running average of a numeric value, then the mapping's form (here a scale) applied to it. |
 
 At most 16 cases or thresholds per mapping. Comparisons are numeric for numbers, exact and
 case-sensitive for strings; booleans compare with `true`/`false`. A missing value takes the
 input's `default`. Validation rejects a mapping whose outputs fall outside the target's
 domain (a palette `id` the slot does not have, a speed above 10).
+
+**Running average.** `average` is a modifier, not a form of its own: the mapping's result is
+computed from the **running average** of the value instead of the value itself. The average
+is the time-weighted mean of the value over the last `windowS` seconds of fresh data
+(`windowS` 1–3600, default 60): stale or missing time is not counted, and data missing for
+longer than the window starts the average again. Core computes it in its machines tick.
+`{"average": {…}}` alone yields the average; with `scale`, `thresholds`, `cases` or `format`
+in the same mapping, that form is applied to the average. It is allowed on numeric values
+only (`int`, `number`) and never with `becomes` or `counter`. In a drive, the optional
+`override` names another non-event input of the same machine: while that input has a value
+(bound and not missing), its value replaces the computed average and still passes through the
+form, so a source that computes its own average can send it. `average` is valid in drives and
+in bindings; a user may change `windowS` per instance ([Default bindings](#default-bindings)).
 
 ### Where bindings live
 
@@ -172,6 +187,32 @@ domain (a palette `id` the slot does not have, a speed above 10).
 so P1 needs no new object format: one `number` 0–10 per `decorative` animation (shown as
 on/off plus speed), one `enum` per `states` slot (its palette ids) and one `text` per
 `labels` slot. A machine replaces these with its declared inputs.
+
+#### Default bindings
+
+Until the configure panel's Data section exists, the prototype binds machines without any
+setup. Every placed instance of a machine asset (from the library, the user folder, or a
+package asset with a machine manifest) runs as a machine, and by default each input `<id>`
+reads source `com.hyprune.sources.<instance id>`, key `<id>`; a repeated input `x.N` reads key
+`x.N`. The source helper publishes a `sources.json` entry whose `id` is the instance ID as
+exactly that source, so one command per machine is enough. User placements have IDs `u-`
+followed by 6 hex digits, shown in Director → Objects → Placed.
+
+An optional user bindings file, `$XDG_CONFIG_HOME/hyprune/machines.json`, overrides the
+defaults and is re-read when it changes:
+
+```json
+{"instances": {"u-3f9a1c": {"source": "com.hyprune.sources.system",
+   "inputs": {"value": {"key": "ram"}, "display": {"key": "ramText"}},
+   "averageWindowS": 120, "worldId": "com.hyprune.lumen-reach"}}}
+```
+
+`source` replaces the default source for every input of that instance; `inputs.<id>` sets
+`source`, `key` or `map` per input; `averageWindowS` replaces the `windowS` of the instance's
+`average` mappings; `worldId` (optional) limits the entry to one world. The
+`HYPRUNE_MACHINES_PROTOTYPE` environment variable remains a development override: it can
+supply manifests for world 0.8 package assets, `effectAsset` and `staleMs`, and its bindings
+win over the user file.
 
 ## 2. Data sources
 
@@ -316,7 +357,7 @@ input a quest or marker means when it names only the machine (default: the first
 ### Slots
 
 The four RFC-0011 slot kinds keep their shape; this RFC gives them meaning and adds optional
-fields and four kinds, all in the first format that enables the `machine` trait:
+fields and five kinds, all in the first format that enables the `machine` trait:
 
 | Slot | RFC-0011 shape | Added here |
 | --- | --- | --- |
@@ -325,7 +366,8 @@ fields and four kinds, all in the first format that enables the `machine` trait:
 | `spawns` | `pose` | `track` (a `tracks` slot, or `"port"` for a flow link), `items` (item assets, as a track's `items.assets`), `maxRate` (items per second, ≤ 10, default 2). |
 | `effects` | `pose` | `kind` (`burst`, `pulse`, `flash`, `ring`), `colour`, `durationMs` (200–3000). |
 | `tracks` **(new)** | | An asset-space track: `points` and `speed` with the RFC-0011 path rules, `items` with RFC-0011's pool fields, an optional `sink` at the end. Each instance gets its own transformed track. Item assets are named as in the package or library that holds the machine. ≤ 4 per asset, ≤ 32 points each. |
-| `stacks` **(new)** | | `node` (hidden at rest, drawn instanced), `layout` `{"grid": [x, y, z], "spacing": [m, m, m], "fill": "xzy"}`, `cap` ≤ 64. |
+| `stacks` **(new)** | | `node` (hidden at rest, drawn instanced), `layout` `{"grid": [x, y, z], "spacing": [m, m, m], "fill": "xzy"}`, `cap` ≤ 100, optional `rate` (copies per second the shown count moves toward the target, ≤ 1000; 0 or absent = at once). Copies take the instance's palette paint of their meshes, so a `state:` drive tints stacked copies too. |
+| `levels` **(new)** | | `node`, `mode` (`fill`, `slide`), `axis` (asset-space unit vector, default `[0, 1, 0]`), `length` (m, > 0, ≤ 10), `surface` (`fill` only, optional), `settle` (`ease`, `spring`); target `level:<id>` ([below](#levels)). |
 | `toggles` **(new)** | | `nodes` that `visible:` may hide; never a collision proxy. |
 | `ports` **(new)** | | `pose`, `direction` (`in`, `out`): where a flow link meets the machine (P3). |
 
@@ -335,6 +377,35 @@ are never pick or collision geometry.
 States SHOULD differ in more than hue (a lamp that blinks, a raised flag, a symbol on the
 label), so colour-blind users can tell them apart; the Explain overlay always names the state
 in text.
+
+### Levels
+
+A `levels` slot moves or scales an authored subtree by a value 0–1, for a liquid column, a
+progress bar or a marker riding a scale:
+
+```json
+"levels": [
+  {"id": "liquid", "node": "liquid", "mode": "fill", "axis": [0, 1, 0], "length": 1.0,
+   "surface": "liquid-surface", "settle": "spring"},
+  {"id": "average-ring", "node": "average-ring", "mode": "slide", "axis": [0, 1, 0], "length": 1.0}
+]
+```
+
+- `node` names the node whose subtree moves; it is never pick or collision geometry.
+- `fill` scales the subtree along `axis` about the **node's origin** by the level: the authored
+  geometry is the full level 1, and level 0 hides it. `slide` translates the subtree by
+  level × `length` along `axis`; the authored pose is level 0.
+- `length` (metres, > 0, ≤ 10) is the fill's full extent from the node origin along the axis,
+  or the slide distance.
+- `surface` (`fill` only) names a node riding the top of the fill. It is authored at the full
+  level and drawn translated by (level − 1) × `length` along the axis, tilting gently while the
+  level sloshes, and hidden at level 0. A fill with a surface is authored without a top cap:
+  the surface is the cap.
+- `settle`: `ease` (default; the 300 ms ease of `position:`) or `spring`, an underdamped spring
+  that overshoots a little and settles in about 2 s while the surface rocks. Reduced motion
+  snaps to the new level.
+
+At most 8 per asset, like every slot kind.
 
 ### Value-driven animations
 
@@ -533,7 +604,7 @@ These extend the 0.8 and RFC-0011 rendering rules; everything there still holds.
   sees the latest state when it comes into view. A change on a visible instance asks for frames
   only for its transition (the 300 ms ease, an effect's duration, item travel). A bound
   animation at speed 0 is still, so an idle machine costs nothing.
-- **Caps**, fixed at load: 64 bound instances per world, 512 stacked copies, 8 concurrent
+- **Caps**, fixed at load: 64 bound instances per world, 1,024 stacked copies, 8 concurrent
   effects of at most 48 particles; items follow RFC-0011's caps. Over a cap the result degrades
   visibly (batch items, `+n` labels, skipped effects) and memory never grows.
 - **Motion** (`live.motion`): `auto` (default: items travel and machines spin while the world
@@ -664,7 +735,7 @@ From P2 it needs world format **0.10**, the same format bump as RFC-0011's mover
 | Change | Where |
 | --- | --- |
 | The `machine` trait enabled: `inputs`, `drives`, `primary`, `positions`, `recipes`; combinations with `decorative`, `collidable`, `movable` | `object.json`, inline `objectAssets[]` |
-| Slot field additions (`labels`, `spawns`, `effects`) and the new kinds `tracks`, `stacks`, `toggles`, `ports` | `slots` |
+| Slot field additions (`labels`, `spawns`, `effects`) and the new kinds `tracks`, `stacks`, `toggles`, `levels`, `ports` | `slots` |
 | `objects[].data`: `defaults` (mappings a user binding starts from) and bindings to `com.hyprune.core.clock` only | `objects[]` |
 | `flows[]` between the world's own instances (P3; this format or the next) | top level |
 

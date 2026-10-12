@@ -72,6 +72,9 @@
   },
   "switchyard@0.1.2": {
    "summary": "The same test world as 0.1.1, rebuilt from cleaned sources with neutral attribution text"
+  },
+  "hyprune-starter@0.1.1": {
+   "summary": "Residents' textures stay GPU-compressed (UASTC base colour and normals): 16 MiB instead of 64 MiB for all four, closer to the lossless originals"
   }
  },
  "timeline": [

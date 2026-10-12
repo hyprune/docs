@@ -390,3 +390,22 @@ Publishes IPC 0.21 (markers, personal quests, focus sessions) and IPC 0.22 (obje
 ## @hyprune/schema 0.8.0 (2026-10-12)
 
 Publishes IPC 0.23 and world format 0.9: characters and NPC instances, authored paths (route/track/generic) with stops, seats, keepClear volumes and NPC interactions.
+
+## Unreleased: object manifest 0.10 draft additions
+
+Draft only; no version changes. `v0.10/object.schema.json` and the validator:
+
+- Mappings take an `average` modifier `{windowS? (1–3600, default 60),
+  override?}`: the running average of a numeric value, alone or under `scale`,
+  `thresholds`, `cases` or `format`; never with `becomes` or `counter`. The
+  validator requires an `int` or `number` input, and in drives an `override`
+  that names another non-event input of the machine (recipes take no override).
+  A direct average of an `int` is fractional, so counts need a rounded scale.
+- New slot kind `levels` (at most 8): `{id, node, mode: fill|slide, axis?
+  (unit vector, default [0, 1, 0]), length (> 0, ≤ 10), surface? (fill only),
+  settle?: ease|spring}` and drive target `level:<id>` (outputs 0–1). With the
+  glTF: `node` and `surface` exist in the scene, the surface is not inside the
+  fill node's subtree, no node is moved by two slots, and the collision proxy
+  is never moved.
+- `stacks`: `cap` up to 100 (was 64) and an optional `rate` (copies per second,
+  0–1000).

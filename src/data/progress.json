@@ -146,7 +146,8 @@
     "2026-10-08": "hands-on, first releases, offload",
     "2026-10-09": "playable, faster, smaller",
     "2026-10-10": "compressed release, feel, a second test machine",
-    "2026-10-11": "fixes from testing"
+    "2026-10-11": "fixes from testing",
+    "2026-10-12": "objects, quests, residents"
   },
   "releases": [
     {
@@ -415,7 +416,7 @@
       "time": "14:30",
       "formatVersion": "0.8",
       "archiveBytes": 39421507,
-      "triangles": null,
+      "triangles": 245062,
       "gpuMiB": null,
       "gpuMeasured": false,
       "summary": "The Sun Court plaza is plain paving: the dark expansion seams and the bent inset route rails are gone (1,492 fewer visible triangles, same draw calls).",
@@ -1012,6 +1013,20 @@
       "href": "https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.10.1"
     },
     {
+      "date": "2026-10-11",
+      "time": "23:46–01:02",
+      "title": "Machines prototype",
+      "text": "Placed objects driven by data: five deterministic simulators (CI, queue, server rack, deploy, build) move jobs through machines in the world.",
+      "generated": false
+    },
+    {
+      "date": "2026-10-12",
+      "time": "00:16–01:50",
+      "title": "Gizmo 2.0",
+      "text": "The position tool (tool 4) gets move, rotate and scale handles in perspective, drawn anti-aliased at native resolution, with placement rules, previews and undo.",
+      "generated": false
+    },
+    {
       "id": "release:lumen-reach@0.10.2",
       "generated": true,
       "date": "2026-10-12",
@@ -1022,22 +1037,46 @@
       "href": "https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.10.2"
     },
     {
-      "id": "ipc:0.21",
-      "generated": true,
       "date": "2026-10-12",
-      "time": "01:17",
-      "title": "IPC 0.21",
-      "text": "",
-      "href": "/reference/schema/ipc/0.21/"
+      "time": "00:58–01:30",
+      "title": "Quests and markers",
+      "text": "<a href=\"/reference/schema/ipc/0.21/\">IPC 0.21</a>: tapping TAB shows waypoints and markers for a moment, holding it opens the Director. hypruned runs personal quests and focus sessions.",
+      "covers": [
+        "ipc:0.21"
+      ],
+      "generated": false
     },
     {
-      "id": "ipc:0.22",
-      "generated": true,
       "date": "2026-10-12",
-      "time": "03:16",
-      "title": "IPC 0.22",
-      "text": "",
-      "href": "/reference/schema/ipc/0.22/"
+      "time": "04:12–05:04",
+      "title": "Object catalog",
+      "text": "<a href=\"/reference/schema/ipc/0.22/\">IPC 0.22</a>: installed libraries form an object catalog. Objects come out of the pocket with tool 5 and are saved as user placements.",
+      "covers": [
+        "ipc:0.22"
+      ],
+      "major": true,
+      "generated": false
+    },
+    {
+      "date": "2026-10-12",
+      "time": "09:45–11:33",
+      "title": "No catalog hitches; objects in offload",
+      "text": "A watch that rescanned the catalog every 1.2 s and costly aiming caused stalls: on the catalog demo at 1080p60, frame gaps over 25 ms fell from 177 to 13–28 and p99 from 114.6 to 21–23 ms. The offload worker now draws world objects.",
+      "generated": false
+    },
+    {
+      "date": "2026-10-12",
+      "time": "10:09",
+      "title": "Only the room floats",
+      "text": "Windows on a home's wall stay tiled when you leave focus; a window moved into the world goes to the room.",
+      "generated": false
+    },
+    {
+      "date": "2026-10-12",
+      "time": "12:40",
+      "title": "Path tool",
+      "text": "Tool 3 picks path points under the reticle: drag, insert, delete and undo. Paths are drawn only while the tool is out.",
+      "generated": false
     },
     {
       "id": "release:hyprune-starter@0.1.0",
@@ -1050,22 +1089,16 @@
       "href": "https://github.com/hyprune/worlds/releases/tag/hyprune-starter-v0.1.0"
     },
     {
-      "id": "world:0.9",
-      "generated": true,
       "date": "2026-10-12",
-      "time": "13:47",
-      "title": "World format 0.9",
-      "text": "",
-      "href": "/reference/schema/world/0.9/"
-    },
-    {
-      "id": "ipc:0.23",
-      "generated": true,
-      "date": "2026-10-12",
-      "time": "13:51",
-      "title": "IPC 0.23",
-      "text": "",
-      "href": "/reference/schema/ipc/0.23/"
+      "time": "14:22–17:43",
+      "title": "Residents",
+      "text": "<a href=\"/reference/schema/world/0.9/\">World format 0.9</a> and <a href=\"/reference/schema/ipc/0.23/\">IPC 0.23</a>: characters walk authored paths, stop, sit on seats, step aside and guide you. The offload worker draws them too. Core 0.5.0 ships it.",
+      "covers": [
+        "world:0.9",
+        "ipc:0.23"
+      ],
+      "major": true,
+      "generated": false
     },
     {
       "id": "release:lumen-reach@0.10.3",
@@ -1076,6 +1109,13 @@
       "title": "Lumen Reach 0.10.3 released",
       "text": "The Sun Court plaza is plain paving: the dark expansion seams and the bent inset route rails are gone (1,492 fewer visible triangles, same draw calls).",
       "href": "https://github.com/hyprune/worlds/releases/tag/lumen-reach-v0.10.3"
+    },
+    {
+      "date": "2026-10-12",
+      "time": "16:06",
+      "title": "Core 0.4.0: prebuilt core",
+      "text": "Each core tag now publishes a build for Hyprland 0.56.2 with its ABI hash. <a href=\"/try-it/\">Try it</a> uses it when your Hyprland matches, so there is nothing to compile.",
+      "generated": false
     }
   ]
 }

@@ -411,3 +411,22 @@ Draft only; no version changes. `v0.10/object.schema.json` and the validator:
   0–1000). `layout.spacing` components may be negative (−10 to 10 m; copies fill
   from the node towards the sign) and must be non-zero where that axis's grid is
   above 1.
+
+## IPC 0.24: machine inputs in the catalog and live machine state (RFC-0013)
+
+- `objects.catalog` entries gain required `machine`: null for an entry without
+  the machine trait, else `{primary: input id|null, inputs[1..16]}`. Each input
+  is the object 0.10 declaration as authored: `{id, type (enum|int|number|bool|
+  text|event|items), label, explain, default?, values? (enum), min?/max?
+  (int, number), maxLength? (text), repeat? (2–16, not expanded), states?
+  (items)}`.
+- Required state key `live {instances[<=64]}`, published on change and never
+  per frame. An instance is `{id, asset, ref|null, source|null (the source
+  every bound input reads, null when they differ), status (ok|error|null, the
+  source's _status), error (<=256|null, its _error), stale, inputs}`; `inputs`
+  maps up to 16 input ids, repeated inputs expanded (`health.1`), to `{source|null,
+  key|null, value, raw, condition (fresh|stale|missing|error), publishedAt}`.
+  Values are scalars (strings <=256) or null; `publishedAt` is the wall-clock
+  Unix ms of the publication core holds, null when missing.
+- Everything else is inherited from 0.23 unchanged (no new method, grant or
+  event); `session.hello` reports `0.24`. Inheritance test included.

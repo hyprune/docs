@@ -24,9 +24,11 @@ Primary, Secondary, Alternate and Cycle use the same globally rebindable `primar
 | --- | --- | --- | --- | --- |
 | Normal | Click / interact | Right-click | Middle-click | Scroll window |
 | Window | Tag/mount or lock (sub-mode) | Lock/unlock | Unassigned | Place/lock sub-mode |
-| Path | Add point | Remove last point | Open/close path | Line/curve/arc |
+| Path | Add point; drag a point; click a segment to insert | Remove the aimed point (else the last) | Open/close path | Line/curve/arc |
 | Position | Select / drag gizmo | World/local axes | Toggle snapping | Move/rotate/scale |
 | Placement | Place ahead | Mount on surface | Pocket aimed window | Select pocketed window |
+
+Paths show only in the path tool, with their points and curve handles; the point under the reticle highlights. Press on a point and drag to move it (Shift snaps to 0.1 m), release to commit; Escape cancels the drag. Ctrl+Z and Ctrl+Shift+Z (or Ctrl+Y) undo and redo path edits as they do position edits. Period (`.`) in the path tool keeps all paths shown in the other tools; the debug view (F3) shows them too.
 
 Tool hints come from core declarations over IPC. Pocketed windows remain alive but invisible; newest pocketed comes first. There is no return-to-last-spot command. `windows.carry_face_player` defaults to true in Lua config; content scale changes client logical resolution while keeping the world rectangle fixed. Reset returns content resolution, facing and distance to defaults, subject to collision recovery.
 

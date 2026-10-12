@@ -3,7 +3,10 @@ title: "RFC-0013 — Live objects: data bindings, machines and flows"
 description: "Objects that show the state of real systems: declarative bindings from published data to authored visual states, ready-made machines, items on tracks and a no-code source helper."
 ---
 
-**Status: draft · proposed 2026-10-11.** Nothing here is implemented. It builds on world
+**Status: draft · proposed 2026-10-11; the `live` state key and the catalog's machine inputs are
+specified for IPC 0.24 ([amendment below](#amendment-live-state-in-ipc-024)).** Beyond that and
+the prototype it records (default bindings, the source helper's command sources), nothing
+here is implemented. It builds on world
 format 0.8 placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-world-objects)),
 the extension data channel ([RFC-0003](/rfcs/0003-ipc/#publishing-authority-and-bootstrap),
 [RFC-0007](/rfcs/0007-extensions/)) and two drafts written alongside it: [RFC-0011](/rfcs/0011-objects/) (world
@@ -240,6 +243,11 @@ growing number in the response (a build number, a total). A field typed `events`
 at an array and names the pointers for the event `id`, `name` and fields; the helper keeps the
 last 16.
 
+Until the daemon owns source configurations (`live.sources.*`, [Contract plan](#ipc-one-version-per-phase-numbered-at-acceptance)),
+the helper reads them from `$XDG_CONFIG_HOME/hyprune/sources.json`, and the reference shell
+edits, tests and restarts them through the helper's local
+[control channel](#source-helper-control-channel), which is not part of the IPC protocol.
+
 ### Third-party publishers
 
 Any extension with the `data.publish` grant publishes sources beneath its extension ID, as
@@ -296,6 +304,12 @@ The helper publishes every source with reserved keys: `_status` (`ok` or `error`
 or `_exitCode`. On an error it **keeps the last good values** in the publication, so a machine
 dims rather than resets. The Sources page shows the last error, the last success and the next
 attempt.
+
+`_reset` (an integer, optional) asks for a fresh start: when its value changes between two
+publications of a source, core restarts the running averages of every input bound to that
+source, and with them the drives those inputs feed. A missing `_reset` counts as 0, and the
+first publication core sees for an input resets nothing. The helper raises it on a restart
+with "Reset average".
 
 ### Security (normative)
 
@@ -752,7 +766,8 @@ palette ids, map domains) with the asset glTF.
 | P1 | `live.sources.list` → configs without secrets, status, last error, users; `live.sources.set {source}` / `live.sources.remove {id}` | `state.read` / **`live.control`** |
 | P1 | `live.sources.test {source}` → `{preview, values, error?}` (runs once, publishes nothing) | `live.control` |
 | P1 | `live.secret.set {name, value}` / `live.secret.remove {name}` / `live.secret.list` (names only) | `live.control` |
-| P1 | State key **`live`**: per bound instance `{id, inputs: {<id>: {value, raw, source, key, condition, ageMs}}, link}`, at most 64 entries, published on change and never per frame; `condition` is `fresh`, `stale`, `missing` or `error` | `state.read` |
+| P1 | State key **`live`** (IPC 0.24, [amendment](#amendment-live-state-in-ipc-024)): `{instances}`, at most 64 bound instances `{id, asset, ref, source, status, error, stale, inputs: {<id>: {source, key, value, raw, condition, publishedAt}}}`, published on change and never per frame; `condition` is `fresh`, `stale`, `missing` or `error`; `publishedAt` is the wall-clock time of the held publication, so a reader computes the age itself. `link` waits for the Data section | `state.read` |
+| P1 | `objects.catalog` entries gain `machine` (IPC 0.24): `null`, or the machine trait's `primary` and input declarations as authored | `state.read` |
 | P2 | `data.publish` optional `events` (≤ 16); `spatial.projection` marker kind `live-slot`; `live.explain` world action | `data.publish` / `state.read` |
 | P3 | `data.publish` optional `items` (≤ 64); `live.flows.set` / `live.flows.remove`; `live` gains `flows` with per-link counts | `data.publish` / `live.control` |
 
@@ -818,3 +833,142 @@ the core changelog.
    another user imports, with commands confirmed again?
 6. **Third-party network:** a brokered fetch (the helper's network worker on behalf of an
    extension, per approved origin), or network namespaces per extension?
+
+## Amendment: live state in IPC 0.24
+
+IPC **0.24** ([schema](/reference/schema/ipc/0.24/), core `docs/CHANGELOG.md`) carries the part
+of P1 a shell needs to show, edit, test and restart a placed machine's data source without a
+text editor: the catalog's machine inputs and the `live` state key. World formats and object
+manifests are unchanged (world 0.9; object manifest 0.10 is still a draft). Both additions
+reach only sessions that negotiate 0.24; older peers keep their exact shapes. There is no new
+method, grant or event. It follows this RFC except where noted here.
+
+**Catalog.** Every `objects.catalog` entry gains `machine`: `null` for an entry without the
+`machine` trait, else the trait's `primary` (an input id, or `null` when none is declared) and
+its `inputs` exactly as declared in `object.json`, so a shell can label inputs and check a test
+run against them before anything is bound. `repeat` is not expanded here.
+
+```json
+"machine": {"primary": "value", "inputs": [
+  {"id": "value", "type": "number", "min": 0, "max": 100, "default": 0,
+   "label": "Value", "explain": "How full the tube is."},
+  {"id": "display", "type": "text", "maxLength": 12, "label": "Display", "explain": "The text under the tube."}]}
+```
+
+An input has `id`, `type` (`enum`, `int`, `number`, `bool`, `text`, `event`, `items`),
+`label` and `explain`, and optionally `default`, `values` (`enum`), `min` and `max` (`int`,
+`number`), `maxLength` (`text`), `repeat` (2–16) and `states` (`items`): the object 0.10 input.
+At most 16 inputs.
+
+**State.** The required key `live` lists the bound machine instances of the loaded world:
+
+```json
+"live": {"instances": [
+  {"id": "u-3f9a1c", "asset": "gauge-tube", "ref": "library/com.hyprune.starter@0.2.0/gauge-tube",
+   "source": "com.hyprune.sources.u-3f9a1c", "status": "ok", "error": null, "stale": false,
+   "inputs": {
+     "value": {"source": "com.hyprune.sources.u-3f9a1c", "key": "value", "value": 71, "raw": 71,
+               "condition": "fresh", "publishedAt": 1791800000000},
+     "display": {"source": "com.hyprune.sources.u-3f9a1c", "key": "display", "value": "71 %",
+                 "raw": "71 %", "condition": "fresh", "publishedAt": 1791800000000}}}]}
+```
+
+- At most 64 instances, the bound-instance cap; instances past it are not bound and not
+  listed. Core publishes the key when a value, condition, status or binding changes, never
+  per frame.
+- `asset` is the catalog id, `ref` the qualified object ref (`null` for a world 0.8 package
+  asset without one). `source` is the source every bound input reads (`null` when they
+  differ or none is bound); `status` and `error` are that source's `_status` and `_error`
+  (`null` without data; `error` at most 256 characters). `stale` is true while any bound
+  input is `stale` or `error`.
+- `inputs` has one entry per input, repeated inputs expanded (`health.1` … `health.4`), at
+  most 16. `source` and `key` name the binding (`null` when unbound). `value` is the mapped
+  value the machine shows (the input's default when data is missing), `raw` the published
+  value (`null` when missing); both are scalars, strings at most 256 characters, or `null`.
+  `condition` is `fresh`, `stale`, `missing` or `error` ([Staleness](#staleness-and-ttl)).
+- `publishedAt` is the wall-clock time (Unix milliseconds) of the publication core holds for
+  that input, fixed per publication, or `null` when missing. A shell computes the age itself,
+  so the key does not change while time passes.
+
+**Source metadata.** The reserved key `_reset` ([Errors and source metadata](#errors-and-source-metadata))
+restarts the running averages of every input bound to the source, and the drives they feed,
+when its value changes between publications.
+
+**Deviations from the text above.**
+
+- *The `live` shape.* The [contract plan](#ipc-one-version-per-phase-numbered-at-acceptance)
+  sketched `ageMs` per input; 0.24 sends `publishedAt` instead, because an age changes every
+  frame and the key is published on change only. Instances add `asset`, `ref`, `source`,
+  `status`, `error` and `stale`. `link` waits for the configure panel's Data section.
+- *Bindings.* Instances are bound by the [default bindings](#default-bindings) and
+  `machines.json`; the `objects.configure` `data` section is not part of 0.24.
+- *Source configurations.* Until `live.sources.*`, `live.control` and `sources.host` exist,
+  the helper's configuration is the user's `sources.json`, and the reference shell edits it
+  and drives the helper through the helper's local control channel (below), not through
+  core. This is the one place the shell talks to the helper directly. The channel is not
+  part of the IPC protocol, has no version and gives no peer more than the same user already
+  has.
+- *Helper lifetime.* The launcher starts the helper with every session, also without a
+  `sources.json`: it idles, and picks the file up when it appears or changes (checked at
+  least once a second), so a first Save needs no restart.
+
+### Source helper control channel
+
+A local, same-user interface of the bundled helper, used by the reference shell's bridge.
+
+- **Socket.** `sources.sock` in the directory of core's control socket (the dirname of the
+  helper's `--socket`), or the path given with `--control`. Mode 0600; the helper checks the
+  peer's user id (`SO_PEERCRED`) and closes connections from any other user.
+- **Framing.** Newline-delimited JSON: one request line, one response line, each at most
+  64 KiB. A refusal is `{"ok": false, "error": "<reason>"}`.
+- **`{"op": "status"}`** →
+  `{"ok": true, "config": "<path>", "connected": <bool>, "sources": {"<id>": {...}}, "limits": {...}}`.
+  Each source reports `kind`, `argv` (commands) or `url` (HTTP), `intervalS`, `enabled`,
+  `running`, `lastRun` (`null`, or `{at, ok, values, error, exitCode, durationMs}` with `at` in
+  Unix milliseconds), `nextRunAt` (Unix milliseconds or `null`) and `resets`. `limits` gives
+  the bounds a shell enforces: `{"command": {"intervalS": [5, 86400], "devIntervalS": 1,
+  "timeoutS": [1, 60]}}`.
+- **`{"op": "test", "source": {"kind": "command", "argv": [...], "timeoutS"?: n, "output"?: "json"}}`**
+  runs that argument vector once under the helper's command rules (no shell, the timeout,
+  the output caps) and publishes nothing →
+  `{"ok": true, "values": {...}, "stdout": "<at most 4 KiB>", "stderr": "<at most 4 KiB>", "error": <string|null>, "exitCode": n, "durationMs": n}`.
+- **`{"op": "restart", "id": "<id>", "resetAverage": <bool>}`** kills a running command of that
+  source, runs it now and publishes; with `resetAverage` it first raises the source's
+  `_reset`.
+- **`{"op": "restart-all"}`** removes every source (`data.remove`), drops the core
+  connection, re-reads the configuration, reconnects with a renewed grant and starts every
+  source at once.
+- **`{"op": "reload"}`** re-reads the configuration now.
+
+The helper never runs a command that is not in its configuration file or in a `test`
+request. [Security](#security-normative) still holds: commands come only from the user, and
+the shell sends one only after the user has seen the exact argument vector.
+
+### Director: a machine's data source
+
+The reference shell's flow for a placed machine:
+
+1. **Place** a machine from Director → **Objects** (Add, then tool 5).
+2. Open Director → Objects → **Placed** and select it. Its configure panel has a **Data
+   source** section: each input with its label, live value, raw value, condition and age
+   (from `live`), the source it reads with that source's status and error, and the helper's
+   last run.
+3. **Command:** a script (**Choose…** browses folders) and its arguments, one per line, and
+   an **interval** within the helper's limits (5 s to 24 h for commands). The panel shows
+   the exact argument vector that will run.
+4. **Test** asks the helper to run it once (`test`), publishing nothing, and shows the
+   values, stdout, stderr and exit status, checked against the machine's inputs (unknown
+   keys, values of the wrong type, missing inputs).
+5. **Save** writes the entry and the helper starts it at once. **Remove** deletes it.
+6. **Restart** runs the source now (`restart`); with **Reset average** checked, the running
+   averages start over. **Restart helper** (asks for a second press) restarts every source
+   and reconnects (`restart-all`).
+
+Test and Save are the user's confirmation of the command. Saving updates or inserts the
+`sources.json` entry whose `id` is the instance id, `{"id": "<instance id>", "kind":
+"command", "argv": [<script>, ...args], "intervalS": n}`, keeping that entry's other keys
+(`env`, `timeoutS`, …), every other entry and every top-level key in their order. The file
+is the one the helper reports in `status.config`, else `$XDG_CONFIG_HOME/hyprune/sources.json`;
+it is written to a temporary file in the same directory, flushed to disk and renamed over the
+old one (a new file gets mode 0600 and its directory is created), then the shell sends
+`reload`. Remove deletes the entry the same way. Nothing else in the shell runs a command.

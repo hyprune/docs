@@ -681,3 +681,10 @@ worker frames then arrive later than the 50 ms freshness limit and the local
 renderer stands in; with the worker on the x16 GPU, 12 %. Results:
 [core `docs/evidence/offload/objects/README.md`](https://github.com/hyprune/core/blob/main/docs/evidence/offload/objects/README.md).
 
+**Characters.** World format 0.9 characters and user-spawned characters (IPC 0.23,
+[RFC-0011 P2](/rfcs/0011-objects/#amendment-p2-in-world-format-09-and-ipc-023)) are drawn by
+the worker too, with the same results as the in-process renderer. The worker loads character
+assets with the package and catalog assets; each pose carries the per-frame pose parameters of
+every drawn character (clips, clip times, fade, look-at and model matrix), and the worker
+evaluates the same skinning. See [RFC-0010](/rfcs/0010-npcs/#amendment-runtime-in-core).
+

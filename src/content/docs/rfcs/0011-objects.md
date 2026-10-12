@@ -3,7 +3,7 @@ title: "RFC-0011 — World objects: libraries, traits, user placement and paths"
 description: "One object system for authored, shared and user objects: the object manifest and its traits, three sources in one catalog, user placement, tools on objects, paths, seats and the contract plan."
 ---
 
-**Status: draft · proposed 2026-10-11; P1 shipped in IPC 0.22 (amendment below).** Before P1, nothing here was implemented beyond world format 0.8
+**Status: draft · proposed 2026-10-11; P1 shipped in IPC 0.22, P2 in world format 0.9 and IPC 0.23 (amendments below).** Before P1, nothing here was implemented beyond world format 0.8
 placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-world-objects))
 and the M3B path and position tools ([RFC-0006](/rfcs/0006-interaction/#amendment-m3b-keymap-v2)).
 It extends 0.8 objects instead of adding a parallel system: ambient characters
@@ -907,3 +907,126 @@ block a frame.
 **Not in 0.22.** User characters, paths, seats and sitting (P2); `objects.configure` sections
 beyond the lock; library references from world packages; windows avoiding non-collidable objects;
 a translucent model as the ghost (the ghost is the bounds and edges).
+
+## Amendment: P2 in world format 0.9 and IPC 0.23
+
+P2 ships as world format **0.9** ([RFC-0004 amendment](/rfcs/0004-world-format/#amendment-world-09-characters-paths-seats-and-keepclear),
+[schema](/reference/schema/world/0.9/)) and IPC **0.23** ([schema](/reference/schema/ipc/0.23/),
+core `docs/CHANGELOG.md`). Object and library manifests are unchanged (0.9, draft 0.10). The
+character runtime is recorded in [RFC-0010's amendment](/rfcs/0010-npcs/#amendment-runtime-in-core).
+It follows this RFC except where noted here.
+
+**What shipped.** Characters in the world format: inline, directory and library object assets
+with traits; instances bound to `route` paths or standing on a spot, with `reverse`, `seat`,
+`accent` and instance `interactions`; authored `paths` with stops, `seats` and `keepClear`;
+`locked` on movable authored instances. Over IPC: user-spawned characters, user paths (listed,
+saved, removed and drawn with tool 3, checked for walkability), interactions with aimed
+characters, the `npcs` state key and the `npc_motion` graphics setting.
+
+**Deviations from the text above.**
+
+- *Character methods.* User characters are managed by `npcs.spawn`, `npcs.bind`, `npcs.disable`
+  and `npcs.remove`, not by `objects.place` and `objects.configure` sections. The character
+  section of `objects.configure` is `npcs.bind`; `objects.configure` stays lock-only (P1).
+  `objects.place` with a character ref is refused (-32005, "use npcs.spawn");
+  `objects.transform`, `objects.configure` and `objects.pocket` refuse characters (-32005,
+  "characters are protected"). `objects.hide` on an authored character works as
+  `npcs.disable`, `objects.remove` on a user character as `npcs.remove`.
+- *"Draw a new route".* `paths.draw` selects tool 3 with a fresh active path (`use` default
+  `route`); `paths.finish`, or leaving tool 3, ends it. With `spawn` it spawns a user character on
+  the new route, with `bind` it rebinds that user character to it. An unwalkable or too short
+  route keeps the path and sends `path.unwalkable` instead (no character). A second
+  `paths.draw` replaces the first; the draw in progress is `npcs.drawing` in state.
+- *Ending an interaction.* `interaction.choose` with `interactionId: null` ends the current
+  interaction; with an id it runs that interaction of the aimed or current character.
+- *Actions.* `travel` and `quest` are reserved and rejected in world 0.9. Instance interactions
+  take `say`, `waypoint`, `guide` and `panel`; asset-level interactions stay `say` and `panel`.
+- *Setting.* `graphics.npc_motion` (`auto`, `always`, `still` or `off`, default `auto`) is the
+  same value as Lua `npc.motion`, persisted in `graphics.json`.
+- *Power.* `auto` animates only while the offload power profile
+  ([RFC-0009](/rfcs/0009-offload-renderer/)) is `full-ac` or `limited-ac` and the supply is not
+  discharging (desktops: mains). Battery, USB-C and unknown supplies pause characters.
+- *Overlay.* `editor.json` stays version 2; the new fields are additive (below).
+- *State.* Characters get their own state key, `npcs`, besides the `objects` instances.
+- *Reticle.* `interaction.reticle.action` gains `interact` for an aimed character with
+  interactions; peers below 0.23 see `click`.
+- *Seat fit.* The ±0.08 m `seatHeight` tolerance of [Sitting](#seats-and-sitting) step 1 is
+  replaced by a lift and a feet-clearance range (RFC-0010 amendment).
+- *Offload.* The offload worker draws characters too, with the same results as the in-process
+  renderer: it loads character assets with the package and catalog assets and receives
+  per-frame pose parameters (clips, times, fade, look-at, model), then evaluates the same
+  skinning.
+
+**Methods.**
+
+| Method | Params → result | Grant |
+| --- | --- | --- |
+| `npcs.spawn` | `{ref, path?, pose?, phase?, speed?, accent?, reverse?}` → `{revision, id}` | objects.control |
+| `npcs.bind` | `{id, path?, pose?, phase?, speed?, accent?, reverse?}` (user characters; at least one setting) → `{revision}` | objects.control |
+| `npcs.disable` | `{id, disabled}` (authored and user characters) → `{revision}` | objects.control |
+| `npcs.remove` | `{id}` or `{all: true}` (user characters) → `{revision}` | objects.control |
+| `paths.list` | `{}` → `{paths}` (this world's package and user paths) | state.read |
+| `paths.set` | `{path}` (create or replace a user path) → `{revision, id}` | objects.control |
+| `paths.remove` | `{id, unbind?}` (user paths) → `{revision}` | objects.control |
+| `paths.draw` | `{use?, name?, spawn?: {ref, phase?, speed?, accent?}, bind?}` → `{revision, id}` | objects.control |
+| `paths.finish` | `{}` → `{revision, id, bound}` (`id` and `bound` may be null) | objects.control |
+| `interaction.choose` | `{objectId, interactionId}` (`interactionId` null ends the interaction) → `{revision}` | world.control |
+
+- `ref` is the object ref of a character entry (`package/…`, `library/<id>@<version>/<object>`,
+  `user/…`). A `path` param is a qualified path ref (`package/<id>` or `user/<id>`; a bare id
+  means `package/<id>`) and must be a walkable `route`. `pose` is a standing spot checked by the
+  reachable-floor rule for a body ([User-spawned characters](#user-spawned-characters));
+  `npcs.spawn` with neither `path` nor `pose` stands the character in front of the player by the
+  reachable-spawn rules. `path` and `pose` are exclusive, `reverse` needs a path. `phase` is
+  0 ≤ phase < 1, `speed` 0.25-2 (scales the character's walk), `accent` linear RGB 0-1 or null.
+- `paths.list` returns at most 192 entries `{ref, source (package or user), id, name, use,
+  closed, points, speed, stops, walkable, problems, bound}`: `walkable` is null for paths that
+  are not routes, `problems` at most 8 messages, `bound` at most 8 object ids.
+- `paths.set {path: {id?, name?, use, closed, points, speed?, stops?}}`: without `id` it creates
+  a user path (`path-<n>`). A package path id is refused (-32005); a route must be walkable
+  (-32007, rule `walkable`, the message names the first problem); a path that characters are
+  bound to must stay a walkable route.
+- `paths.remove` removes user paths only. It is refused (-32005) while characters are bound
+  unless `unbind: true`, which leaves them standing where they are.
+- `paths.set`, `paths.remove`, `paths.draw` and `paths.finish` ids are user path ids.
+
+**Errors.** -32004 unknown id, ref or path; -32005 protected, authored, not a character or no
+world; -32007 a placement or walkability rule (`error.data {retryable: false, rule}`); -32008 a
+budget (`rule: "budget"`: 8 user characters per world, plus the 0.22 object budgets).
+
+**State.**
+- `npcs` (new, required): `{motion, state, reason, usage, limits, drawing, aimed, interaction}`.
+  `motion` is the setting; `state` is `none`, `animating`, `paused`, `still` or `off`; `reason`
+  (null or at most 64 characters) says why characters are paused: `inactive`, `typing`, `focus`,
+  `free cursor`, `idle`, `battery`, `usb-c power`, `power unknown` or `reduced motion`. `usage`
+  and `limits` count authored (limit 16) and user (limit 8) characters. `drawing` is null or the
+  `paths.draw` in progress `{pathId, use, spawn: null | {ref}, bind: null | objectId}`. `aimed`
+  is null or `{objectId, name, prompt, interactions}` (at most 8 `{id, label, type}`).
+  `interaction` is null or `{objectId, interactionId (or null), type (choose, say, waypoint,
+  guide or panel), label, choices (at most 8 {id, label}), line (or null), lineIndex,
+  lineCount, panel (or null)}`.
+- `objects.instances[]` gain required `character` (boolean) and `accent` (null or linear RGB);
+  `path` is null or a qualified path ref, `activity` null or `idle`, `walking`, `running`,
+  `stopped`, `sitting`, `guiding`, `interacting` or `suspended`, and `seat` null or a seat ref
+  (at most 192 characters). `state` may be `suspended` (the bound route became unwalkable).
+  Moving characters' positions are published at most twice a second.
+- `editor.paths[]` gain required `use`, `name` (or null), `speed` (or null) and `stops` (at most
+  32, the world 0.9 stop).
+
+Peers below 0.23 receive none of these fields or methods.
+
+**Notices** (`runtime.notice` codes): `npc.spawned`, `npc.removed`, `npc.disabled`,
+`npc.enabled`, `npc.suspended` (a bound route became unwalkable), `npc.budget`,
+`path.unwalkable`, `path.saved`, `path.removed`, `object.protected` (carry, gizmo or pocket
+aimed at a character, at most once every 10 s) and `world.library.missing`.
+
+**Overlay.** `editor.json` stays version 2 with additive fields. Path records gain `use`
+(default `generic`), `name`, `speed` and `stops`. User characters are placements
+`{worldId, id, areaId, ref, pose, scale: 1, path?, phase?, speed?, accent?, reverse?,
+disabled?}`, `path` a qualified path ref; `pose` is always written (the route start or the
+standing spot), so older cores keep a readable record. Disabling an authored character is an
+override `{worldId, objectId, hidden: true}`, as `objects.hide` writes.
+
+**Not in P2.** The `travel` and `quest` actions; movers and track items (`source`, `sink`,
+`items`; world format 0.10); player sitting, `mount` and `interactive` (P4); avoidance between
+characters (RFC-0010 amendment).

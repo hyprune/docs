@@ -871,8 +871,9 @@ triangles at the instance pose; node animation is ignored. Characters are never 
 - *Refusals:* a gizmo drag shows and releases to its start pose; a carry releases to its last
   valid pose; wheel gestures, drop, align and tool 5 are refused with `placement.blocked` and the
   rule's message; methods return `-32007` naming the rule.
-- *Relighting:* a commit recomputes the instance's visibility regions and probe light in the tick
-  (64 rays); off-thread relighting waits until it shows up in frame times.
+- *Relighting:* a commit recomputes the instance's visibility regions in the tick; its probe light
+  (64 rays) runs on a worker thread and is applied on a later tick if the instance still has that
+  pose, so the object keeps its previous light for a few frames.
 
 **Placement rules as implemented.** The shape is the asset's bounds box at the pose, shrunk 2 cm;
 a collidable asset's proxy triangles confirm a wall hit. "Inside solid geometry" means back faces

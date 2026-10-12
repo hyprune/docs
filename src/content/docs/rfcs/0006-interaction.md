@@ -68,7 +68,7 @@ Core owns `$XDG_CONFIG_HOME/hyprune/input.json` (default `~/.config/hyprune/inpu
 
 An enabled binding steals any colliding Hyprland bind only while the world is active and only in its defining mode. The cancellable keyboard/button/axis hooks run before the native keybind manager. Consumed presses own their releases across transitions; native forwarded presses receive balanced manager releases. Native binds are never rewritten, so deactivate, unload and helper failure restore behavior through removal of interception. Uncolliding binds retain native dispatch. The settings collision list reads native keybind records; descriptions for Lua dispatchers can fall back to dispatcher/reference when Hyprland stores no description. Keycode and multi-key native binds are intercepted by the actual triggering event, but their configuration descriptions currently require a manual check.
 
-Tools are 1 normal, 2 window (place/lock), 3 path (open/closed × line/curve/arc), 4 position (move/rotate/scale), and 5 reserved. Position handles use axis arrows, cubes with uniform centre, and rotation arcs. Shift snaps translation to 0.1 m, rotation to 15° and scale factors to 0.1. Paths and object transforms are per-world/area overlays; authored packages are read-only. Window OBB placement checks and real client configure remain required.
+Tools are 1 normal, 2 window (place/lock), 3 path (open/closed × line/curve/arc), 4 position (move/rotate/scale), and 5 reserved. Position handles use axis arrows, cubes with uniform centre, and rotation arcs. Shift snaps translation to 0.1 m, rotation to 15° and scale factors to 0.1. Paths and object transforms are per-world/area overlays; authored packages are read-only. Paths draw only in the path tool (points, curve handles, the aimed point highlighted), unless the player keeps all paths shown or the debug view is on. A path point drag follows the aimed surface (Shift snaps to 0.1 m and a point on a floor stays on it); its release, inserts and removals are undoable edits like position-tool transforms (Ctrl+Z, Ctrl+Shift+Z / Ctrl+Y). Window OBB placement checks and real client configure remain required.
 
 All cursor, focus and workspace effects are deferred after the frame. Shader and geometry drawing save/restore GL state and never invoke compositor rendering. Nested software-cursor evidence cannot validate hardware-cursor transitions; those require the core's supervised live checklist.
 
@@ -179,7 +179,7 @@ name. Up to three bindings remain supported for each action.
 | --- | --- | --- | --- | --- |
 | Normal | Click/interact | Right-click | Middle-click | Scroll client |
 | Window | Tag/mount or lock per sub-mode | Lock/unlock | Unassigned | Place/lock sub-mode |
-| Path | Add point | Remove last point | Open/close | Line/curve/arc |
+| Path | Add point; press on a point and drag to move it; click a segment to insert | Remove the aimed point, else the last | Open/close | Line/curve/arc |
 | Position | Select/drag gizmo | World/local axes | Toggle snapping | Move/rotate/scale |
 | Placement (5) | Place ahead | Mount on surface | Pocket aimed window | Select queue item |
 

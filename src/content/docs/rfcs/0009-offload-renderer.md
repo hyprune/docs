@@ -679,5 +679,5 @@ pose to frame ready 10 ms) and from 4.7 to 0.6 ms at 4K (worker 6.5 ms render,
 5.9 ms transfer on a PCIe x8 GPU, 19 ms to frame ready). At 4K a quarter of the
 worker frames then arrive later than the 50 ms freshness limit and the local
 renderer stands in; with the worker on the x16 GPU, 12 %. Results:
-[core `docs/evidence/offload/objects/README.md`](https://github.com/hyprune/core/blob/remote/offload-objects/docs/evidence/offload/objects/README.md).
+[core `docs/evidence/offload/objects/README.md`](https://github.com/hyprune/core/blob/main/docs/evidence/offload/objects/README.md).
 

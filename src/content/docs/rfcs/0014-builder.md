@@ -30,8 +30,10 @@ into a world they can live in:
   other world.
 - **Approachable.** A checklist in the HUD, shaped like a quest, says what is missing and shows
   where the problem is. Every failure is a checklist item, never a log.
-- **Honest about rights.** Imports record source, author and licence. Only CC0 and CC-BY
-  content may be exported for sharing; everything else stays private to the user.
+- **Users own what they make.** Imports record source, author and licence (or "unknown"),
+  and made worlds and exports carry that record. Hyprune shows it and never enforces it: no
+  licence blocks an import, a world or an export. Only publishing to the official hyprune org
+  checks it.
 
 Non-goals: modelling or sculpting tools, terrain editing, lightmap baking on the user's
 machine, scripted behaviour, network fetches of any kind, and editing an installed package.
@@ -66,8 +68,8 @@ machine, scripted behaviour, network fetches of any kind, and editing an install
    classifies it and renders a thumbnail. The job publishes progress by stage.
 4. The job stops in **`review`**. The shell shows the review form: thumbnail, name, category,
    tags, surfaces, size class with the measured numbers against the budgets, warnings, and the
-   provenance fields (source, author, licence). A licence text found in the source is shown,
-   never applied silently.
+   provenance fields (source, author, licence; each may stay unknown). A licence text found in
+   the source is shown, never applied silently.
 5. **Add to my objects** (`objects.import.commit`) validates the candidate with the user's
    answers using the same checks as RFC-0011's user folder, and moves it into
    `$XDG_DATA_HOME/hyprune/objects/<id>/` atomically. **Change options** (`objects.import.revise`)
@@ -217,6 +219,7 @@ harbour-plaza/
   "license": {"spdx": "CC-BY-4.0", "author": "A. Modeller",
               "source": "https://example.com/models/harbour-plaza", "detectedFrom": "license.txt"},
   "importedAt": "2026-10-12T14:03:11Z",
+  "history": [],
   "original": "sha256:9f2c41d0…"
 }
 ```
@@ -225,35 +228,50 @@ The original file is kept under `$XDG_DATA_HOME/hyprune/imports/<sha256>/` so th
 converted again with other options or repaired (`import.keep_originals`, default true, 8 GiB
 cap, least recently used first). Deleting the object offers to delete its original.
 
-### Rights and provenance (normative)
+### Licence and provenance (normative)
 
-- The review MUST collect `license` (an SPDX id from a short list: `CC0-1.0`, `CC-BY-4.0`,
-  `CC-BY-3.0`, `CC-BY-SA-4.0`, or **Other / I don't know**), `author` and `source` (a URL or a
-  free-text origin such as "my own work"). They become `object.json` `license` and an
-  `attribution` entry for `"."`. **Other / I don't know** writes `LicenseRef-unknown`.
-- A licence detected from files in the source is a suggestion shown with its text; the user
-  chooses. The helper never infers a licence from a file name alone.
-- An object is **shareable** when its licence is `CC0-1.0` or `CC-BY-4.0`, its attribution
-  names an author and a source, and it was not built from a non-shareable object. Everything
-  else is **private**: it works on this machine, and every export path refuses it
-  (`rights.private`, naming the file and licence). The catalog shows a lock badge on private
-  entries.
-- Exports (an object directory archive, a library, a made world) MUST NOT include private
-  files. Hyprune itself publishes nothing; "sharing" means writing an archive the user can
-  hand on.
+Users own what they make. Hyprune records licence and provenance, carries them along and shows
+them; it does not judge them. The only place a licence is checked is the path into the official
+hyprune org (below).
+
+- **Record.** The review asks for `license` (an SPDX id from a short list: `CC0-1.0`,
+  `CC-BY-4.0`, `CC-BY-3.0`, `CC-BY-SA-4.0`, `CC-BY-NC-4.0`, any other SPDX expression, or
+  **I don't know**), `author` and `source` (a URL or a free-text origin such as "my own work").
+  Every field may be left unknown. They become `object.json` `license` and an `attribution`
+  entry for `"."`; an unknown licence is written as `LicenseRef-unknown` and an unknown author
+  or source as `"unknown"`, and the UI shows all three as **unknown**.
+- **Never block.** The review's Add button MUST NOT depend on these fields. No licence value,
+  unknown or otherwise, may refuse or limit an import, an edit, a placement, a builder session,
+  make-world or an export.
+- **Suggest, don't decide.** A licence detected from files in the source is shown with its text
+  as a suggestion; the user chooses. The helper never infers a licence from a file name alone.
+- **Carry.** Make-world and every export write the recorded licences and attributions into the
+  package metadata (`license`, `attribution[]`, `ATTRIBUTION.md`, the `LICENSE` texts found)
+  unchanged, including unknown entries. Exports MUST NOT drop, merge away or rewrite
+  attribution.
+- **Show.** The catalog, the review, the Builder page and the make-world result show each
+  entry's licence, author and source, and a world's provenance summary lists which parts are
+  unknown.
+- **Official publishing is the one check.** Content accepted into the official hyprune org
+  must be CC0-1.0 or CC-BY-4.0 with a named author and source (the RFC-0004 rights policy).
+  **Check for official publishing** (`publish.check`) reports, file by file, whether an object
+  or a made world meets that bar and what is missing. It writes nothing and blocks nothing;
+  submission itself is a reviewed pull request to the org, outside Hyprune, as RFC-0015
+  (the community registry, in draft) describes. Community and custom sources in that RFC
+  link to content and trust its declared licences; Hyprune does not police them either.
 
 ### Managing objects
 
 The Objects tab gains per-entry actions for user-folder entries. Library and package entries
-are read-only and show **Copy to my objects** instead (allowed when the entry's licence
-permits modification).
+are read-only and show **Copy to my objects** instead; the copy keeps the original's licence
+and attribution.
 
 | Action | Effect | Method |
 | --- | --- | --- |
 | Rename | Changes `name` (display). The directory id and every `user/<id>` reference stay. | `objects.edit {ref, patch: {name}}` |
 | Re-tag | `category`, `tags`, `description`. | `objects.edit` |
 | Re-trait | `movable` (surfaces, upright, scale range); add or remove a **box** or **convex** collision proxy; remove `decorative` animations. Changes that rewrite the glTF (a new proxy, a new origin) run as an import job from the existing entry and end in review. | `objects.edit`, or `objects.import {source: {ref}}` |
-| Provenance | `license`, `author`, `source`. Moving to a less permissive licence is allowed; moving a private entry to a shareable licence asks the user to confirm they hold the rights. | `objects.edit` |
+| Provenance | `license`, `author`, `source`; any value, unknown included. The previous values are kept in `import.json` history. | `objects.edit` |
 | Re-check | Validates again now and shows the result. | `objects.recheck {ref}` |
 | Repair | See [Repair](#repair). | `repair.apply` |
 | Delete | Moves the directory to a backup, then removes it. Placements of it become `missing` (RFC-0011), never silently removed. | `objects.delete {ref}` |
@@ -538,14 +556,14 @@ optionally a waypoint.
 | `screen.approach` · "Screen approaches clear" | For each screen, the approach checks below hold | yes, per screen | Marks the screen and its blocked approach |
 | `walk.area` · "Check the walkable area" | A `check` job ran on the current session digest; the spawn is on the main navmesh island; every screen's standback is on it | yes (make-world runs the check itself when it is stale) | Turns on the navmesh overlay |
 | `budgets` · "Within budgets" | GPU, triangles, collision and object counts within the limits | yes | Opens the Performance numbers |
-| `rights` · "Licences recorded" | Every map, object and the sky have a licence entry | yes | Lists the entries without one |
+| `rights` · "Record licences" | Every map, object and the sky have licence, author and source recorded (any value) | no | Lists the entries still unknown |
 | `areas.named` · "Name your areas" | Every screen lies in a named area | no | Marks unnamed screens |
 | `sky.set` · "Choose a sky" | A panorama or preset is chosen | no | Opens Sky |
 | `make` · "Make world" | The last make-world job succeeded on the current digest | — | Opens the result |
 
 Warnings (non-blocking) appear under the item they belong to: `boxes` collision, a navmesh island
-larger than 25 m² that the spawn can't reach, visibility derivation skipped, a private licence
-(the world will be private).
+larger than 25 m² that the spawn can't reach, visibility derivation skipped, parts with an unknown
+licence, author or source (listed in the world's provenance).
 
 ### Approach checks (normative)
 
@@ -588,7 +606,7 @@ which the daemon does.
 | 8 | **Visibility** | Derived visibility over the navmesh: 4 m cells over walkable floor, forward rays to each chunk's surface samples, 26-neighbour margin, merged camera regions (the worlds tooling's derived-visibility method). Capped at 15 minutes; over the cap the world ships without `visibility` (everything drawn) and a warning. |
 | 9 | **Sky and lighting** | `atmosphere.panorama` from the session sky, environment lighting derived from it, the session sun as `atmosphere.sky.sun`, exposure 1, ACES tone mapping, mild bloom, no fog; the gradient sky colours estimated from the panorama's horizon and zenith rows as the fallback. |
 | 10 | **Map** | `com.hyprune.map` and `com.hyprune.blueprint` levels drawn from collision, the navmesh, areas and screens (the worlds tooling's blueprint method). SHOULD; skipped with a warning when it fails. |
-| 11 | **Provenance** | `license` (the SPDX `AND` of every distinct licence), `attribution[]` per copied path from each source's attribution, `ATTRIBUTION.md`, `LICENSE` texts, and `builder/session.json` (the frozen session, for **Edit in builder**). |
+| 11 | **Provenance** | `license` (the SPDX `AND` of every distinct licence, `LicenseRef-unknown` included), `attribution[]` per copied path from each source's attribution, `ATTRIBUTION.md`, `LICENSE` texts, and `builder/session.json` (the frozen session, for **Edit in builder**). |
 | 12 | **Validate** | The shared validator and the `hyprune-world-check` rules core can run: schema, references, path safety, glTF, extension rules, budgets, spawns against collision, placement rules for authored collidable objects, every approach check again on the final data. |
 | 13 | **Install** | The daemon moves the package into `$XDG_DATA_HOME/hyprune/worlds/<id>/` atomically (staging directory and rename). A previous version of the same id is moved to a backup (see [Repair](#repair)) first. |
 
@@ -607,9 +625,9 @@ A stage that fails stops the job with `failed`, the stage, a code and checklist-
   `extensionsRequired` for the glTF extensions it uses.
 - **Load.** The result offers **Load world now** (`world.load`) and **Edit in builder**, which
   opens a new session from `builder/session.json` with the maps resolved from the user folder.
-- **Private or shareable.** A world is shareable only if every file in it is (the rights rules
-  above). **Export** writes a `.tar.zst` with RFC-0004's archive rules, and refuses private
-  worlds with the list of private files.
+- **Export.** Writes a `.tar.zst` with RFC-0004's archive rules and the package's provenance as
+  recorded, for any world the user made. **Check for official publishing** reports whether
+  every file meets the official bar (see [Licence and provenance](#licence-and-provenance-normative)).
 - **Remove.** The Builder page lists made worlds; **Remove** deletes one (with a backup) after
   confirming. `worlds.remove` refuses any world that has a non-`local.` id or no
   `com.hyprune.builder.project` extension, so it never removes an installed official world.
@@ -622,7 +640,9 @@ A stage that fails stops the job with `failed`, the stage, a code and checklist-
   "sessionId": "s-5d1a7c", "digest": "sha256:41aa…", "elapsedMs": 412880,
   "world": {"id": "local.harbour-plaza", "version": "0.1.3", "formatVersion": "0.11",
             "path": "$XDG_DATA_HOME/hyprune/worlds/local.harbour-plaza/",
-            "shareable": true, "license": "CC-BY-4.0 AND CC0-1.0"},
+            "license": "CC-BY-4.0 AND CC0-1.0 AND LicenseRef-unknown",
+            "provenance": {"entries": 6, "unknown": [{"path": "objects/old-crate/",
+                           "fields": ["license", "source"]}], "officialEligible": false}},
   "stats": {"triangles": 1302566, "gpuBytes": 338689024, "collisionTriangles": 19806,
             "navmesh": {"polygons": 18342, "islands": 3, "mainIslandArea": 21840.5},
             "visibility": {"cells": 1366, "regions": 211}, "homes": 2, "objects": 4},
@@ -703,7 +723,8 @@ Settings repair needs the existing `runtime.control`; reads need `state.read`.
 | `objects.edit` | `{ref, patch}` (`name`, `description`, `category`, `tags`, `traits.movable`, `traits.collidable: null`, `traits.decorative: null`, `license`, `author`, `source`) → `{revision}` | objects.manage | P1 |
 | `objects.delete` | `{ref, deleteOriginal?}` → `{revision, backupId}` | objects.manage | P1 |
 | `objects.recheck` | `{ref}` → `{revision, state, errors}` | objects.manage | P1 |
-| `objects.export` | `{ref, path}` (a directory the portal returned) → `{jobId}`; refused for private objects | objects.manage | P1 |
+| `objects.export` | `{ref, path}` (a directory the portal returned) → `{jobId}` | objects.manage | P1 |
+| `publish.check` | `{ref}` or `{worldId}` → `{eligible, files: [{path, license, author, source, ok, missing}]}` (read-only; the official-org bar) | state.read | P1 (objects), P3 (worlds) |
 | `repair.scan` | `{}` → `{issues: [{id, kind, target, problem, actions}]}` (at most 128) | state.read | P1 |
 | `repair.apply` | `{issueId, action}` → `{revision, backupId}` | objects.manage, or runtime.control for settings | P1 |
 | `repair.backups` / `repair.restore` | `{}` → `{backups}` / `{backupId}` → `{revision, backupId}` | state.read / as `repair.apply` | P1 |
@@ -720,7 +741,7 @@ Settings repair needs the existing `runtime.control`; reads need `state.read`.
 | `builder.walkable` | `{show}` → `{revision}` (core draws the last check's navmesh) | builder.control | P3 |
 | `builder.make` | `{name, id?, version?, objectsMovable?}` → `{jobId}` | builder.control | P3 |
 | `worlds.remove` | `{worldId}` (user worlds folder only) → `{revision, backupId}` | builder.control | P3 |
-| `worlds.export` | `{worldId, path, id?}` → `{jobId}`; refused for private worlds | builder.control | P3 |
+| `worlds.export` | `{worldId, path, id?}` → `{jobId}` | builder.control | P3 |
 
 `objects.place` places map entries only in a builder world; elsewhere it returns `-32005` with
 rule `map.builder-only`. Screens, markers and objects in the builder use the existing objects
@@ -732,16 +753,16 @@ methods.
 | --- | --- |
 | `jobs` | `{list: [{id, kind, state, stage, stages, progress, source?, class?, startedAtMs, elapsedMs, error?}]}`, at most 16 (running, queued and the last finished per kind). `state`: `queued`, `running`, `review`, `succeeded`, `failed`, `cancelled`. Full records (measurements, proposed manifest, warnings, items) through `jobs.get`. |
 | `builder` | `null` outside a builder world; else `{sessionId, name, digest, maps: [{id, ref, locked, collision, state}], screens: [{id, slot, workspace, areaId, approach: "ok" \| "blocked" \| "unchecked"}], spawn, areas, sky, plainHidden, checklist: [{id, label, state: "done" \| "open" \| "warning", blocking, message?, show?}], lastCheck, lastMake}` |
-| `objects` | Catalog entries gain `class` (`object` or `map`), `shareable` and `imported` (`{at, sourceName}` or null). |
+| `objects` | Catalog entries gain `class` (`object` or `map`), `provenance` (`{license, author, source}`, `"unknown"` where unrecorded) and `imported` (`{at, sourceName}` or null). |
 
 **Events.** `job.progress {jobId, kind, state, stage, progress, message?}`, at most 4 per second
 per job, plus one on every state change. Notices: `import.started`, `import.review`,
 `import.failed`, `import.unsupported`, `import.sandbox`, `import.limit`, `object.edited`,
 `object.deleted`, `repair.applied`, `repair.restored`, `builder.locked`, `builder.check`,
-`builder.made`, `builder.make.failed`, `rights.private`.
+`builder.made`, `builder.make.failed`.
 
 **Errors.** `-32004` unknown job, ref, session or issue; `-32005` refused (locked, map outside a
-builder world, read-only source, private on export); `-32007` a validation or placement rule
+builder world, read-only source); `-32007` a validation or placement rule
 (`error.data {rule, errors}`); `-32008` a limit (queue full, a job limit, a budget).
 
 **Paths from clients.** `objects.import`, `builder.sky.set`, `objects.export` and
@@ -756,9 +777,9 @@ directory it was not given.
 | --- | --- | --- |
 | Import… | Objects tab toolbar | Portal FileChooser with filters for the formats above; then the job row with progress and Cancel. |
 | Review form | Objects tab, modal | Thumbnail, class badge and measured numbers against both classes' limits, options (units, up axis, lighting, Reduce, Treat as map), provenance (licence list, author, source, the detected licence text), warnings and steps, Add / Change options / Discard. |
-| Entry actions | Objects tab, per entry | Rename, Re-tag, Re-trait, Provenance, Re-check, Repair, Delete, Export, Open in builder (maps). Lock badge on private entries. |
+| Entry actions | Objects tab, per entry | Rename, Re-tag, Re-trait, Provenance, Re-check, Repair, Delete, Export, Check for official publishing, Open in builder (maps). A licence chip on every entry ("unknown" when unrecorded). |
 | Repair | Settings → Repair, and Objects tab | `repair.scan` issues with their actions; backups with Restore. |
-| Builder page | Director, after Objects | Sessions; the active session's maps, screens (slot order), areas, spawn, sky and sun, Hide the plain, Allow tilt; Check; Make world; made worlds with Load, Edit in builder, Export, Remove. |
+| Builder page | Director, after Objects | Sessions; the active session's maps, screens (slot order), areas, spawn, sky and sun, Hide the plain, Allow tilt; Check; Make world; made worlds with their provenance summary, Load, Edit in builder, Export, Check for official publishing, Remove. |
 | Checklist | HUD, the RFC-0012 tracker component | Items with state and Show me; collapses to "3 of 9" in calm mode. |
 | Dialog presentation | — | The portal dialog is an ordinary toplevel. The shell enters free cursor before opening it and restores the previous state after; core treats the portal's dialog (parented to the shell through xdg-foreign) as a transient window that is shown in front of the player in every world, the builder included, and never captured into placements. Every cursor and focus change this causes is deferred outside the render pass and goes on the supervised live checklist. |
 
@@ -772,7 +793,8 @@ directory it was not given.
 - **SDK:** types and mock-core support for jobs, builder state and repair;
   `hyprune object import PATH [--license --author --source --map --reduce]`,
   `hyprune object edit|delete|export`, `hyprune repair [scan|apply|restore]`,
-  `hyprune builder open|check|make`, `hyprune world export|remove`.
+  `hyprune builder open|check|make`, `hyprune world export|remove`,
+  `hyprune publish check PATH|ID`.
 - **Import helper:** `hyprune-import` in the meta repository's packages, with its sandbox
   launcher, the glTF wrap path, the Assimp backend, the optional Blender backend, the CPU
   thumbnail renderer, and the collision, Recast navmesh, derived-visibility and blueprint stages
@@ -798,7 +820,7 @@ directory it was not given.
 
 | Phase | Delivers | Needs | Proven when |
 | --- | --- | --- | --- |
-| **P1** | Import (glTF wrap, `.zip`, FBX, OBJ, the rest of the Assimp formats), the sandboxed helper and its limits, size classes, review, rights fields and the private/shareable rule, `import.json`, kept originals, entry management, object export, repair with backups. Maps are importable and listed, but nothing can place them yet. | RFC-0011 P1 (IPC 0.22). | A user imports a `.glb`, an `.fbx` and a zipped glTF scene from the Director without a terminal and places the first two. A crafted archive with traversal, a 3 GiB zip bomb, a parser crash and a 10-minute hang each fail only their job, with the right code and no files left. Repair brings back an object with a broken manifest and a world overlay with dangling records, and Restore undoes both. |
+| **P1** | Import (glTF wrap, `.zip`, FBX, OBJ, the rest of the Assimp formats), the sandboxed helper and its limits, size classes, review, provenance fields (recorded, never enforced), the official-publishing check, `import.json`, kept originals, entry management, object export, repair with backups. Maps are importable and listed, but nothing can place them yet. | RFC-0011 P1 (IPC 0.22). | A user imports a `.glb`, an `.fbx` and a zipped glTF scene from the Director without a terminal and places the first two. A crafted archive with traversal, a 3 GiB zip bomb, a parser crash and a 10-minute hang each fail only their job, with the right code and no files left. An import with licence, author and source all unknown is added, placed and exported, and its export carries them as unknown. Repair brings back an object with a broken manifest and a world overlay with dangling records, and Restore undoes both. |
 | **P2** | The builder world package; sessions; map placement, alignment and lock with collision; workspace screens on the `mount` trait; spawn and area markers; panorama skies; the checklist with the items that need no navmesh; object format 0.11. | P1; world format 0.9 (object directories in packages). | In a nested session, a user places a downloaded CC-licensed level scene on the plain, aligns, locks and walks on it, sets a spawn and places two screens; moving a screen into a wall unchecks its item and shows why. |
 | **P3** | `builder.check` (collision, navmesh, approach checks) with the navmesh overlay; make-world with every stage; made-world install, load, edit, export and remove; world format 0.11. | P2. | The made world loads in a nested session with both homes on workspaces 21 and 22, selecting each workspace travels to its screen, a window opened there shows on that wall, nothing is reachable outside the playable volumes, derived visibility culls without visible popping across the any-angle sweep, and `hyprune-world-check` passes the package. |
 | **P4** | Composability: placing a made world's map, collision, navmesh and homes as an **area** inside another world (an area package with an attachment pose and connectors), and several sessions merged into one world. | P3; a world-format design for nested collision, navigation and visibility. | — |
@@ -815,8 +837,8 @@ the core changelog.
 2. **Collision budget for maps.** 20,000 static collision triangles forces simplification of
    almost every level scene. Raise it for made worlds (for example 200,000 with a BVH), or keep
    one budget for all worlds?
-3. **CC-BY-3.0 and other licences.** Shareable is CC0-1.0 and CC-BY-4.0 (the official rights
-   policy). Should CC-BY-3.0 also count as shareable for user exports?
+3. **Official bar versions.** The official-publishing check accepts CC0-1.0 and CC-BY-4.0.
+   Should it also accept CC-BY-3.0? RFC-0015 sets the org policy; the check follows it.
 4. **More formats.** USD/USDZ and Alembic are common for scenes; are they worth a backend in
    P1 or later?
 5. **Lighting.** Imports are unlit-baked or lit by the sun and probes. Should make-world offer an

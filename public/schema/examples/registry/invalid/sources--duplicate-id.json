@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "builtin": {
+    "official": {
+      "enabled": true
+    },
+    "community": {
+      "enabled": false
+    }
+  },
+  "custom": [
+    {
+      "id": "example-index",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "tidepool",
+      "label": "Tidepool",
+      "kind": "github",
+      "repo": "example-creator/tidepool-world",
+      "enabled": true,
+      "added": "2026-11-02"
+    },
+    {
+      "id": "street",
+      "label": "Street kit",
+      "kind": "github",
+      "repo": "example-org/hyprune-objects/street",
+      "enabled": false
+    },
+    {
+      "id": "one-archive",
+      "label": "example.org",
+      "kind": "url",
+      "url": "https://example.org/files/com.example.street-1.2.0.tar.zst",
+      "sha256": "5d2f0c6e3b9a41d8e7c2b0f4a6d9e1c3b5a7f9e2d4c6b8a0f1e3d5c7b9a2e4f6",
+      "enabled": true
+    },
+    {
+      "id": "one-record",
+      "label": "A record",
+      "kind": "url",
+      "url": "https://example.org/files/com.example.street-1.2.0.release.json",
+      "enabled": true
+    },
+    {
+      "id": "example-index",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    }
+  ]
+}

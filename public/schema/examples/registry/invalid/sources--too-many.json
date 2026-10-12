@@ -1,0 +1,277 @@
+{
+  "version": 1,
+  "builtin": {
+    "official": {
+      "enabled": true
+    },
+    "community": {
+      "enabled": false
+    }
+  },
+  "custom": [
+    {
+      "id": "s0",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s1",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s2",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s3",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s4",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s5",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s6",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s7",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s8",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s9",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s10",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s11",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s12",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s13",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s14",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s15",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s16",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s17",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s18",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s19",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s20",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s21",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s22",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s23",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s24",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s25",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s26",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s27",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s28",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s29",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s30",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s31",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    },
+    {
+      "id": "s32",
+      "label": "Example worlds",
+      "kind": "index",
+      "url": "https://example.org/hyprune/v0.1/index.json",
+      "enabled": true,
+      "added": "2026-11-01"
+    }
+  ]
+}

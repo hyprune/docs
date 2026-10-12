@@ -2,7 +2,7 @@
 //
 //   node scripts/sync-schema.mjs [../schema]
 //
-// Copies all version directories (v0, v0.2, ...), extensions/ and examples/
+// Copies all version directories (v0, v0.2, ...), extensions/, registry/ and examples/
 // byte-for-byte and records one manifest (public/schema/source.json) with the
 // source commit and SHA-256 of every file. Raw files keep the URLs used by the
 // schemas' own $id values (https://hyprune.com/schema/v0.15/ipc.schema.json).
@@ -19,7 +19,7 @@ const source = resolve(process.argv[2] || join(docs, '../schema'));
 const target = join(docs, 'public/schema');
 const git = (...args) => execFileSync('git', ['-C', source, ...args], { encoding: 'utf8' }).trim();
 
-const mirroredRoots = name => /^v0(\.\d+)?$/.test(name) || name === 'extensions' || name === 'examples';
+const mirroredRoots = name => /^v0(\.\d+)?$/.test(name) || ['extensions', 'examples', 'registry'].includes(name);
 
 const roots = readdirSync(source).filter(n => mirroredRoots(n) && statSync(join(source, n)).isDirectory()).sort();
 if (git('status', '--porcelain', '--', ...roots, 'CHANGELOG.md')) throw new Error('Commit the schema contract tree before mirroring it');

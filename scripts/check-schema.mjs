@@ -41,7 +41,7 @@ const upstream = resolve(process.argv[2] || join(docs, '../schema'));
 let note = 'no sibling schema checkout; hashes only';
 if (existsSync(join(upstream, '.git'))) {
   const git = (...args) => execFileSync('git', ['-C', upstream, ...args], { encoding: 'utf8', maxBuffer: 64 << 20 });
-  const contract = n => /^(v0(\.\d+)?|extensions|examples)\//.test(n) && n.endsWith('.json') || n === 'CHANGELOG.md';
+  const contract = n => /^(v0(\.\d+)?|extensions|registry|examples)\//.test(n) && n.endsWith('.json') || n === 'CHANGELOG.md';
   const tree = rev => new Map(git('ls-tree', '-r', rev).trim().split('\n').map(l => l.split('\t')).filter(([, n]) => contract(n)).map(([meta, n]) => [n, meta.split(' ')[2]]));
   try {
     const recorded = tree(manifest.commit);

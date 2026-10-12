@@ -1,0 +1,22 @@
+{
+  "id": "com.example.street",
+  "type": "library",
+  "name": "Street kit",
+  "summary": "Lanterns and benches.",
+  "creator": "example-org",
+  "repo": "https://github.com/example-org/hyprune-objects",
+  "versions": [
+    {
+      "tag": "street-v1.2.0",
+      "version": "1.2.0",
+      "formatVersion": "0.10",
+      "published": "2026-10-30",
+      "license": "CC0-1.0",
+      "url": "https://github.com/example-org/hyprune-objects/releases/download/street-v1.2.0/com.example.street-1.2.0.tar.zst",
+      "sha256": "5d2f0c6e3b9a41d8e7c2b0f4a6d9e1c3b5a7f9e2d4c6b8a0f1e3d5c7b9a2e4f6",
+      "bytes": 314572800,
+      "expandedBytes": 7340032,
+      "files": 24
+    }
+  ]
+}

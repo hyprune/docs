@@ -386,3 +386,7 @@ Publishes IPC 0.21 (markers, personal quests, focus sessions) and IPC 0.22 (obje
 - Everything else is inherited from 0.22 unchanged (no new grant or event);
   `session.hello` reports `0.23` and lists the ten methods. Inheritance test
   included.
+
+## @hyprune/schema 0.8.0 (2026-10-12)
+
+Publishes IPC 0.23 and world format 0.9: characters and NPC instances, authored paths (route/track/generic) with stops, seats, keepClear volumes and NPC interactions.

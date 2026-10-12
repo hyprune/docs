@@ -7,7 +7,7 @@ description: "Creator-owned releases, one index format for the official, communi
 world package and archive rules of [RFC-0004](/rfcs/0004-world-format/), the libraries,
 library install and `<id>@<version>` layout of [RFC-0011](/rfcs/0011-objects/) (IPC 0.22),
 the extension host and grant approvals of [RFC-0007](/rfcs/0007-extensions/) and the grant
-model of [RFC-0003](/rfcs/0003-ipc/). RFC-0014 (draft, in progress: the in-world builder,
+model of [RFC-0003](/rfcs/0003-ipc/). [RFC-0014](/rfcs/0014-builder/) (draft, in progress: the in-world builder,
 import, the builder world and Make world) produces the package directories this RFC
 publishes.
 

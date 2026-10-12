@@ -256,7 +256,7 @@ hyprune org (below).
   must be CC0-1.0 or CC-BY-4.0 with a named author and source (the RFC-0004 rights policy).
   **Check for official publishing** (`publish.check`) reports, file by file, whether an object
   or a made world meets that bar and what is missing. It writes nothing and blocks nothing;
-  submission itself is a reviewed pull request to the org, outside Hyprune, as RFC-0015
+  submission itself is a reviewed pull request to the org, outside Hyprune, as [RFC-0015](/rfcs/0015-registry/)
   (the community registry, in draft) describes. Community and custom sources in that RFC
   link to content and trust its declared licences; Hyprune does not police them either.
 

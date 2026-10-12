@@ -219,56 +219,75 @@ says why an entry can't be placed.
 Machines ([RFC-0013](/rfcs/0013-live-objects/), draft) show live data. The starter kit's
 gauges show one number from 0 to 100 as a fill, a halo ring at its running average and a
 label. Every placed machine reads its inputs from a data source named after its instance ID,
-so wiring a gauge to your data takes a script and one entry in a file.
+and the Director sets that source up for you: a script, an interval, a test run and Save.
 
-1. **Place a gauge.** In the Director's **Objects** tab pick a gauge from the catalog;
-   **Add** puts it in your pocket and selects tool 5, and Primary places it.
-2. **Read its ID.** Director → Objects → **Placed** lists your placements. The gauge's
-   configure panel shows `ID u-3f9a1c` (`u-` and 6 hex digits): this is also the ID of its
-   data source.
-3. **Write a script** that prints one JSON object, for example `~/bin/ram-gauge`:
+1. **Write a script** that prints one JSON object, for example `~/bin/ram-gauge`:
 
    ```sh
    #!/bin/sh
    used=$(free | awk '/^Mem:/ {printf "%d", $3 * 100 / $2}')
-   printf '{"value": %s, "display": "%s%%", "label": "RAM"}
-' "$used" "$used"
+   printf '{"value": %s, "display": "%s%%", "label": "RAM"}\n' "$used" "$used"
    ```
 
    It prints `{"value": 71, "display": "71%", "label": "RAM"}`. Each key feeds the gauge
    input of the same name: `value` (number 0–100), `display` (text, up to 12 characters),
    `label` (text, up to 16 characters), optionally `level` (`ok`, `warn` or `fail`: the
    fill's colour) and `average` (0–100, see below). Make the script executable.
-4. **Add a source** to `$XDG_CONFIG_HOME/hyprune/sources.json` (usually
-   `~/.config/hyprune/sources.json`), with the gauge's ID as the source `id`:
+2. **Place a gauge.** In the Director's **Objects** tab pick a gauge from the catalog;
+   **Add** puts it in your pocket and selects tool 5, and Primary places it.
+3. **Open its data source.** Director → Objects → **Placed**, select the gauge. Its configure
+   panel shows `ID u-3f9a1c` (`u-` and 6 hex digits) and a **Data source** section listing the
+   gauge's inputs with their live values.
+4. **Choose the command.** Pick the script with **Choose…** (or type its path), add any
+   arguments one per line, and set the **interval** (at least 5 seconds). The panel shows the
+   exact command that will run; it runs without a shell.
+5. **Test** runs it once and shows what it printed, checked against the gauge's inputs:
+   unknown keys, values of the wrong type and missing inputs are flagged. Nothing is
+   published yet.
+6. **Save.** The source helper starts the command at once and publishes its output as source
+   `com.hyprune.sources.<id>`, which is exactly the source the gauge reads by default. The
+   gauge fills within one interval; the section shows each input's value, its age and the
+   source's last run or error.
 
-   ```json
-   {"sources": [{"id": "u-3f9a1c", "kind": "command", "argv": ["/home/you/bin/ram-gauge"], "intervalS": 5}]}
-   ```
-
-   Add one entry per gauge. `argv` runs without a shell; `intervalS` is at least 5 seconds.
-5. **Start Hyprune.** When this file exists, the supervised launcher starts the source
-   helper with its own one-use launch grant. The helper runs each command and publishes its
-   output as source `com.hyprune.sources.<id>`, which is exactly the source the gauge reads
-   by default.
+**Restart** runs the command again now; tick **Reset average** first to start the halo
+ring's average over. **Restart helper** restarts every source and reconnects to core, and
+**Remove** deletes the gauge's source. If the script fails or stops, the gauge keeps its last
+reading and turns grey, and the section shows the error.
 
 A ready-made script for system load ships with core: `dev/machines/scripts/system-gauges.py`
-takes one argument, `cpu`, `ram`, `gpu` or `vram`, and prints the gauge's keys, so a CPU
-gauge's entry is
-`{"id": "u-7c21e0", "kind": "command", "argv": ["/path/to/core/dev/machines/scripts/system-gauges.py", "cpu"], "intervalS": 5}`.
+takes one argument, `cpu`, `ram`, `gpu` or `vram`, and prints the gauge's keys: choose it as
+the command and enter `cpu` as its argument.
 
 **The running average.** The halo ring sits at the running average of `value` over the last
-60 seconds. To change the window for one gauge, set `averageWindowS` for its ID in
-`$XDG_CONFIG_HOME/hyprune/machines.json` (re-read when it changes):
+60 seconds. A script that computes its own average sends it as `average`; while that key is
+present it replaces the computed one.
 
-```json
-{"instances": {"u-3f9a1c": {"averageWindowS": 300}}}
-```
+### Advanced: the configuration files
 
-A script that computes its own average sends it as `average`; while that key is present it
-replaces the computed one. The same file can also point a gauge's inputs at another source
-or other keys ([Default bindings](/rfcs/0013-live-objects/#default-bindings)). If the script
-fails or stops, the gauge keeps its last reading and turns grey.
+The Director edits files you can also write by hand; the source helper and core re-read them
+when they change.
+
+- **Sources.** `$XDG_CONFIG_HOME/hyprune/sources.json` (usually
+  `~/.config/hyprune/sources.json`) holds one entry per source; a gauge's source uses the
+  gauge's ID as its `id`:
+
+  ```json
+  {"sources": [{"id": "u-3f9a1c", "kind": "command", "argv": ["/home/you/bin/ram-gauge"], "intervalS": 5}]}
+  ```
+
+  `argv` runs without a shell; `intervalS` is at least 5 seconds. Saving in the Director
+  updates only that entry's `argv` and `intervalS` and keeps everything else in the file
+  (other entries and keys such as `env` or `timeoutS`). For example, a CPU gauge on the
+  bundled script is
+  `{"id": "u-7c21e0", "kind": "command", "argv": ["/path/to/core/dev/machines/scripts/system-gauges.py", "cpu"], "intervalS": 5}`.
+- **Bindings.** `$XDG_CONFIG_HOME/hyprune/machines.json` changes what a placed machine reads.
+  `averageWindowS` sets the window of one gauge's running average, and the same entry can
+  point its inputs at another source or other keys
+  ([Default bindings](/rfcs/0013-live-objects/#default-bindings)):
+
+  ```json
+  {"instances": {"u-3f9a1c": {"averageWindowS": 300}}}
+  ```
 
 ## Use it in a world
 

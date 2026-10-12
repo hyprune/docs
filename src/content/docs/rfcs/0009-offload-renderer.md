@@ -3,7 +3,7 @@ title: "RFC-0009 — Optional offload renderer"
 description: "A supervised world renderer, explicit cross-GPU frames, power admission and local fallback."
 ---
 
-**Status: accepted · proposed 2026-10-08, accepted 2026-10-09 · phase 1 implemented, default off.** Phase 1 is on core main and verified in nested sessions; physical power-profile qualification is pending (see the [phase 1 amendment](#phase-1-implementation-amendment-hot-switching-and-performance-010) and the [roadmap](/roadmap/)). The [IPC 0.18 amendment](#amendment-ipc-018-device-scaled-offload-power-and-device-selection) scales the power cap to the offload GPU on systems without a battery and adds device selection. The buffer protocol remains private to core.
+**Status: accepted · proposed 2026-10-08, accepted 2026-10-09 · phase 1 implemented, default off.** Phase 1 is on core main and verified in nested sessions; physical power-profile qualification is pending (see the [phase 1 amendment](#phase-1-implementation-amendment-hot-switching-and-performance-010) and the [roadmap](/roadmap/)). The [IPC 0.18 amendment](#amendment-ipc-018-device-scaled-offload-power-and-device-selection) scales the power cap to the offload GPU on systems without a battery and adds device selection. The [world objects amendment](#amendment-world-objects-and-scene-edits-in-the-offload-renderer) lets the worker draw world objects and edited scene nodes. The buffer protocol remains private to core.
 
 This amends [RFC-0002](/rfcs/0002-runtime/) without moving compositor or input
 authority. Its buffer protocol is private to core, not a public provider API.
@@ -556,8 +556,9 @@ scale is independent of those bounds. The Performance page may poll at 4 Hz.
 Older protocols keep their frozen config shape and reject the new setting keys.
 
 Initial limitations: NVIDIA GLES/Vulkan LINEAR, Linux x86-64 with Landlock ABI≥3,
-outputs up to 3840×2160. Edited world-node transforms select local rendering until
-synchronised scene edits are implemented; carrying/resizing windows stays supported.
+outputs up to 3840×2160. Edited world-node transforms selected local rendering until
+synchronised scene edits were implemented (see the world objects amendment);
+carrying/resizing windows stays supported.
 Both copies and local depth reconstruction are intentional phase-1 costs. Resource
 residency doubles world GPU storage. These nested results do not qualify physical
 outputs, real-session cursor behavior, arbitrary drivers or hardware power changes.
@@ -627,3 +628,56 @@ cap clamped to [20, 100], and an effective cap above 100 W is reported as 100.
 Writing `offload_device`, a `null` cap or a cap above 100 from such a session is
 an invalid-params error ("setting requires IPC 0.18"). All earlier capabilities
 are inherited.
+
+## Amendment: world objects and scene edits in the offload renderer
+
+Since world format 0.8 a world can place animated objects, and since IPC 0.22
+the user can place catalog objects and move or hide objects with the position
+tool. The phase 1 worker drew scene geometry only, so any world with objects
+(the release world among them) and any edited scene node rendered in-process
+on the compositor GPU, whatever `offload` said. The worker now draws them, with
+the same results as the in-process renderer. There is no IPC change.
+
+**State.** The worker loads the same package, so it starts with the authored
+object assets. Everything else travels with the poses on the private transport,
+as a delta against what the worker already has:
+
+- the world-animation clock, in every pose, so both renderers draw an animated
+  object at the same pose;
+- catalog object assets merged after load, once each, by object directory and
+  manifest; the worker decodes and uploads them itself, between frames;
+- the instance count and the records of changed instances only (pose, bounds,
+  visibility regions, speed and phase, probe lighting);
+- the hidden set, with its own revision, only when it changes;
+- edited scene-node transforms, changed and removed nodes.
+
+A delta counts as delivered only once its pose was written, so transport
+backpressure never drops a change. The frame reply names the state revision it
+shows. A new worker starts from the package and receives every instance in its
+first pose. Frames, freshness and fallback are unchanged: a frame older than
+50 ms still yields to the local renderer for that frame.
+
+**Confinement.** The worker may also read the catalog object roots that exist
+(the user's objects and libraries, system libraries), read-only. A root created
+later restarts the worker once with the new root.
+
+**Reasons.** `performance.reason` no longer reports "world objects use local
+renderer" or "edited world transforms use local renderer". Two development
+prototypes that are off unless an environment variable enables them keep the
+local renderer: "machines prototype uses local renderer" and "NPC prototype
+uses local renderer". `reason` is free text; no version gates it.
+
+**Evidence.** Nested runs on Lumen Reach 0.10.2 with the compositor on one GPU
+and the worker on another, the animation clock pinned at fixed times: stills of
+the authored armillary, a placed catalog rack and armillary, the rack moved
+with the position tool while offload runs, a hidden authored object and an
+edited scene node are identical to the in-process stills, pixel for pixel
+(core `dev/nested/offload_objects.py`). With the clock running and objects in
+view, two RTX 3090s present 60 FPS either way; offload takes the compositor GPU
+from 4.9 to 1.0 ms per frame at 1080p (worker 2.2 ms render, 1.5 ms transfer,
+pose to frame ready 10 ms) and from 4.7 to 0.6 ms at 4K (worker 6.5 ms render,
+5.9 ms transfer on a PCIe x8 GPU, 19 ms to frame ready). At 4K a quarter of the
+worker frames then arrive later than the 50 ms freshness limit and the local
+renderer stands in; with the worker on the x16 GPU, 12 %. Results:
+[core `docs/evidence/offload/objects/README.md`](https://github.com/hyprune/core/blob/remote/offload-objects/docs/evidence/offload/objects/README.md).
+

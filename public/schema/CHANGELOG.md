@@ -294,3 +294,7 @@ Object manifests use the world format numbering: a world may use objects whose
   method).
 - Everything else is inherited from 0.21 unchanged; `session.hello` reports
   `0.22`. Inheritance test included.
+
+## @hyprune/schema 0.7.0 (2026-10-12)
+
+Publishes IPC 0.21 (markers, personal quests, focus sessions) and IPC 0.22 (object catalog, user placements, libraries), plus the object manifest (`object.json` 0.9 and the 0.10 draft), library and library release-record schemas.

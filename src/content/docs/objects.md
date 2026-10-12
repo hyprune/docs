@@ -3,10 +3,11 @@ title: "Objects for authors"
 description: "How to make and check a Hyprune world object: the object directory, its manifest, the import and check tools, libraries, licensing and provenance."
 ---
 
-World objects are a draft feature ([RFC-0011](/rfcs/0011-objects/)). Worlds can already place
-object glTFs as format 0.8 `objectAssets`; the catalog, user placement and libraries come with
-core's first objects release. The object manifest and its checks are ready now, so objects
-made today are catalog-ready.
+World objects follow [RFC-0011](/rfcs/0011-objects/). Core's object catalog (IPC 0.22) lists a
+world's own objects, installed libraries and your object folder
+(`~/.local/share/hyprune/objects/`). The Director's Objects tab adds one to the pocket, tool 5
+places it and the gizmo adjusts it; placements are saved per world. The first official library,
+the **Hyprune starter kit**, is published (see [Libraries](#libraries)).
 
 ## The object directory
 
@@ -161,6 +162,12 @@ rights to its output. When you change someone else's CC-BY work, keep their attr
 and describe the change (an `ATTRIBUTION.md` beside the objects is a good place).
 
 ## Libraries
+
+The official **Hyprune starter kit** (`com.hyprune.starter` 0.1.0) holds the Sun Court armillary,
+four ambient residents and five live machines with their job token, under CC-BY-4.0. It is a
+GitHub release on hyprune/worlds (`hyprune-starter-v0.1.0`); install it from the Director's
+Objects tab or with `libraries.install`. Residents become placeable when characters land in the
+world format; machines place as static objects until live data ships.
 
 A library publishes a set of objects with one manifest:
 

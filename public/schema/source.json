@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/hyprune/schema",
-  "commit": "ab7a2a852c9d86b5797376c06a8a150d3b7b1456",
+  "commit": "50d72719ed909eecd8820169ce02c26d0ab107a3",
   "committed": "2026-10-12",
   "files": {
     "examples/extension.json": "7ef103bfbf43c12ad1db7486827a930a552f41a04ef386a67331123c90af272e",
@@ -40,6 +40,7 @@
     "examples/object.json": "45a254367e57f106e2350b66d5efe51bfec5a01f10237caaa543a7a388fa1bb9",
     "examples/placement-input.json": "5c57e0521fe4e4f8b913012f2a8c858d8d967f1844b6db8bce9c7a72107aa571",
     "examples/screen-type.json": "dc20b8c7e7126a7ab26efc5958171e88df0e6463a98f8e26df53921ac2e76f5d",
+    "examples/world-npcs.json": "ad517285581c56a3c4f3c500463d4b0cbbea7915a28359bc36dc08fa3f1a90d1",
     "examples/world.json": "e009854abb93ca573c731893e6cd5c7c49eb0000d96ab46d89fe4176a0e3f65c",
     "extensions/blueprint.schema.json": "5fd9779c74253591ca237249d31e8f52c6b5f5d0c3673c0aa225aca2b122d0db",
     "extensions/hud-style-manifest.schema.json": "e733a0e732043ecc6617554a6b3edf1e935fce096d3134fff62dbbd87ba65bdd",
@@ -70,6 +71,7 @@
     "v0.21/ipc.schema.json": "6f5ff8089934a6cb4ce86f8c39a81cb6801a457a79ee58d9539e3b33305cef5c",
     "v0.21/quests-personal.schema.json": "e97f7e7e107d34acf832e3210c7e1e8b08625c4825be7cfbf798a194ec96d82a",
     "v0.22/ipc.schema.json": "ac0cb5e1eaecc8ec61e2a793b45e710f2b6cda45f98af42549dc929f22cca0f8",
+    "v0.23/ipc.schema.json": "8f4f49d23a3f0d1dd79b104bfe43013d080edb58725b1b3bbf5dd6e7ffc5644a",
     "v0.3/common.schema.json": "7d09e00487407c05af053336adab990acb8dc91f80d15b914d8439e780e6c138",
     "v0.3/ipc.schema.json": "815e3bd2dac366bde101c9f81adf95b4f587ade4bbed42f880ce2949e9f2c5d3",
     "v0.3/world.schema.json": "56efe855b91924964b1b26a7363e080b36d7310b0263bfed0bfc605d1e880ad9",
@@ -89,12 +91,14 @@
     "v0.8/common.schema.json": "6bb9d9e30feeb1004e8103a6ed72e74e8a426bd88711288aa4dae616a068c787",
     "v0.8/ipc.schema.json": "72d5e186214cff598300cc8b4ef294e6042ecb5f089afd772be4e8c3ac5eea71",
     "v0.8/world.schema.json": "cffb36b8b5605b30b1d0d3054ee62f28ffb6757ac017efd01c7fecf2eeb9cde5",
+    "v0.9/common.schema.json": "dd33bca4f023744b4434dfa01f6ab155d94e159e4b73d21e148c40180e6866e9",
     "v0.9/input.schema.json": "a069cb5db721bf78a3760516b0e6da855b382705eccfa9b41c04d41da5aa6064",
     "v0.9/ipc.schema.json": "4c56a24da3814a9d7e378bb648ef742ea30fb24b6d97cda9dd0384594b478cf3",
     "v0.9/library-releases.schema.json": "92a153fc6acd0a9a680eaf4db798791b54ce5fcca7b5fc9d69242024d3fde95c",
     "v0.9/library.schema.json": "55b696d630dfd28bc3390242c50979bcd79f6fcb9b5925575a2e7bc5eb5ae934",
     "v0.9/object.schema.json": "f0b1279e5e383f790b391042234635decb267eb3f9eb58362ed8f9401ce04d3a",
-    "CHANGELOG.md": "286e19d9f71a75256c439f19965af879d35215486148812b35c2879a8002c20e"
+    "v0.9/world.schema.json": "268d6c7cf7ad2e9733b77d4867e012cc7abccfbbb732f8d62c224a5454f6f357",
+    "CHANGELOG.md": "9b71cc096d247a2cfd5cf3780fba802ae165db53ad96d31b7548dcf41a551f7d"
   },
   "added": {
     "examples/extension.json": "2026-10-07",
@@ -134,6 +138,7 @@
     "examples/object.json": "2026-10-12",
     "examples/placement-input.json": "2026-10-09",
     "examples/screen-type.json": "2026-10-07",
+    "examples/world-npcs.json": "2026-10-12",
     "examples/world.json": "2026-10-07",
     "extensions/blueprint.schema.json": "2026-10-11",
     "extensions/hud-style-manifest.schema.json": "2026-10-08",
@@ -164,6 +169,7 @@
     "v0.21/ipc.schema.json": "2026-10-12",
     "v0.21/quests-personal.schema.json": "2026-10-12",
     "v0.22/ipc.schema.json": "2026-10-12",
+    "v0.23/ipc.schema.json": "2026-10-12",
     "v0.3/common.schema.json": "2026-10-07",
     "v0.3/ipc.schema.json": "2026-10-07",
     "v0.3/world.schema.json": "2026-10-07",
@@ -183,11 +189,13 @@
     "v0.8/common.schema.json": "2026-10-11",
     "v0.8/ipc.schema.json": "2026-10-08",
     "v0.8/world.schema.json": "2026-10-11",
+    "v0.9/common.schema.json": "2026-10-12",
     "v0.9/input.schema.json": "2026-10-08",
     "v0.9/ipc.schema.json": "2026-10-08",
     "v0.9/library-releases.schema.json": "2026-10-12",
     "v0.9/library.schema.json": "2026-10-12",
     "v0.9/object.schema.json": "2026-10-12",
+    "v0.9/world.schema.json": "2026-10-12",
     "CHANGELOG.md": "2026-10-07"
   }
 }

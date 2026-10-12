@@ -298,3 +298,91 @@ Object manifests use the world format numbering: a world may use objects whose
 ## @hyprune/schema 0.7.0 (2026-10-12)
 
 Publishes IPC 0.21 (markers, personal quests, focus sessions) and IPC 0.22 (object catalog, user placements, libraries), plus the object manifest (`object.json` 0.9 and the 0.10 draft), library and library release-record schemas.
+
+## World 0.9: characters, paths, seats and keepClear (RFC-0011 P2)
+
+- `objectAssets[]` (at most 32, ids unique) take exactly one source: inline
+  `{id, scene, animations?, collision?, lighting?, traits?, slots?}` (the 0.8
+  asset plus object.json 0.9 `traits` and `slots`; `decorative`, `collidable`,
+  `movable`, `character` and `seat` are allowed, `mover`, `mount`, `machine` and
+  `interactive` rejected), `dir {id, dir}` (a package directory holding
+  `object.json`, object format at most the world's) or `library {id, library,
+  object}` (`library` is `<reverse-domain id>@<semver>`, `object` a slug).
+  `animations` is shorthand for `traits.decorative.animations` and `collision`
+  for `traits.collidable`; giving both forms of one is invalid.
+- `objects[]` gain `path` (a `route` path; replaces `pose`), `reverse` (only
+  with `path`), `seat` (a `seats[]` id, `<objectId>/<anchorId>` or
+  `<objectId>`; characters without a path), `accent` (linear RGB 0..1),
+  `interactions` (1..8, replacing the asset's list) and `locked` (movable
+  assets). `pose` is required unless `path` is set and forbidden with it. A
+  character's `scale` must be 1; at most 16 character instances and 8 per path.
+- Instance interactions `{id, label (1..32), prompt? (1..64), action}` with
+  `say {lines[1..8]}`, `waypoint {target: {zoneId}|{position}|{anchor}|{object}}`,
+  `guide {path}` (a route) or `panel {panel}`. `travel` and `quest` are
+  reserved and rejected. Asset-level interactions stay `say`/`panel`.
+- `paths[]` (at most 64, 1,024 points in total): `{id, name?, use?
+  (route|track|generic, default generic), closed?, points[2..256] {position,
+  type: line|curve|arc}, speed? (0.1..30), stops?[<=32]}`. A stop is `{point,
+  seconds? (0.5..600), clip? (look_around|wave|nod|idle_fidget), face?
+  ({position}|{anchor}|{object}), seat?}` with at most one of clip, face and
+  seat, one stop per point and the point below the point count. Track stops
+  take only `point` and `seconds`; generic paths have no stops. An `arc` needs
+  a horizontal chord of at least 0.1 m.
+- `seats[]` (at most 64): `{id, pose, height (0.2..1), use? (["sit"]),
+  approach? (0.3..2)}`. `keepClear[]` (at most 64): `{id, min, max}`, min
+  below max on every axis.
+- `validate('world', manifest, undefined, '0.9', {assets})` adds unique ids,
+  asset, path, seat, waypoint and face references, route-only bindings,
+  character-only and movable-only fields, pose/path exclusivity, normalised
+  seat poses, arc chords, the point total, keepClear ordering and the
+  character limits. `assets` maps a dir or library asset id to its parsed
+  `object.json`, so its traits are checked like an inline asset's; without it
+  those checks skip the asset. Reserved traits and actions are reported with a
+  plain reason. `worldLimits` exports the limits.
+- `validate('scene', gltf, undefined, '0.9', {world, asset})` reads an inline
+  asset's animations and proxy from either form and checks an inline
+  character's skin and clips; dir and library assets are checked as objects.
+- `v0.9/common.schema.json` is the 0.8 common definitions under the 0.9 `$id`
+  (the directory's IPC, input, object and library schemas are untouched).
+  `examples/world-npcs.json` is a synthetic 0.9 manifest. Everything else is
+  inherited from 0.8 unchanged. Inheritance test included.
+
+## IPC 0.23: characters, paths and interactions (RFC-0011 P2)
+
+- Required state key `npcs {motion (auto|always|still|off), state
+  (none|animating|paused|still|off), reason (null or up to 64 characters, e.g.
+  battery), usage {authored, user}, limits {authored (<=16), user (<=8)},
+  drawing, aimed, interaction}`. `drawing` is null or `{pathId, use, spawn:
+  null|{ref}, bind: null|objectId}` (a `paths.draw` in progress); `aimed` is null
+  or `{objectId, name, prompt, interactions[<=8] {id, label, type}}`;
+  `interaction` is null or `{objectId, interactionId|null, type
+  (choose|say|waypoint|guide|panel), label, choices[<=8] {id, label},
+  line|null, lineIndex, lineCount, panel|null}`.
+- `objects.instances[]` gain required `character` (boolean) and `accent`
+  (null or linear RGB); `path` is null or a qualified path ref
+  (`package/<id>`, `user/<id>`), `activity` null or
+  `idle|walking|running|stopped|sitting|guiding|interacting|suspended`, `seat`
+  null or a seat ref (up to 192 characters).
+- `editor.paths[]` gain required `use` (route|track|generic), `name`
+  (string|null), `speed` (number|null) and `stops` (at most 32, the world 0.9
+  stop shape).
+- `interaction.reticle.action` gains `interact`. `graphicsConfig` and
+  `graphicsPatch` gain `npc_motion` (`auto`, `always`, `still`, `off`).
+- Methods: `npcs.spawn {ref, path?, pose?, phase?, speed? (0.25..2), accent?,
+  reverse?}` (`{revision, id}`; path and pose exclusive, reverse needs a path);
+  `npcs.bind {id, path?, pose?, phase?, speed?, accent?, reverse?}` (at least one
+  setting); `npcs.disable {id, disabled}`; `npcs.remove {id}|{all:true}`;
+  `paths.list {}` (`{paths[<=192]}`: `{ref, source (package|user), id, name,
+  use, closed, points, speed, stops, walkable (null for non-routes),
+  problems[<=8], bound[<=8]}`); `paths.set {path: {id?, name?, use, closed,
+  points[2..256], speed?, stops?}}` (`{revision, id}`); `paths.remove {id,
+  unbind?}`; `paths.draw {use?, name?, spawn? {ref, phase?, speed?, accent?},
+  bind?}` (`{revision, id}`; spawn and bind exclusive); `paths.finish {}`
+  (`{revision, id|null, bound|null}`); `interaction.choose {objectId,
+  interactionId|null}`. Path params take a qualified ref or a bare id
+  (`package/<id>`); `paths.set/remove/draw/finish` ids are user path ids.
+  Grants: `npcs.*` and `paths.set/remove/draw/finish` need `objects.control`,
+  `paths.list` needs `state.read`, `interaction.choose` needs `world.control`.
+- Everything else is inherited from 0.22 unchanged (no new grant or event);
+  `session.hello` reports `0.23` and lists the ten methods. Inheritance test
+  included.

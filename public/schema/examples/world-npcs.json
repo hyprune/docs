@@ -1,0 +1,493 @@
+{
+  "formatVersion": "0.9",
+  "id": "com.hyprune.example.courtyard",
+  "version": "0.1.0",
+  "name": "Courtyard",
+  "description": "Synthetic world 0.9 manifest: characters on routes, seats, interactions and keep-clear volumes. Referenced files are not supplied.",
+  "license": "CC-BY-4.0",
+  "scene": "scene.gltf",
+  "defaultSpawn": "arrival",
+  "spawns": [
+    {
+      "id": "arrival",
+      "pose": {
+        "position": [
+          0,
+          1,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    }
+  ],
+  "attribution": [
+    {
+      "path": ".",
+      "author": "Hyprune contributors",
+      "license": "CC-BY-4.0"
+    }
+  ],
+  "zones": [
+    {
+      "id": "work",
+      "name": "Work",
+      "bounds": {
+        "min": [
+          -4,
+          0,
+          -4
+        ],
+        "max": [
+          4,
+          4,
+          4
+        ]
+      }
+    }
+  ],
+  "anchors": [
+    {
+      "id": "desk",
+      "pose": {
+        "position": [
+          0,
+          1.4,
+          -3
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "size": [
+        1.6,
+        0.9
+      ],
+      "screenType": "com.hyprune.window"
+    }
+  ],
+  "collision": [
+    {
+      "node": 0,
+      "shape": "mesh",
+      "layer": "static"
+    }
+  ],
+  "navigation": {
+    "kind": "mesh",
+    "node": 1,
+    "agentRadius": 0.3,
+    "agentHeight": 1.8
+  },
+  "lightmaps": [
+    {
+      "material": 0,
+      "texture": 1,
+      "texCoord": 1,
+      "encoding": "linear",
+      "intensity": 1
+    }
+  ],
+  "audio": [
+    {
+      "id": "air",
+      "path": "audio/air.ogg",
+      "position": [
+        0,
+        2,
+        0
+      ],
+      "radius": 10,
+      "gain": 0.2,
+      "loop": true
+    }
+  ],
+  "objectAssets": [
+    {
+      "id": "resident",
+      "dir": "characters/resident-blue"
+    },
+    {
+      "id": "porter",
+      "library": "com.hyprune.starter@0.1.0",
+      "object": "porter"
+    },
+    {
+      "id": "guide",
+      "scene": "characters/guide.glb",
+      "traits": {
+        "character": {
+          "clips": {
+            "walk": {
+              "speed": 1.1
+            },
+            "idle": {},
+            "wave": {},
+            "nod": {},
+            "sit": {
+              "seatHeight": 0.46
+            },
+            "sit_idle": {}
+          },
+          "height": 1.72,
+          "radius": 0.3,
+          "accent": true,
+          "interactions": [
+            {
+              "id": "talk",
+              "label": "Talk",
+              "action": {
+                "type": "say",
+                "lines": [
+                  "Welcome to the courtyard."
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "court-bench",
+      "scene": "objects/bench.glb",
+      "collision": {
+        "node": "proxy"
+      },
+      "traits": {
+        "movable": {},
+        "seat": {
+          "capacity": 2,
+          "anchors": [
+            {
+              "id": "left",
+              "position": [
+                -0.4,
+                0,
+                0.55
+              ],
+              "yaw": 0,
+              "height": 0.45
+            },
+            {
+              "id": "right",
+              "position": [
+                0.4,
+                0,
+                0.55
+              ],
+              "yaw": 0,
+              "height": 0.45
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "fountain",
+      "scene": "objects/fountain.glb",
+      "animations": [
+        {
+          "node": "spray",
+          "type": "spin",
+          "axis": [
+            0,
+            1,
+            0
+          ],
+          "pivot": [
+            0,
+            0,
+            0
+          ],
+          "period": 12
+        }
+      ],
+      "lighting": {
+        "mode": "probe"
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "fountain-1",
+      "asset": "fountain",
+      "pose": {
+        "position": [
+          1.5,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    },
+    {
+      "id": "bench-east",
+      "asset": "court-bench",
+      "pose": {
+        "position": [
+          3.6,
+          0,
+          -2
+        ],
+        "rotation": [
+          0,
+          -0.7071068,
+          0,
+          0.7071068
+        ]
+      },
+      "locked": true
+    },
+    {
+      "id": "porter-1",
+      "asset": "porter",
+      "path": "court-loop",
+      "phase": 0.25,
+      "speed": 1,
+      "accent": [
+        0.9,
+        0.5,
+        0.1
+      ],
+      "interactions": [
+        {
+          "id": "talk",
+          "label": "Talk",
+          "action": {
+            "type": "say",
+            "lines": [
+              "The desk is on the north side.",
+              "Mind the fountain."
+            ]
+          }
+        },
+        {
+          "id": "where",
+          "label": "Where is work?",
+          "prompt": "Mark it",
+          "action": {
+            "type": "waypoint",
+            "target": {
+              "zoneId": "work"
+            }
+          }
+        },
+        {
+          "id": "show-desk",
+          "label": "Show me the desk",
+          "prompt": "Follow me",
+          "action": {
+            "type": "guide",
+            "path": "to-desk"
+          }
+        },
+        {
+          "id": "map",
+          "label": "Open the map",
+          "action": {
+            "type": "panel",
+            "panel": "map"
+          }
+        }
+      ]
+    },
+    {
+      "id": "guide-1",
+      "asset": "guide",
+      "path": "court-loop",
+      "phase": 0.75,
+      "reverse": true,
+      "accent": [
+        0.2,
+        0.4,
+        0.9
+      ]
+    },
+    {
+      "id": "reader",
+      "asset": "resident",
+      "pose": {
+        "position": [
+          1.5,
+          0,
+          1.8
+        ],
+        "rotation": [
+          0,
+          1,
+          0,
+          0
+        ]
+      },
+      "seat": "fountain-ledge",
+      "interactions": [
+        {
+          "id": "fountain",
+          "label": "The fountain?",
+          "action": {
+            "type": "waypoint",
+            "target": {
+              "object": "fountain-1"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "paths": [
+    {
+      "id": "court-loop",
+      "name": "Court loop",
+      "use": "route",
+      "closed": true,
+      "speed": 1.1,
+      "points": [
+        {
+          "position": [
+            -3.5,
+            0,
+            3
+          ],
+          "type": "line"
+        },
+        {
+          "position": [
+            -3.5,
+            0,
+            -2
+          ],
+          "type": "line"
+        },
+        {
+          "position": [
+            3,
+            0,
+            -2
+          ],
+          "type": "curve"
+        },
+        {
+          "position": [
+            3,
+            0,
+            3
+          ],
+          "type": "arc"
+        }
+      ],
+      "stops": [
+        {
+          "point": 1,
+          "seconds": 3,
+          "clip": "look_around"
+        },
+        {
+          "point": 2,
+          "seconds": 20,
+          "seat": "bench-east/left"
+        },
+        {
+          "point": 3,
+          "seconds": 4,
+          "face": {
+            "anchor": "desk"
+          }
+        }
+      ]
+    },
+    {
+      "id": "to-desk",
+      "name": "To the desk",
+      "use": "route",
+      "points": [
+        {
+          "position": [
+            0,
+            0,
+            3
+          ],
+          "type": "line"
+        },
+        {
+          "position": [
+            0,
+            0,
+            -2
+          ],
+          "type": "line"
+        }
+      ]
+    },
+    {
+      "id": "garden-walk",
+      "points": [
+        {
+          "position": [
+            -2,
+            0,
+            2
+          ],
+          "type": "line"
+        },
+        {
+          "position": [
+            2,
+            0,
+            2
+          ],
+          "type": "curve"
+        }
+      ]
+    }
+  ],
+  "seats": [
+    {
+      "id": "fountain-ledge",
+      "pose": {
+        "position": [
+          1.5,
+          0,
+          1.2
+        ],
+        "rotation": [
+          0,
+          1,
+          0,
+          0
+        ]
+      },
+      "height": 0.5,
+      "use": [
+        "sit"
+      ],
+      "approach": 0.6
+    }
+  ],
+  "keepClear": [
+    {
+      "id": "north-door",
+      "min": [
+        -0.8,
+        0,
+        -4.2
+      ],
+      "max": [
+        0.8,
+        2.4,
+        -3.6
+      ]
+    }
+  ]
+}

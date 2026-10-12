@@ -570,9 +570,12 @@ per-object bakes. Authors fix the rare bad probe with `ambient`.
   static geometry. Render-pass safety rules apply: nothing that makes the
   compositor render is called inside the render pass, and GL state is saved and
   restored.
-- The optional offload renderer (RFC-0009) draws scene geometry only: a world
-  with objects uses the in-process renderer, and performance state reports the
-  reason "world objects use local renderer".
+- The optional offload renderer (RFC-0009) draws world objects with the same
+  results as the in-process renderer: the same animation clock, instanced path,
+  lighting and culling, including catalog placements and editor changes (see the
+  [RFC-0009 world objects amendment](/rfcs/0009-offload-renderer/#amendment-world-objects-and-scene-edits-in-the-offload-renderer)).
+  Until that amendment a world with objects used the in-process renderer, with
+  the reason "world objects use local renderer".
 
 ### Validation
 

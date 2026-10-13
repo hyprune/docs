@@ -972,3 +972,14 @@ is the one the helper reports in `status.config`, else `$XDG_CONFIG_HOME/hyprune
 it is written to a temporary file in the same directory, flushed to disk and renamed over the
 old one (a new file gets mode 0600 and its directory is created), then the shell sends
 `reload`. Remove deletes the entry the same way. Nothing else in the shell runs a command.
+
+**A new machine starts with a demo source (draft, no wire change).** When the user places a
+machine and `sources.json` has no entry for the instance id, the shell adds one that runs
+`hyprune-demo-source` (shipped with core beside `hyprune-system-gauges`) every 5 s with one
+`KEY=TYPE[:ARGS]` argument per declared input (repeats expanded: `number:min:max`,
+`int:min:max`, `enum:a|b|c`, `bool`, `text:maxLength`, `event`). The script prints made-up but
+plausible values that drift smoothly with the clock (mostly the first enum value, counters
+that go up every 20-45 s), so the machine shows something live at once. The entry is an
+ordinary command source: the Data source section shows it with a hint, and the user edits or
+removes it like any other. An existing entry is never replaced, and machines placed before the
+shell saw the world's first state get none.

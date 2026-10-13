@@ -384,7 +384,9 @@ and occlude like walls. Tool 4 selection is `selectedKind: "object"` for instanc
 
 **Gizmo.** Move, rotate and scale as M3B, with objects' scale uniform (the centre cube only);
 `upright` objects show the yaw arc only. Locked authored instances show the lock badge and
-refuse edits.
+refuse edits. An object resting on a floor when a scale begins (its base within 8 cm of it)
+stays on that floor while it is scaled: scaled up its base rises out of the floor, scaled down
+it drops onto it, so rule 3 never refuses a size; the other rules still apply.
 
 ### Placement rules (normative)
 

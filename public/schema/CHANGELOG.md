@@ -494,3 +494,7 @@ registry kinds. The package ships `registry/`. World formats and IPC are unchang
   `editor.unplaced.count` allows 144 (128 windows and the 16-item object pocket).
 - No new method, event or grant; `session.hello` reports `0.26`. Inheritance test
   included.
+
+## @hyprune/schema 0.12.0 (2026-10-13)
+
+Publishes IPC 0.26: tool 9 (the debug tool) with `editor.debugTool` and the world action `tool9`, the companion's pace (`companionState.pace`, `companion.mode` `pace`) and 128-item pocket and mount-instance lists. Inherits 0.25.

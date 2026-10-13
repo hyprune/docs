@@ -475,3 +475,22 @@ naming their version (`v<version>` or `<name>-v<version>`), SPDX licences, per-t
 archive limits and custom source rules. New exports: `registryVersions`,
 `registryLimits`, `parseSemver`, `compareSemver`, `tagVersion`. The CLI accepts the four
 registry kinds. The package ships `registry/`. World formats and IPC are unchanged.
+
+## IPC 0.26: debug tool, companion pace, longer pocket list
+
+- Tool 9, the debug tool: `interaction.tool`, `editor.tool`, `hud.pose.tool`,
+  `tool.changed.slot` and `toolDefinition.slot` are 1-5 or 9; `tool.changed.name`
+  is `debug` for slot 9. `editor.submode` adds the debug layer ids (`windows`,
+  `window-zones`, `collision`, `playable`, `paths`, `keep-clear`, `seats`,
+  `visibility`, `steering`; `placement` already existed). `editor.toolDefinitions`
+  lists six tools: slots 1-5, then slot 9.
+- Required `editor.debugTool`: null while another tool is out, else `{layer, label
+  (<=64), index (0-based), count, legend [{label, colour [r,g,b] 0-1}] (<=8), card
+  [string] (1-8 lines of <=256) | null}`.
+- World action `tool9` (required in `inputConfig.modes.world`).
+- `companionState.pace` (`walk` | `run`) is required; `companion.mode` takes an
+  optional `pace`.
+- `editor.unplaced.windows` and `mounts.instances` allow 128 items (the apps limit);
+  `editor.unplaced.count` allows 144 (128 windows and the 16-item object pocket).
+- No new method, event or grant; `session.hello` reports `0.26`. Inheritance test
+  included.

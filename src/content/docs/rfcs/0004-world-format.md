@@ -190,7 +190,8 @@ shortest graph path from the nearest node to the current camera. Multi-point
 routes retain caller-specified paths. The connector to the first node and every
 path segment still use the capsule solver: an obstruction stops autodrive.
 Disconnected declared destinations are rejected. Arbitrary off-graph targets
-retain explicit direct-route behavior. The legacy route namespace keeps its
+retain explicit direct-route behavior while that leg is clear (see
+[off-graph routes round obstructions](#amendment-off-graph-routes-round-obstructions-core-081)). The legacy route namespace keeps its
 existing place-only behavior.
 
 ## Amendment: climbable volumes, world format 0.4
@@ -692,6 +693,16 @@ position.
   are IPC 0.23; older peers keep their frozen shapes.
 
 The schema is [0.9](/reference/schema/world/0.9/).
+
+## Amendment: off-graph routes round obstructions (core 0.8.1)
+
+No format or wire change. A one-destination `route.set` whose target is not a declared
+node (an arbitrary position, or a zone's destination point) and whose straight leg from
+the camera is blocked by collision follows the walking graph instead: the shortest graph
+path from the node nearest the camera to the node nearest the target, then the target.
+The last route entry keeps the caller's target. A clear straight leg keeps the direct
+route above, and worlds without a walking graph are unchanged. A target the graph can't
+reach keeps the direct route. The drawn route line lies on the ground under each leg.
 
 ## Format versions
 

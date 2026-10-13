@@ -802,3 +802,13 @@ is ASCII.
 `quest.provide` grant; `signal`, `discover`, `interact` and `place` objectives; world
 quests (`com.hyprune.quests`), unlocks, world progress and daily caps (P2/P3); compass
 ticks; `iconAtlas.markerIcons`.
+
+## Amendment: arrival clears the waypoint (core 0.8.1)
+
+No wire change. Clutter rule 6 hides a marker inside its `range[0]`; for the waypoint,
+arriving also ends it. When the player is within the waypoint marker's `range[0]` (2 m)
+across the ground, and the target lies between 1 m below the feet and 1 m above the eye
+(not a level above or below), core clears the waypoint: `location.waypoint` becomes null,
+as after `waypoint.clear`. A route whose last point is within 1 m of the waypoint is
+cleared with it. Icons scale with the output up to 2x and labels start clear of the
+icon (or the fallback `+`) at every scale.

@@ -621,9 +621,9 @@ These extend the 0.8 and RFC-0011 rendering rules; everything there still holds.
 - **Caps**, fixed at load: 64 bound instances per world, 1,024 stacked copies, 8 concurrent
   effects of at most 48 particles; items follow RFC-0011's caps. Over a cap the result degrades
   visibly (batch items, `+n` labels, skipped effects) and memory never grows.
-- **Motion** (`live.motion`): `auto` (default: items travel and machines spin while the world
-  is active and the player present, and pause on battery and USB-C power, as [RFC-0010](/rfcs/0010-npcs/) does for
-  characters), `always`, `still` (states, labels, counts and flashes only; no spins or travel;
+- **Motion** (`live.motion`): `auto` (default: items travel and machines spin whenever the world
+  is shown, with no pause for the power supply, as [RFC-0010](/rfcs/0010-npcs/) does for characters;
+  render on demand keeps the cost to what is visible), `always`, `still` (states, labels, counts and flashes only; no spins or travel;
   effects become flashes) and `off` (rest pose and rest state). `graphics.reduced_motion: true`
   forces `still`. States always change, so a reduced-motion user still sees a failure.
 - **Render-pass safety.** No binding, effect or item causes compositor work; links and focus go

@@ -435,7 +435,36 @@ Draft only; no version changes. `v0.10/object.schema.json` and the validator:
 
 Publishes IPC 0.24: `objects.catalog` entries carry a placed machine's declared inputs (`machine`), and a new `live` state key reports each placed machine's source, status and per-input values (published only on change). Inherited from 0.23 otherwise; no new grant. Also the object 0.10 draft additions for gauges: the `average` mapping modifier, `levels` slots (fill/slide with spring) and stack rate, cap 100 and signed spacing.
 
-## Unreleased: registry documents
+## IPC 0.25 (draft): companions (RFC-0010 companions amendment)
+
+- Methods (grant `objects.control`): `companion.set {ref}` (a companion-capable
+  library or user catalog ref), `companion.clear {}` and `companion.mode {mode:
+  follow|stay}`; each returns `{revision}`. Existing methods take the reserved
+  object id `companion`: `npcs.bind` (a route or a standing spot), `paths.draw
+  {bind}` and `interaction.choose`. No new grant, no new event.
+- Required state key `companion {ref|null, name|null (<=32), state
+  (none|loading|unavailable|active|waiting|hidden), reason|null (<=64), mode
+  (follow|stay|route), path|null (qualified path ref), activity|null
+  (following|walking|running|idle|talking|sitting|waiting|carried),
+  position|null, carried}`.
+- `objects.catalog` entries gain required `companion`: null, or `{capable,
+  name, reason|null}`.
+- `npcs.aimed.interactions[].type` gains `companion` (Stay and Follow).
+- Everything else is inherited from 0.24 unchanged; `session.hello` reports
+  `0.25`. Inheritance test included.
+
+## Object format 0.10 (draft): companion block
+
+- Optional `companion {name? (1-32), followDistance? (1.5-2.5 m), idles?
+  (<=4 unique clip names), say? (<=8 lines of <=160 characters)}`, only on
+  characters; idle variants must be clips of `traits.character` and not
+  canonical RFC-0010 clip names (`talk` is a new canonical name).
+
+## @hyprune/schema 0.10.0 (2026-10-13)
+
+Publishes IPC 0.25: companions. `companion.set`, `companion.clear` and `companion.mode` (follow or stay), a required `companion` state key, a companion capability on catalog entries and the aimed interaction type `companion`; and the object 0.10 draft `companion` block (name, followDistance, idles, say). Inherits 0.24.
+
+## @hyprune/schema 0.11.0 (2026-10-13): registry documents
 
 Registry documents (RFC-0015), versioned independently under `registry/v0.1/`:
 `index.schema.json` (index documents; `$defs.entry` for registry entry files),

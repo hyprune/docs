@@ -663,6 +663,22 @@
    "time": "03:25",
    "title": "Core 0.6.0",
    "text": "Data sources, gauges, machines in offload, wrapped captions, hidden residents at no cost and GPU-compressed character textures, with a prebuilt for Hyprland 0.56.2 that <a href=\"/try-it/\">Try it</a> installs."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "02:00–04:35",
+   "title": "Companions",
+   "text": "<a href=\"/reference/schema/ipc/0.25/\">IPC 0.25</a>: pick a companion character from an installed library and it follows you through any world, catches up after a warp, keeps out of the way of your screens and talks when you press E. Put it, or any character you placed, on a drawn path by binding it with the path tool or carrying it there. Core 0.7.0.",
+   "covers": [
+    "ipc:0.25"
+   ],
+   "major": true
+  },
+  {
+   "date": "2026-10-13",
+   "time": "04:45",
+   "title": "Registry, phase 1",
+   "text": "<a href=\"/rfcs/0015-registry/\">RFC-0015</a>: official, community and labelled custom sources; install, update, roll back, pin and remove with every download checked against its hash, from the SDK's command line and the Director's Library page. The installers preinstall the pinned libraries."
   }
  ]
 }

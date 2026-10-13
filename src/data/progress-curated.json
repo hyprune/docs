@@ -679,6 +679,42 @@
    "time": "04:45",
    "title": "Registry, phase 1",
    "text": "<a href=\"/rfcs/0015-registry/\">RFC-0015</a>: official, community and labelled custom sources; install, update, roll back, pin and remove with every download checked against its hash, from the SDK's command line and the Director's Library page. The installers preinstall the pinned libraries."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "09:11–11:25",
+   "title": "Smooth demo cameras",
+   "text": "Demo recordings use a camera driven by core: keyframed tracks on smooth curves and follow shots, written out through a frame export path that records every presented frame. Demo films no longer stutter the way screen captures did."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "09:13",
+   "title": "Characters move whenever the world is shown",
+   "text": "Residents and the companion no longer pause on battery, when you stop moving, while you type or in the free cursor; they pause only while the world is inactive or covered. Motion still, off and reduced motion are how you stop them, and a request they can't carry out is refused with the reason. Render on demand and the hidden-resident test keep the cost to characters in view."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "10:25–13:17",
+   "title": "Live offload pacing",
+   "text": "With offload on, the worker hands the compositor one fresh frame per frame in a live session; at 60 Hz a quarter of frames used to repeat. Frame pacing now matches rendering in the compositor."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "10:26–10:35",
+   "title": "Ghost windows fixed",
+   "text": "Every window on the room and home workspaces gets a record. Past the old cap of 16 records, new windows opened invisible and could not be pocketed. A closed window is now dropped at once, also while another is in focus."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "11:22–13:37",
+   "title": "Steering, avoidance and gait",
+   "text": "<a href=\"/rfcs/0010-npcs/\">RFC-0010</a> amendment: characters steer round each other, take detours round placed objects and pillars, and stop in front of a screen just outside its approach zone. Their feet keep in step with their speed, without sliding. The companion eases its pace and can walk or run with you."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "14:12",
+   "title": "Core 0.7.2",
+   "text": "No-cap window records, characters that move whenever the world is shown, steering and gait, demo cameras, live offload pacing and a demo source for newly placed machines, with a prebuilt for Hyprland 0.56.2 that <a href=\"/try-it/\">Try it</a> installs."
   }
  ]
 }

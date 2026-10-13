@@ -6,7 +6,8 @@
   "2026-10-09": "playable, faster, smaller",
   "2026-10-10": "compressed release, feel, a second test machine",
   "2026-10-11": "fixes from testing",
-  "2026-10-12": "objects, quests, residents"
+  "2026-10-12": "objects, quests, residents",
+  "2026-10-13": "residents, gauges, releases"
  },
  "releases": {
   "lumen-reach@0.4.0": {
@@ -75,6 +76,12 @@
   },
   "hyprune-starter@0.1.1": {
    "summary": "Residents' textures stay GPU-compressed (UASTC base colour and normals): 16 MiB instead of 64 MiB for all four, closer to the lossless originals"
+  },
+  "lumen-reach@0.11.0": {
+   "summary": "Residents: one per area on authored routes with stops, benches and short lines; Crimson marks the way to Rime Vault and Ember guides you to Signal Rise"
+  },
+  "hyprune-starter@0.2.0": {
+   "summary": "Three gauges (tube, abacus, voxel cube) fed by scripts, with a running-average ring and gold, orange and red states"
   }
  },
  "timeline": [
@@ -612,6 +619,50 @@
     "ipc:0.23"
    ],
    "major": true
+  },
+  {
+   "date": "2026-10-12",
+   "time": "20:00–22:07",
+   "title": "Gauges",
+   "text": "A tube that fills with liquid, an abacus of 100 beads and a cube of 100 voxels show any value from 0 to 100. A script feeds each one its value, display text and label; core keeps a running average, shown as a white ring. A placed machine reads the data source named after it, with no bindings file."
+  },
+  {
+   "date": "2026-10-12",
+   "time": "22:27–23:20",
+   "title": "Data sources in the Director",
+   "text": "<a href=\"/reference/schema/ipc/0.24/\">IPC 0.24</a>: Objects → Placed shows a gauge's inputs with live values and edits its command and interval, with Test, Save and Restart, and no world reload.",
+   "covers": [
+    "ipc:0.24"
+   ],
+   "major": true
+  },
+  {
+   "date": "2026-10-13",
+   "time": "00:19",
+   "title": "Machines in offload",
+   "text": "The offload worker draws machine state (fills, beads, labels), so a placed gauge no longer forces local rendering."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "01:17",
+   "title": "Wrapped captions, hidden residents",
+   "text": "Say lines wrap over up to four lines. A resident hidden behind a wall is neither drawn nor keeps frames coming; at rest in Rime Vault the frame rate drops to 0."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "03:05",
+   "title": "Lumen Reach 0.11.0",
+   "text": "Residents in the world: one per area on its own route, with a vista, a stop by a screen and a bench where it sits. Crimson marks the way to Rime Vault and Ember walks you to Signal Rise.",
+   "covers": [
+    "release:lumen-reach@0.11.0"
+   ],
+   "major": true
+  },
+  {
+   "date": "2026-10-13",
+   "time": "03:25",
+   "title": "Core 0.6.0",
+   "text": "Data sources, gauges, machines in offload, wrapped captions, hidden residents at no cost and GPU-compressed character textures, with a prebuilt for Hyprland 0.56.2 that <a href=\"/try-it/\">Try it</a> installs."
   }
  ]
 }

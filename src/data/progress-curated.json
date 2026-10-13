@@ -760,6 +760,12 @@
    "covers": [
     "release:lumen-reach@0.11.2"
    ]
+  },
+  {
+   "date": "2026-10-14",
+   "time": "02:00",
+   "title": "Core 0.8.2",
+   "text": "Fixes: a GPU that enforces less than 20 W no longer trips the offload power cap; new characters upload over several frames, so spawning a few no longer hitches; the reticle hint and route checks use the collision index; characters from older exporters (specular-glossiness materials) keep their colours; X11 menus stay with their own app instead of the focused window. No wire change; <a href=\"/try-it/\">Try it</a> installs the new prebuilt."
   }
  ]
 }

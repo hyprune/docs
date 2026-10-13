@@ -22,7 +22,7 @@ curl -fsSL https://hyprune.com/check | bash -s -- --json
 
 `try` runs the same checks first. If something is missing it prints the install commands and stops: it never runs a package manager or `sudo`. Then it downloads into `~/hyprune-try`, verifying every SHA-256:
 
-- **core** (the Hyprland plugin and its helpers): the prebuilt [core release](https://github.com/hyprune/core/releases) for your Hyprland's ABI (core 0.8.1 for Hyprland 0.56.2), so there is nothing to compile. If no prebuilt matches your Hyprland, it builds core from source inside the folder instead (5-15 minutes; the check lists the build packages);
+- **core** (the Hyprland plugin and its helpers): the prebuilt [core release](https://github.com/hyprune/core/releases) for your Hyprland's ABI (core 0.8.2 for Hyprland 0.56.2), so there is nothing to compile. If no prebuilt matches your Hyprland, it builds core from source inside the folder instead (5-15 minutes; the check lists the build packages);
 - **the shell** (Quickshell HUD and Director) with a private Python venv in the folder, its packages pinned by hash (`pip --require-hashes`);
 - **Lumen Reach**, the release world, checked against [`worlds/releases.json`](https://github.com/hyprune/hyprune/blob/main/worlds/releases.json).
 - **the starter kit** (residents, machines and gauges to place from Director → Objects), checked against [`libraries/releases.json`](https://github.com/hyprune/hyprune/blob/main/libraries/releases.json), and the `hyprune` command line for installing more from the registry (Director → Library).

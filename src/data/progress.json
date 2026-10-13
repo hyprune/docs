@@ -1350,6 +1350,13 @@
       "title": "Core 0.8.0",
       "text": "IPC 0.26 in a release: the debug tool, the companion's pace and the whole pocket list, with a prebuilt for Hyprland 0.56.2 that <a href=\"/try-it/\">Try it</a> installs. SDK 0.10.0 and schema 0.12.0 carry the same contract.",
       "generated": false
+    },
+    {
+      "date": "2026-10-13",
+      "time": "20:50",
+      "title": "Core 0.8.1",
+      "text": "Fixes from the Lumen Reach 0.11.1 live notes and the queue: offload draws the companion and anything from a library installed mid-session; the waypoint line lies on the ground and its route goes round hills and buildings (<a href=\"/rfcs/0004-world-format/#amendment-off-graph-routes-round-obstructions-core-081\">RFC-0004 amendment</a>); arriving clears the waypoint (<a href=\"/rfcs/0012-quests/#amendment-arrival-clears-the-waypoint-core-081\">RFC-0012 amendment</a>); marker labels at 4K; characters use their own names; Recall spreads windows out. No wire change; <a href=\"/try-it/\">Try it</a> installs the new prebuilt.",
+      "generated": false
     }
   ]
 }

@@ -82,6 +82,9 @@
   },
   "hyprune-starter@0.2.0": {
    "summary": "Three gauges (tube, abacus, voxel cube) fed by scripts, with a running-average ring and gold, orange and red states"
+  },
+  "lumen-reach@0.11.1": {
+   "summary": "Fixes from live testing: no more flickering tiles, decks and beams where surfaces met flush, no drain pipe stubs on the roof, the valley below the edges in daylight instead of black, and residents stop in front of the screens"
   }
  },
  "timeline": [
@@ -715,6 +718,15 @@
    "time": "14:12",
    "title": "Core 0.7.2",
    "text": "No-cap window records, characters that move whenever the world is shown, steering and gait, demo cameras, live offload pacing and a demo source for newly placed machines, with a prebuilt for Hyprland 0.56.2 that <a href=\"/try-it/\">Try it</a> installs."
+  },
+  {
+   "date": "2026-10-13",
+   "time": "17:21",
+   "title": "Lumen Reach 0.11.1",
+   "text": "Fixes from live testing. Surfaces that met flush (tiles, decks, beams, screen frames) no longer flicker: the build removes hidden faces and steps the rest back, and a new check covers every plane in the world. The valley floor below the settlement edges is in daylight instead of reading as black glass, and residents stop in front of the screens they look at.",
+   "covers": [
+    "release:lumen-reach@0.11.1"
+   ]
   }
  ]
 }

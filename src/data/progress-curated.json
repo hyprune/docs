@@ -736,6 +736,12 @@
    "covers": [
     "ipc:0.26"
    ]
+  },
+  {
+   "date": "2026-10-13",
+   "time": "18:00",
+   "title": "Core 0.8.0",
+   "text": "IPC 0.26 in a release: the debug tool, the companion's pace and the whole pocket list, with a prebuilt for Hyprland 0.56.2 that <a href=\"/try-it/\">Try it</a> installs. SDK 0.10.0 and schema 0.12.0 carry the same contract."
   }
  ]
 }

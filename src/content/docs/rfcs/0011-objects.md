@@ -943,9 +943,9 @@ characters, the `npcs` state key and the `npc_motion` graphics setting.
   take `say`, `waypoint`, `guide` and `panel`; asset-level interactions stay `say` and `panel`.
 - *Setting.* `graphics.npc_motion` (`auto`, `always`, `still` or `off`, default `auto`) is the
   same value as Lua `npc.motion`, persisted in `graphics.json`.
-- *Power.* `auto` animates only while the offload power profile
-  ([RFC-0009](/rfcs/0009-offload-renderer/)) is `full-ac` or `limited-ac` and the supply is not
-  discharging (desktops: mains). Battery, USB-C and unknown supplies pause characters.
+- *Power.* `auto` doesn't depend on the power supply: characters animate whenever the world is
+  shown ([RFC-0010 motion amendment](/rfcs/0010-npcs/#amendment-motion-follows-the-users-settings-draft);
+  it first paused them on battery, USB-C and unknown supplies).
 - *Overlay.* `editor.json` stays version 2; the new fields are additive (below).
 - *State.* Characters get their own state key, `npcs`, besides the `objects` instances.
 - *Reticle.* `interaction.reticle.action` gains `interact` for an aimed character with
@@ -997,8 +997,9 @@ budget (`rule: "budget"`: 8 user characters per world, plus the 0.22 object budg
 **State.**
 - `npcs` (new, required): `{motion, state, reason, usage, limits, drawing, aimed, interaction}`.
   `motion` is the setting; `state` is `none`, `animating`, `paused`, `still` or `off`; `reason`
-  (null or at most 64 characters) says why characters are paused: `inactive`, `typing`, `focus`,
-  `free cursor`, `idle`, `battery`, `usb-c power`, `power unknown` or `reduced motion`. `usage`
+  (null or at most 64 characters) says why characters are paused: `inactive`, `focus` or
+  `reduced motion` (before the [RFC-0010 motion amendment](/rfcs/0010-npcs/#amendment-motion-follows-the-users-settings-draft)
+  also `typing`, `free cursor`, `idle`, `battery`, `usb-c power` and `power unknown`). `usage`
   and `limits` count authored (limit 16) and user (limit 8) characters. `drawing` is null or the
   `paths.draw` in progress `{pathId, use, spawn: null | {ref}, bind: null | objectId}`. `aimed`
   is null or `{objectId, name, prompt, interactions}` (at most 8 `{id, label, type}`).

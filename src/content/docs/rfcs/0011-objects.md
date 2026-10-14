@@ -501,6 +501,17 @@ the fraction of the path's length at which it starts, so several share one path 
 an ineligible instance (a lamp to a route, a character to a track) is a validation error or a
 refused method.
 
+**Drawn paths become routes (amendment, core 0.8.4, no wire change).** Tool 3 draws `generic`
+paths; only `paths.draw` (the Director's "Draw a new route") starts one with `use: route`. A
+user's `generic` path is therefore also taken wherever a character needs a route: setting a
+carried character down within 0.75 m of it, `npcs.bind` / `npcs.spawn` with its `path`, and the
+companion's binding. When the path passes the walkability check for that character, core
+changes its `use` to `route` (one undo step, saved in the overlay) and binds; otherwise the
+usual refusal (-32007, rule `walkable`, with the first problem). Package paths are never
+changed. `paths.list` keeps `walkable: null` for a `generic` path until then; the Director's
+route list offers the user's drawn paths ("Drawn path"). Before 0.8.4 a path drawn with tool 3
+was neither a carry snap target nor bindable ("is not a route").
+
 ### Walkability (routes)
 
 Core checks a route at load and on every edit, against collision; the worlds tooling's Recast

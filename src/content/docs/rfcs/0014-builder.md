@@ -5,8 +5,8 @@ description: "Import and simplify models inside Hyprune through a sandboxed conv
 
 **Status: draft · proposed 2026-10-12; revised 2026-10-12 with decisions on the file dialog,
 size caps and Simplify, the screen standback, the builder entry flow and version control.**
-Implemented so far, as drafts: workspace screens (object format 0.11, IPC 0.27) and importing
-objects from the Director ([amendments below](#amendment-import-in-the-objects-tab-object-format-011-and-ipc-027));
+Implemented so far (core 0.9.0, @hyprune/schema 0.13.0, SDK 0.11.0): workspace screens (object
+format 0.11, IPC 0.27), importing objects from the Director and the builder world ([amendments below](#amendment-import-in-the-objects-tab-object-format-011-and-ipc-027));
 the rest is not implemented. It builds on the object catalog, user folder, placements and
 placement rules of [RFC-0011](/rfcs/0011-objects/) as shipped in
 [IPC 0.22](/rfcs/0011-objects/#amendment-p1-in-ipc-022), the world format of
@@ -567,7 +567,7 @@ the project file, not an RFC-0011 overlay lock.
 
 ### The `mount` trait for workspaces
 
-**Amendment (draft, object format 0.11, IPC 0.27).** Workspace screens shipped ahead of the
+**Amendment (object format 0.11, IPC 0.27; core 0.9.0).** Workspace screens shipped ahead of the
 builder, as ordinary user placements in any world: see
 [RFC-0011's amendment](/rfcs/0011-objects/#amendment-workspace-screens-in-object-format-011-and-ipc-027).
 A `mounted-workspace` anchor may be 16:9 or 21:9 (2.33 to 2.39), at least 0.9 m high, and a
@@ -1107,7 +1107,7 @@ the core changelog.
 
 ## Amendment: import in the Objects tab (object format 0.11 and IPC 0.27)
 
-**Status: draft.** The first slice of P1: **Director → Objects → Import…** turns a model file into
+**Status: shipped in core 0.9.0.** The first slice of P1: **Director → Objects → Import…** turns a model file into
 an object in **My objects** without Blender, and it appears in the catalog at once. It follows
 this RFC's flow (choose, review, add) and its rules on sizes and provenance, with a simpler
 process model.
@@ -1181,7 +1181,7 @@ of them.
 
 ## Amendment: the builder world (world format 0.11, builder/project.json and IPC 0.27)
 
-**Status: draft.** The first slice of P2 and P3: **Director → Builder → Build** makes a world
+**Status: shipped in core 0.9.0.** The first slice of P2 and P3: **Director → Builder → Build** makes a world
 folder from a name, opens it in editor mode, and the user places imports, workspace screens
 and library objects on it, saves (git commits) and releases (git tags). It follows this RFC's
 model (a folder that is a git repository, Save as one commit, Release as a tag in RFC-0015's

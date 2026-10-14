@@ -3,7 +3,7 @@ title: "RFC-0011 — World objects: libraries, traits, user placement and paths"
 description: "One object system for authored, shared and user objects: the object manifest and its traits, three sources in one catalog, user placement, tools on objects, paths, seats and the contract plan."
 ---
 
-**Status: draft · proposed 2026-10-11; P1 shipped in IPC 0.22, P2 in world format 0.9 and IPC 0.23, workspace screens in object format 0.11 and IPC 0.27 (drafts; amendments below).** Before P1, nothing here was implemented beyond world format 0.8
+**Status: draft · proposed 2026-10-11; P1 shipped in IPC 0.22, P2 in world format 0.9 and IPC 0.23, workspace screens in object format 0.11 and IPC 0.27 (core 0.9.0; amendments below).** Before P1, nothing here was implemented beyond world format 0.8
 placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-world-objects))
 and the M3B path and position tools ([RFC-0006](/rfcs/0006-interaction/#amendment-m3b-keymap-v2)).
 It extends 0.8 objects instead of adding a parallel system: ambient characters
@@ -1057,7 +1057,7 @@ characters (RFC-0010 amendment).
 
 ## Amendment: workspace screens in object format 0.11 and IPC 0.27
 
-**Status: draft** (object format **0.11** and IPC **0.27**, [schema](/reference/schema/ipc/0.27/),
+**Status: shipped in core 0.9.0** (object format **0.11** and IPC **0.27**, [schema](/reference/schema/ipc/0.27/),
 core `docs/CHANGELOG.md`). A user can place a screen anywhere, like any object, and bind it to a
 workspace; it then shows that workspace live like an authored home wall. It switches on the
 `mount` trait for the one role [RFC-0014](/rfcs/0014-builder/#workspace-screens) designed,
@@ -1121,6 +1121,6 @@ Older peers see no `screen` field and can't send `workspace`.
 **Starter kit.** `com.hyprune.starter` 0.3.0 (unpublished) adds four screens built without
 Blender: a slim wall bezel and a frame on two legs, each 16:9 (3.2 × 1.8 m) and 21:9 (4.2 × 1.8 m).
 
-**Sizes in object format 0.11.** The same draft format turns this RFC's per-asset
+**Sizes in object format 0.11.** The same format turns this RFC's per-asset
 [budgets](#budgets-and-limits) into recommendations for ordinary objects, with hard caps, and
 raises the per-world user totals; see [RFC-0014's import amendment](/rfcs/0014-builder/#amendment-import-in-the-objects-tab-object-format-011-and-ipc-027).

@@ -546,3 +546,14 @@ Publishes IPC 0.26: tool 9 (the debug tool) with `editor.debugTool` and the worl
 - IPC 0.27: required state key `builder` (null, or `{projectId, worldId, name, folder, mode:
   "edit", revision, placements, sky, error}`; also in deltas), catalog source `world` and
   `world/<id>` object refs. New definition `builderState`.
+
+## @hyprune/schema 0.13.0 (2026-10-15)
+
+Publishes IPC 0.27, world format 0.11 and object format 0.11, which were drafts until now and
+are final as released here: workspace screens (the object `mount` trait, `screen` on catalog
+entries and object instances, `workspace` on `objects.configure` and `objects.place`), object
+format 0.11 size recommendations below `objectHardCaps`, `import.json` (importVersion 0.1),
+catalog `warnings`, `provenance` and `imported`, world format 0.11 panorama skies and builder
+worlds, `builder/project.json` (projectVersion 0.1) and the IPC 0.27 `builder` state key.
+Object format 0.10 stays an unreleased draft (world format 0.10 is not defined); 0.11 carries
+its additions. IPC 0.27 inherits 0.26.

@@ -5,7 +5,9 @@ description: "Import and simplify models inside Hyprune through a sandboxed conv
 
 **Status: draft · proposed 2026-10-12; revised 2026-10-12 with decisions on the file dialog,
 size caps and Simplify, the screen standback, the builder entry flow and version control.**
-Nothing here is implemented. It builds on the object catalog, user folder, placements and
+Implemented so far, as drafts: workspace screens (object format 0.11, IPC 0.27) and importing
+objects from the Director ([amendments below](#amendment-import-in-the-objects-tab-object-format-011-and-ipc-027));
+the rest is not implemented. It builds on the object catalog, user folder, placements and
 placement rules of [RFC-0011](/rfcs/0011-objects/) as shipped in
 [IPC 0.22](/rfcs/0011-objects/#amendment-p1-in-ipc-022), the world format of
 [RFC-0004](/rfcs/0004-world-format/) (spawns, areas and workspace homes, playable volumes,
@@ -1102,3 +1104,77 @@ the core changelog.
    notes, as well as the tag message?
 10. **Starters.** Flat land first; which others (shallow sea, desert, an enclosed hall) are worth
     shipping, and may third parties publish starters through RFC-0015?
+
+## Amendment: import in the Objects tab (object format 0.11 and IPC 0.27)
+
+**Status: draft.** The first slice of P1: **Director → Objects → Import…** turns a model file into
+an object in **My objects** without Blender, and it appears in the catalog at once. It follows
+this RFC's flow (choose, review, add) and its rules on sizes and provenance, with a simpler
+process model.
+
+**Where it runs.** The import is the SDK CLI's `hyprune object import`, which the shell runs as
+its own child process, as the Library tab runs the CLI (RFC-0015 phase 1): `--inspect --json`
+first, then the import with JSON lines (`{event: stage | done | error}`). There are no daemon
+jobs and no import IPC methods (`objects.import`, `jobs.*`, `…revise`, `…commit` stay this RFC's
+design); the compositor never parses a model. Core sees only the finished directory, through
+the user folder's watch, and validates it like any other.
+
+| This RFC | As built |
+| --- | --- |
+| Portal file chooser | The Director's own file browser (the one the Data source editor uses; the Director holds exclusive input), filtered to the importable extensions. |
+| Convert, then review, then Add | Measure (`--inspect`), review the options and provenance, then convert and add in one step. The review shows the file's numbers, the units guess and the resulting size: pressing Import confirms them. |
+| Sandboxed helper (namespaces, seccomp) | An unprivileged child of the shell. glTF is parsed by glTF-Transform (JavaScript), every other format by Assimp compiled to WebAssembly, so a parser fault stays inside the WebAssembly memory. Remote resources are refused, sources are capped at 2 GiB, Assimp reads at most 256 files and 512 MiB beside the model. The namespace sandbox stays open (P1 follow-up). |
+| Formats | glTF and GLB; OBJ, FBX, DAE, 3DS, PLY and STL through Assimp. Not yet: `.zip`, Draco-compressed glTF (refused with `import.draco`), USD. |
+| Size classes, maps | Every import is an object. Object format 0.11 turns the per-asset budgets into recommendations (below); maps wait for editor mode. |
+| Simplify as a job with before/after review | Decimation, texture shrinking and KTX2 run during the import, to targets set in the review; the result shows the numbers before and after. Simplify on existing entries, repair, editing, export and the publishing check are not in this slice. |
+| Convex decomposition | One convex hull (points merged on a grid, at most 1,000 triangles), else the bounding box, or no proxy. |
+| Kept originals, `history`, `original` | Not kept; `import.json` records the source's name, format, size and SHA-256. |
+
+**What an import does** (in order): read (glTF-Transform, or Assimp to GLB); drop animations,
+skins, cameras, lights, morph targets, points and lines (each listed as a warning); bake node
+transforms into the meshes; apply the units (**Auto** guesses from the size in the file: up to 50
+units across means metres, up to 5,000 centimetres, more millimetres; or metres, centimetres,
+millimetres, inches, feet), the up axis (**Z up** turns +Z to +Y), a turn of 0, 90, 180 or 270
+degrees and the pivot (base centre on a floor, back centre on a wall, top centre on a ceiling,
+centre when it floats); join primitives by material and weld; decimate with meshoptimizer to the
+triangle target (default 50,000; error at most 1 % of the size, then 2 % and 5 %, and a warning
+if it stays above); shrink textures to the chosen size (1,024, 2,048 or 4,096 px); build the
+collision proxy outside the scene; render a 256 × 256 thumbnail on the CPU (flat shading,
+base-colour textures sampled, no GPU); encode textures of 1,024 px and more to KTX2 with Basis
+Universal in WebAssembly (colour ETC1S with an sRGB transfer function, data UASTC with Zstandard,
+mips; 60 s budget, left-over textures stay PNG or JPEG with a warning); compress the geometry
+(meshopt, 16-bit quantisation, as world format 0.7); write `object.json` (format 0.11, `movable`
+on the chosen surface with scale 0.25-4, `collidable` when there is a proxy, `lighting unlit` for
+**Baked into textures**) and `import.json`; check the staged directory with the shared validator
+and rename it into the user folder (a taken id gets `-2`, `-3`). A failed or cancelled import
+writes nothing.
+
+**Sizes (object format 0.11).** For ordinary objects (not characters or items) the RFC-0011
+per-asset budgets are recommendations: over one is a catalog warning ("(recommended; it still
+loads)"), never a refusal. Only hard caps refuse a directory: 2,000,000 triangles, 8,192 px
+textures, 1 GiB of GPU memory, 100,000 proxy triangles, 256 files, 512 MiB per directory and
+64 MiB per file. Formats 0.9 and 0.10, characters and items keep their budgets as errors. The
+per-world user totals (core, every protocol) become 2,000,000 triangles, a 512 MiB GPU pool and
+100,000 proxy triangles; they still refuse a placement, as the physical limit.
+
+**Provenance.** As [Licence and provenance](#licence-and-provenance-normative): the review offers
+I don't know (default), CC0 1.0, CC BY 4.0, CC BY 3.0, CC BY-SA 4.0, CC BY-NC 4.0 or any SPDX
+expression, an author and a source (a link or free text). None is required. `object.json` gets
+the licence (`LicenseRef-unknown` when unknown) and an attribution for `"."` with the author
+(`unknown`) and, when it is an `https://` link, the source; `import.json` keeps all three as
+typed (`unknown` when empty).
+
+**`import.json`** (importVersion 0.1, [schema](/reference/schema/) `v0.11/import.schema.json`):
+`{importVersion, source: {name, format, bytes, sha256}, converter: {name, version, backend:
+gltf | assimp}, options: {units, scale, up, yaw, surface, maxTriangles, maxTexture, collision,
+ktx2, lighting}, measured: {before, after} ({triangles, maxTexture, gpuBytes,
+collisionTriangles, extent}), steps (at most 32), license: {spdx, author, source},
+importedAt}`. The shared validator checks it beside `object.json` (`validate('import')`); core
+checks it in the catalog.
+
+**IPC 0.27 additions.** Catalog entries carry required `warnings` (at most 8: sizes over their
+recommendation and other validation notes), `provenance` (null for world package assets, else
+`{license, author, source}` from `import.json`, else from the `"."` attribution, `"unknown"` where
+unrecorded) and `imported` (null, or `{at, sourceName}` from `import.json`). Older peers see none
+of them.
+

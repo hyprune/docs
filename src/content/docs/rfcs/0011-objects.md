@@ -1120,3 +1120,7 @@ Older peers see no `screen` field and can't send `workspace`.
 
 **Starter kit.** `com.hyprune.starter` 0.3.0 (unpublished) adds four screens built without
 Blender: a slim wall bezel and a frame on two legs, each 16:9 (3.2 × 1.8 m) and 21:9 (4.2 × 1.8 m).
+
+**Sizes in object format 0.11.** The same draft format turns this RFC's per-asset
+[budgets](#budgets-and-limits) into recommendations for ordinary objects, with hard caps, and
+raises the per-world user totals; see [RFC-0014's import amendment](/rfcs/0014-builder/#amendment-import-in-the-objects-tab-object-format-011-and-ipc-027).

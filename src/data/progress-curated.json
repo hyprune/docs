@@ -772,6 +772,12 @@
    "time": "13:30",
    "title": "Core 0.8.3",
    "text": "Fixes: after a screen lock or the display turning off, the HUD comes back (the shell could not take its screen again); spawning a character in front of you finds open floor past the areas reserved for windows, and a refusal says why; the E USE / F FOCUS prompt hides while you use a window. No wire change; <a href=\"/try-it/\">Try it</a> installs the new prebuilt."
+  },
+  {
+   "date": "2026-10-14",
+   "time": "17:45",
+   "title": "Core 0.8.4",
+   "text": "Fixes: a character you placed can be set down on a path you drew with tool 3 (or rebound to it from Director → Objects), which then becomes its route; your companion no longer stands idle far away when you stop where there is no free spot near you (the foot of the Signal Rise ramp); with offload, steam behind a character no longer draws over them. No wire change; <a href=\"/try-it/\">Try it</a> installs the new prebuilt."
   }
  ]
 }

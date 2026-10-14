@@ -565,6 +565,13 @@ the project file, not an RFC-0011 overlay lock.
 
 ### The `mount` trait for workspaces
 
+**Amendment (draft, object format 0.11, IPC 0.27).** Workspace screens shipped ahead of the
+builder, as ordinary user placements in any world: see
+[RFC-0011's amendment](/rfcs/0011-objects/#amendment-workspace-screens-in-object-format-011-and-ipc-027).
+A `mounted-workspace` anchor may be 16:9 or 21:9 (2.33 to 2.39), at least 0.9 m high, and a
+screen binds to a chosen workspace or the next free one rather than to a slot. The rules below
+for editor mode and Make world still apply when those phases land.
+
 RFC-0011 reserves `mount` for props that hold windows. This RFC enables it in object format
 **0.11** for one role, `mounted-workspace`, and only for objects placed in editor mode or
 authored by a world package. Window-holding props in ordinary worlds (tool mounts on user

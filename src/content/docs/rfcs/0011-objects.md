@@ -3,7 +3,7 @@ title: "RFC-0011 — World objects: libraries, traits, user placement and paths"
 description: "One object system for authored, shared and user objects: the object manifest and its traits, three sources in one catalog, user placement, tools on objects, paths, seats and the contract plan."
 ---
 
-**Status: draft · proposed 2026-10-11; P1 shipped in IPC 0.22, P2 in world format 0.9 and IPC 0.23 (amendments below).** Before P1, nothing here was implemented beyond world format 0.8
+**Status: draft · proposed 2026-10-11; P1 shipped in IPC 0.22, P2 in world format 0.9 and IPC 0.23, workspace screens in object format 0.11 and IPC 0.27 (drafts; amendments below).** Before P1, nothing here was implemented beyond world format 0.8
 placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-world-objects))
 and the M3B path and position tools ([RFC-0006](/rfcs/0006-interaction/#amendment-m3b-keymap-v2)).
 It extends 0.8 objects instead of adding a parallel system: ambient characters
@@ -106,7 +106,7 @@ render-only, never picked.
 | `character` | `clips`: clip name to measured values (`walk` and `idle` required); `height` (1.2-2.2 m); `radius` (0.25-0.5 m, default 0.35); `accent` (bool); optional `interactions`. | The RFC-0010 character spec; binding to `route` paths; seats; interactions; protection. |
 | `mover` | `speed` (m/s), `accel` (m/s², default 1), `bank` (`{max, gain}`, max 0-45 deg), `pitch` (`follow` or `level`), `offset` (asset-space vector from the path point to the origin), `item` (bool). | Binding to `track` paths; with `item: true`, pooled items on tracks. World format 0.10 (P3). |
 | `seat` | `anchors`: 1-8 seat anchors; `capacity` (default: the number of anchors). | Sit stops for characters; player sitting later. |
-| `mount` | `anchors`: RFC-0005 tool-mount anchors in asset space (`id`, `pose`, `size`, `screenType`). | **Reserved** (P4): a prop that holds a window. Rejected in 0.9. |
+| `mount` | `anchors`: RFC-0005 tool-mount anchors in asset space (`id`, `pose`, `size`, `screenType`). | **Reserved** (P4): a prop that holds a window. Rejected in 0.9 and 0.10. Object format 0.11 enables it for workspace screens ([amendment](#amendment-workspace-screens-in-object-format-011-and-ipc-027)). |
 | `machine` | — | **Reserved** for RFC-0013: animation, state palette and labels driven by bound data. Rejected in 0.9. |
 | `interactive` | — | **Reserved** (P4): use actions on ordinary objects. Rejected in 0.9. Character interactions are not this trait. |
 
@@ -1054,3 +1054,69 @@ override `{worldId, objectId, hidden: true}`, as `objects.hide` writes.
 **Not in P2.** The `travel` and `quest` actions; movers and track items (`source`, `sink`,
 `items`; world format 0.10); player sitting, `mount` and `interactive` (P4); avoidance between
 characters (RFC-0010 amendment).
+
+## Amendment: workspace screens in object format 0.11 and IPC 0.27
+
+**Status: draft** (object format **0.11** and IPC **0.27**, [schema](/reference/schema/ipc/0.27/),
+core `docs/CHANGELOG.md`). A user can place a screen anywhere, like any object, and bind it to a
+workspace; it then shows that workspace live like an authored home wall. It switches on the
+`mount` trait for the one role [RFC-0014](/rfcs/0014-builder/#workspace-screens) designed,
+`mounted-workspace`, and takes it outside the builder: screens are ordinary user placements in
+any world. World formats are unchanged; world packages can't author screens yet.
+
+**The trait (object format 0.11).** `traits.mount.anchors` holds 1-4 anchors `{id, role,
+mountType, pose, size, screenType?, frameNode?}` in asset space (front +Z, metres), at most one
+with the role `mounted-workspace`; `tool-mount` anchors are accepted and inert. A
+`mounted-workspace` anchor is **16:9** (within 0.5 %) or **21:9** (width over height 2.33 to 2.39:
+21:9, 64:27 and 43:18 panels), at least 0.9 m high at scale 1. Every anchor's rectangle lies
+inside the bounds grown by 0.1 m; `frameNode` names one scene node. `mount` combines with
+`decorative`, `collidable` and `movable`. Below 0.11 the trait is rejected ("needs object format
+0.11"). Not checked yet: that the rectangle clears the collision proxy (RFC-0014 asks for it).
+
+**Placing and binding.** A screen is placed like any movable object (catalog, pocket, tool 5,
+`objects.place`) and moved with the same tools. Placing it binds it to the **next free workspace**
+unless told otherwise: the lowest workspace above `windows.workspace_base` that is not a home of
+this world (authored or another screen), not an explicit home (`workspace.bind`), not the room and
+no configured location. The Director (or `objects.configure`) binds it to a chosen workspace,
+"next free", or none. A screen pocketed with tool 5 keeps its workspace for the next place.
+
+**Homes.** While a screen is placed (drawn, or still loading) and bound, core adds a home to the
+loaded world after the world's own: an area `screen-<placement id>` whose `workspaceSlot` is the
+workspace number, its primary anchor (the object's anchor at the instance pose and scale, `mount
+{type, role: mounted-workspace, interaction: focus-in}`) and an arrival spawn at the standback in
+front of it (max(2.5 m, 0.87 × width), on the floor with a clear capsule; nearer or further when
+that is blocked). The binding is a derived default like an authored slot home, after them and
+never persisted in the layout; a workspace an explicit or authored home already holds leaves the
+screen empty (`screen.unbound`). Everything RFC-0005 does for homes applies: the wall shows the
+workspace's windows, home windows stay tiled on their workspace (only the room workspace
+floats), F flies into the workspace, selecting the workspace travels to the screen, windows pulled
+from it leave for the room. Moving the screen moves the wall. A screen shows the workspace at the
+monitor's aspect, centred in its 16:9 or 21:9 frame (a 16:9 monitor's workspace is pillarboxed on a
+21:9 screen). Worlds without authored homes keep their room-anchor rules for room windows.
+
+**Placement rules.** RFC-0011's rules apply, with the screen's own approach zone (the box in front
+of its anchor) never refusing moves of that screen; every other object keeps out of it, as for
+authored walls. The RFC-0014 approach ghost and the standback checks are not part of this
+amendment.
+
+**Persistence.** The placement record in `editor.json` (version 2) gains `workspace` (1-9999).
+Core 0.8.4 and older reject placement records with fields beyond the lock, so a user character's
+route settings also failed a restart; the restore now accepts the character fields of IPC 0.23
+and `workspace`, and still refuses unknown fields.
+
+**IPC 0.27.** No new method, event or grant.
+
+| Change | Shape |
+| --- | --- |
+| `objects.catalog` entries | Required `screen`: null, or `{aspect: "16:9" \| "21:9", size: [w, h] (metres at scale 1), mountType}`. Screens are `placeable`. |
+| `objects` state instances | Required `screen`: null, or `{workspace: 1-9999 \| null, home: area id \| null, aspect, size}` (`size` at the instance's scale; `home` while it is a home). |
+| `objects.place` | Optional `workspace`: a number, `"next-free"` or null; omitted means `"next-free"`. Refused for other objects. |
+| `objects.configure` | The patch takes `workspace` (as above) besides `locked`; a locked screen refuses it unless the same patch unlocks it. |
+| `mounts` | Bound screens appear as areas, anchors and bindings (also to older peers, whose shapes they match). |
+| Errors | `-32005` with `rule` `workspace.taken` (another home holds it) or `workspace.reserved` (the room or a location); `-32008` when no workspace up to 9999 is free. |
+| Notices | `screen.bound`, `screen.unbound`. |
+
+Older peers see no `screen` field and can't send `workspace`.
+
+**Starter kit.** `com.hyprune.starter` 0.3.0 (unpublished) adds four screens built without
+Blender: a slim wall bezel and a frame on two legs, each 16:9 (3.2 × 1.8 m) and 21:9 (4.2 × 1.8 m).

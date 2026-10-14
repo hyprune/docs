@@ -814,6 +814,12 @@
    "covers": [
     "release:lumen-reach@0.11.3"
    ]
+  },
+  {
+   "date": "2026-10-15",
+   "time": "00:49",
+   "title": "Core 0.9.0",
+   "text": "The builder track is released: <a href=\"/reference/schema/ipc/0.27/\">IPC 0.27</a>, <a href=\"/reference/schema/world/0.11/\">world format 0.11</a> and object format 0.11 are final in @hyprune/schema 0.13.0 and SDK 0.11.0. Workspace screens you place anywhere, models imported from the Director, and your own world folders with panorama skies come out of draft. Also: user characters bound to a route survive a restart, and <code>hyprune-walk-check</code> lets world tools sweep walls and floor edges with the engine’s walker. <a href=\"/try-it/\">Try it</a> installs the new prebuilt."
   }
  ]
 }

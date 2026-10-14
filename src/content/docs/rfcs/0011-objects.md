@@ -595,6 +595,16 @@ capsule clear of collision, inside the playable union, outside approach zones,
 default spawn's navmesh island. A route spawn starts at `phase` along a route that passes the
 walkability check. Worlds without collision refuse user characters.
 
+**Standing spot in front of the player (amendment, core 0.8.3, no wire change).** Without a
+`pose`, the spot is the free one nearest 2 m straight ahead, from 1.5 to 6 m out and up to 80°
+either side of the view (spots in a 90° view first), with its floor within a step of the
+player's and nothing in the way at knee and chest height. Window placement zones and keep-clear
+volumes often cover the open floor in front of an area's screens; the spot is then past their
+edge. A refusal (-32007) carries the rule that refused the first candidate in `data.rule`:
+`support` (no floor), `walls`, `playable`, `approach`, `keep-clear` or `zone`, and the message
+says why (a placement zone by its id). Before 0.8.3, four spots straight ahead were tried and
+every refusal said `support`.
+
 ## Seats and sitting
 
 Seat anchors live on `seat` assets (asset space, moving with the instance) or in the world's

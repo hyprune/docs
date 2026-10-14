@@ -1390,6 +1390,13 @@
       "title": "Core 0.8.2",
       "text": "Fixes: a GPU that enforces less than 20 W no longer trips the offload power cap; new characters upload over several frames, so spawning a few no longer hitches; the reticle hint and route checks use the collision index; characters from older exporters (specular-glossiness materials) keep their colours; X11 menus stay with their own app instead of the focused window. No wire change; <a href=\"/try-it/\">Try it</a> installs the new prebuilt.",
       "generated": false
+    },
+    {
+      "date": "2026-10-14",
+      "time": "13:30",
+      "title": "Core 0.8.3",
+      "text": "Fixes: after a screen lock or the display turning off, the HUD comes back (the shell could not take its screen again); spawning a character in front of you finds open floor past the areas reserved for windows, and a refusal says why; the E USE / F FOCUS prompt hides while you use a window. No wire change; <a href=\"/try-it/\">Try it</a> installs the new prebuilt.",
+      "generated": false
     }
   ]
 }

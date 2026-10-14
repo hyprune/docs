@@ -498,3 +498,20 @@ registry kinds. The package ships `registry/`. World formats and IPC are unchang
 ## @hyprune/schema 0.12.0 (2026-10-13)
 
 Publishes IPC 0.26: tool 9 (the debug tool) with `editor.debugTool` and the world action `tool9`, the companion's pace (`companionState.pace`, `companion.mode` `pace`) and 128-item pocket and mount-instance lists. Inherits 0.25.
+
+## Object format 0.11 (draft) and IPC 0.27 (draft): workspace screens
+
+- `v0.11/object.schema.json` and `v0.11/library.schema.json`: the `mount` trait is
+  enabled. `anchors` holds 1-4 `{id, role (mounted-workspace | tool-mount), mountType,
+  pose, size, screenType?, frameNode?}`; at most one `mounted-workspace` anchor, which
+  is 16:9 within 0.5 % or 21:9 (aspect 2.33-2.39) and at least 0.9 m high. Every
+  anchor's rectangle lies inside the bounds grown by 0.1 m; `frameNode` names one scene
+  node. `mount` combines with `decorative`, `collidable` and `movable`. Below 0.11 the
+  trait is rejected with "needs object format 0.11". New exports `screenAspect` and
+  `screenLimits`; example `examples/object-screen.json`.
+- IPC 0.27: `catalogEntry.screen` (required: null or `{aspect, size, mountType}`) and
+  `objectInstance.screen` (required: null or `{workspace, home, aspect, size}`).
+  `objects.configure` patches and `objects.place` take `workspace`: 1-9999,
+  `"next-free"` or null. New definitions `workspaceId`, `screenAspect`,
+  `catalogScreen`, `instanceScreen`. No new method, event or grant; `session.hello`
+  reports `0.27`. Inheritance test included.

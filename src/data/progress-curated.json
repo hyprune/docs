@@ -793,6 +793,15 @@
    "time": "23:30",
    "title": "Import a model from the Director",
    "text": "Objects → Import… turns a glTF, GLB, OBJ or FBX file into an object without Blender: it guesses the units and shows the size to confirm, turns Z-up models upright, simplifies to a triangle target, shrinks and compresses textures, builds a collision shape and a thumbnail, and records the licence, author and source you give it (or none). Big models import with warnings instead of refusals."
+  },
+  {
+   "date": "2026-10-14",
+   "time": "23:50",
+   "title": "Build your own world",
+   "text": "Director → Builder → Build: name a world and it opens as a big flat plain under a sky you can change, in a folder of its own. Place your imports, workspace screens and library objects; they are copied in, so the world keeps working wherever the folder goes. Save keeps a version with an optional message; Release gives it a version number, and with a GitHub repository it publishes the release in the <a href=\"/rfcs/0015-registry/\">registry format</a>. <a href=\"/reference/schema/world/0.11/\">World format 0.11</a> (draft) adds panorama skies.",
+   "covers": [
+    "world:0.11"
+   ]
   }
  ]
 }

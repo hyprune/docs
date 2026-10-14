@@ -531,3 +531,18 @@ Publishes IPC 0.26: tool 9 (the debug tool) with `editor.debugTool` and the worl
 - IPC 0.27 catalog entries gain required `warnings` (at most 8), `provenance` (null or
   `{license, author, source}`, "unknown" where unrecorded) and `imported` (null or
   `{at, sourceName}`); new definitions `catalogProvenance`, `catalogImported`.
+
+## World format 0.11, builder projects and IPC 0.27 builder state (drafts)
+
+- `v0.11/world.schema.json` and `v0.11/common.schema.json`: world format **0.11** (draft)
+  inherits 0.9 and adds `atmosphere.panorama` `{image, projection: "equirect", encoding?,
+  intensity?, rotation?, maxResolution? (256-2048), environment?}`. A 0.11 world may use object
+  format 0.11 assets (workspace screens, imports); `mount` is no longer reserved in inline
+  assets; movers stay reserved. World format 0.10 is not defined (`worldFormats` skips it).
+- `v0.11/project.schema.json`: `builder/project.json` (projectVersion 0.1): world id, name,
+  starter `flat-land@0.1`, base `builder/base.json`, sky provenance and up to 128 placements
+  `{id: u-xxxxxx, ref: world/<id>, pose, scale, workspace?, locked?}`. `validate('project')`
+  adds unique ids, unit quaternions, one screen per workspace and the sky's SPDX licence.
+- IPC 0.27: required state key `builder` (null, or `{projectId, worldId, name, folder, mode:
+  "edit", revision, placements, sky, error}`; also in deltas), catalog source `world` and
+  `world/<id>` object refs. New definition `builderState`.

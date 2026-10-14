@@ -88,6 +88,9 @@
   },
   "lumen-reach@0.11.2": {
    "summary": "The valley: the painted panorama continues into the terrain below the settlement, with no horizon seam; rock cliffs under the plinths."
+  },
+  "lumen-reach@0.11.3": {
+   "summary": "Nowhere to fall out of the world: the slot at the Signal Rise stair foot is floored, and every floor edge with nothing below it is guarded; a fall-through sweep with the walker is now a release gate."
   }
  },
  "timeline": [
@@ -801,6 +804,15 @@
    "text": "Director → Builder → Build: name a world and it opens as a big flat plain under a sky you can change, in a folder of its own. Place your imports, workspace screens and library objects; they are copied in, so the world keeps working wherever the folder goes. Save keeps a version with an optional message; Release gives it a version number, and with a GitHub repository it publishes the release in the <a href=\"/rfcs/0015-registry/\">registry format</a>. <a href=\"/reference/schema/world/0.11/\">World format 0.11</a> (draft) adds panorama skies.",
    "covers": [
     "world:0.11"
+   ]
+  },
+  {
+   "date": "2026-10-14",
+   "time": "23:51",
+   "title": "Lumen Reach 0.11.3",
+   "text": "Walking, running or autodriving past the foot of the Signal Rise snow-service stairs could drop you through a slot in the floor, one walker wide, into the valley. The floor is closed now, and a sweep of every wall, railing and floor edge with the engine’s own walker (walk, run and autodrive at five angles) found and closed the other places a walker could leave the world: the Sun Court’s west rail runs on under the West lookout, the hall’s upper flight has a railed foot landing, and invisible guards close the rest, roofs you can only fly to included. The sweep is now a release gate. Same frame times as 0.11.2.",
+   "covers": [
+    "release:lumen-reach@0.11.3"
    ]
   }
  ]

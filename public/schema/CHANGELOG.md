@@ -515,3 +515,19 @@ Publishes IPC 0.26: tool 9 (the debug tool) with `editor.debugTool` and the worl
   `"next-free"` or null. New definitions `workspaceId`, `screenAspect`,
   `catalogScreen`, `instanceScreen`. No new method, event or grant; `session.hello`
   reports `0.27`. Inheritance test included.
+
+## Object format 0.11 sizes, import.json and IPC 0.27 catalog fields (drafts)
+
+- Object format 0.11: for ordinary objects (not characters or items) the RFC-0011 budgets are
+  recommendations: over one is a warning ("(recommended; it still loads)"); only the new hard
+  caps refuse (`objectHardCaps`: 2,000,000 triangles, 8,192 px textures, 1 GiB GPU, 100,000
+  proxy triangles, 256 files, 512 MiB per directory, 64 MiB per file). Formats 0.9 and 0.10,
+  characters and items keep their budgets as errors.
+- `v0.11/import.schema.json`: `import.json` (importVersion 0.1, RFC-0014) beside `object.json`:
+  source file (name, format, bytes, sha256), converter, options (units, scale, up, yaw, surface,
+  triangle and texture targets, collision, KTX2, lighting), measures before and after, steps,
+  the recorded licence/author/source and the import time. `validate('import', record)`; the
+  object check validates it with `options.importRecord`.
+- IPC 0.27 catalog entries gain required `warnings` (at most 8), `provenance` (null or
+  `{license, author, source}`, "unknown" where unrecorded) and `imported` (null or
+  `{at, sourceName}`); new definitions `catalogProvenance`, `catalogImported`.

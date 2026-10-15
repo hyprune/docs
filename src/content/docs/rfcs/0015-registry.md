@@ -1044,3 +1044,80 @@ them; custom sources are never checked. `hyprune registry check` prints the same
   the base's `tools/sync-official.mjs` produces at the base: the network step re-runs the sync
   on an export of the base and the offline check compares (check 15, "Official sync match").
   Anyone else still cannot change official entries.
+
+## Amendment: IPC 0.32, the Library over IPC
+
+**Status: draft · 2026-10-16.** IPC 0.32 (draft), a new grant, and a state file moved.
+
+**Content sources move to `content-sources.json`.** The table in
+[Where state lives](#where-state-lives) put custom sources in
+`$XDG_CONFIG_HOME/hyprune/sources.json`, the file the RFC-0013 data-source helper already reads
+(an object with a `sources` list, written whenever a machine gets a source). Each program
+refused the other's keys, so placing a machine broke every registry command. Content sources
+are `$XDG_CONFIG_HOME/hyprune/content-sources.json` (same shape, the sources schema 0.1); the
+first read moves `version`, `builtin` and `custom` out of an existing `sources.json` and leaves
+the helper's keys there. `HYPRUNE_SOURCES_FILES` is unchanged.
+
+**Core runs the SDK pipeline.** IPC 0.32 adds the `content.*`, `sources.*` and `registry.*`
+methods of the [Contract plan](#ipc) that phase 1 has, so the Director's Library and other
+clients drive installs through core and all of them see the same jobs. hypruned runs each job
+with the SDK's CLI, which keeps the role of the fetch helper: `$HYPRUNE_CLI` (a command line
+split on spaces), else `hyprune` on `PATH`, launched without a shell or a terminal, with
+`--json --no-session` and no session socket, token or launch descriptor in its environment.
+Core still opens no network connection and holds no pipeline of its own; a CLI run outside
+core and a job inside it serialise on `content.lock` as before. Libraries a job installs reach
+core through its directory watch, worlds through the world root.
+
+**Grant.** `content.control` covers every mutation; reads need `state.read`. The trusted shell
+and the CLI may request it; worlds and extensions can't.
+
+| Method | Params → result | Grant |
+| --- | --- | --- |
+| `content.install` | `{source, type?, tag?, sha256?, override?, pin?, autoConfirm?}` → `{jobId}`; `source` is `{entry: {sourceId, id}}`, `{github: "owner/repo[/name]"}`, `{url}` or `{file}` (an absolute path); `type` (`world`, `library`) is required except for an entry | content.control |
+| `content.confirm` | `{jobId, accept}` → `{revision}`: a job in stage `confirm` | content.control |
+| `content.cancel` | `{jobId}` → `{revision}`: a queued job, or one waiting in `confirm` | content.control |
+| `content.update` | `{id}` or `{all: true}` → `{jobId}` | content.control |
+| `content.rollback` | `{id}` → `{jobId}` | content.control |
+| `content.pin` | `{id, pinned}` → `{jobId}` | content.control |
+| `content.remove` | `{id, version?, force?}` → `{jobId}` (`version`: one referenced library version) | content.control |
+| `sources.list` | `{}` → `{sources}` | state.read |
+| `sources.add` | `{url}` or `{github}`, with `{label?, id?, sha256?}` → `{jobId}` | content.control |
+| `sources.set` | `{id, label?, enabled?}` → `{jobId}` | content.control |
+| `sources.remove` | `{id}` → `{jobId}` | content.control |
+| `sources.refresh` | `{ids?}` → `{jobId}` | content.control |
+| `registry.list` | `{query?, type?, sourceIds?, tags?, cursor?, limit?}` → `{entries, cursor}` | state.read |
+| `registry.entry` | `{sourceId, id}` → `{entry, installed}` | state.read |
+
+Differences from the plan: every mutation is a job (rollback, pin, remove and source edits run
+the pipeline too; they skip `confirm`), so their results are `{jobId}`, not `{revision}`.
+`content.commit` is not in 0.32: phase 1 has no pending swaps, and updating, rolling back or
+removing the loaded world fails with rule `world.active`.
+
+**Jobs.** At most 16 are listed (`-32008` beyond), one runs at a time and the rest queue in
+order. A job is
+`{jobId, kind, stage, target, plan, progress, error, result, created}`: `kind` is `install`,
+`update`, `rollback`, `pin`, `unpin`, `remove`, `source.add`, `source.set`, `source.remove` or
+`source.refresh`; `stage` runs `queued`, `resolving`, `confirm` (install and update, until
+`content.confirm`; `autoConfirm` skips it for a plan without a source change or override),
+`downloading`, `verifying`, `extracting`, `validating`, `committing`, then `done`, `failed` or
+`cancelled`; `plan` is the CLI's plan (as in [the job example](#ipc), with `sourceChange` and
+`override`), `progress` `{bytes, totalBytes}` or null, `error` `{rule, message}` or null (the
+CLI's rules, plus `cli.missing` when the CLI can't run and `plan.changed` when the confirmed
+plan no longer matches), `result` the CLI's `done` result or null. Accepting a plan runs the
+job again with `--yes` (and `--accept-source-change` when the plan has a source change); the
+packages and hashes must match the confirmed plan. Finished jobs stay listed for 60 s.
+
+**State.** `content {revision, installs, updates, sources, jobs}`: `installs` are the CLI's
+`installed` items (`id, type, sourceId, display, sourceState, tag, version, previous, pinned,
+managed, removedFromSource, newerTag, license`), `updates` the number with a `newerTag` that are
+not pinned, `sources` the CLI's source list items. Core refreshes them from the CLI's listings
+(no network) at start, after every job, and when `content.json`, `content-sources.json` or a
+source cache changes; `registry.list` filters core's copy of `hyprune browse` the same way, so
+typing in Browse spawns nothing. `query` matches the id, name, summary and tags, case
+insensitive; `cursor` is opaque; `limit` is 1..100 (50).
+
+**Notices** (`runtime.notice` codes): `content.installed`, `content.updated`,
+`content.rolled-back`, `content.removed`, `content.failed`, `source.added`, `source.failed`.
+
+**Shell.** The Library uses these methods when the session advertises them and runs the CLI
+itself otherwise (older cores).

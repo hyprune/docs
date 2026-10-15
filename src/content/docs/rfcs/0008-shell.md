@@ -437,3 +437,53 @@ Captures taken while typing in an application, in focus or in the free cursor do
 not prompt, so those modes are never interrupted. Peers below 0.17 receive
 neither message and see captures exactly as before; all earlier capabilities are
 inherited.
+
+## Amendment: IPC 0.29 motion feel (draft)
+
+**Status: draft, 2026-10-15.** IPC 0.29 inherits 0.28. It changes the default keymap,
+makes the recorder a live debug tool for measuring motion feel, and adds frame pacing
+for rate-capped rendering ([RFC-0009](/rfcs/0009-offload-renderer/#amendment-ipc-029-even-pacing-draft)).
+
+**Input version 3.** World mode binds `sprint` to `Control_L`, `down` to `Shift_L`
+(crouch, fly down) and `record.toggle` to `Ctrl+r`, as in most first-person games.
+Ctrl+R is world mode only; in an application it stays the application's. A version 2
+file is upgraded once: each of those three bindings changes only if it still has its old
+default (Shift_L, Control_L, unbound) and the new key is free. Peers that negotiate an
+older version see and send version 2 with the same bindings. A recording replays with
+the keymap it was recorded with. Snapping (gizmo drags, path points) follows the sprint
+key, so holding it never moves the camera; in tools 3 and 4 a Shift press waits for the
+same 180 ms chord window as Ctrl (Ctrl+Shift+Z, Shift+End).
+
+**Recording format 2: live, without changing the feel.** A recording no longer switches
+motion to fixed 1/60 s steps, a logical input clock or continuous rendering, and starting
+one resets nothing: live motion is the same with recording on or off. It may start while
+keys are held (Ctrl's sprint while pressing Ctrl+R): they are recorded as presses in the
+first frame. Gestures, carries, climbing and scope still refuse a start. Each tick writes
+one frame record: the dt it moved by, its start, the backend presentation times since the
+previous tick, the refresh interval and VRR, CPU section times, the renderer's GPU time,
+the offload front, its age, latency and divisor, and the camera/tool state. Each draw
+writes the camera it showed with its CPU time, worker front and pose age. Every input
+keeps its receive time (pointer motion as raw deltas, buttons, wheel and world keys;
+application keys stay redacted as before). The header adds the monitor mode (size,
+refresh, VRR, scale), the GL vendor/renderer/version, the effective graphics, renderer
+and offload policy, and the core, protocol and world versions. Replay of format 2 feeds
+the recorded dt sequence back (format 1 files keep fixed steps). Files are bounded to
+64 MiB and 30 minutes.
+
+**Statistics.** Every 5 s the recording gets a stats record: presents and new frames per
+second, present-interval percentiles (p50/p95/p99/max), dt mean, deviation and maximum,
+missed refreshes and hitches (present intervals over 2.5x the window median and over two
+refreshes, with their time). The latest are in `recording.status` (`stats`, `elapsedMs`)
+and in the new state key `recording` (`active`, `startedAt` on the core steady clock,
+`path`, `stats`, `last`). A notice reminds after 5 minutes, then every 10.
+
+**Label on stop.** Files are named `rec-<local time>.jsonl`. When a recording stops, the
+reference shell shows the note prompt as a label prompt (the same exclusive-input flow as
+capture notes); Enter sends `recording.label {label, meta?}` (`input.control`, 1-120
+characters; meta under 4 KiB, the shell adds its version), which renames the last
+finished recording `rec-<time>-<slug>.jsonl` and writes a 0600 sidecar `.json` with the
+label and meta. An empty Enter or Esc keeps the time-only name. While a recording runs the
+HUD shows a red REC dot with the elapsed time.
+
+**Not in this amendment** (future): managing recordings in the Director, MP4 export,
+share buttons.

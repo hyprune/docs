@@ -688,3 +688,24 @@ assets with the package and catalog assets; each pose carries the per-frame pose
 every drawn character (clips, clip times, fade, look-at and model matrix), and the worker
 evaluates the same skinning. See [RFC-0010](/rfcs/0010-npcs/#amendment-runtime-in-core).
 
+
+## Amendment: IPC 0.29 even pacing (draft)
+
+**Status: draft, 2026-10-15.** Measurements of live captures showed the worker's frames
+landing unevenly: a third of new compositor frames repeated the previous world image and
+the next one carried two intervals of motion, although frames were not short. Three
+causes, fixed without a contract change: the frame budget counted presents instead of
+refresh intervals (a compositor presenting every second refresh earned half a frame per
+present), poses went out on an uneven grid with a varying pose-to-display latency, and the
+compositor paced worker frames again on its own `target_fps` divisor.
+
+IPC 0.29 adds `graphics.frame_pacing`: `even`, `max_rate` or null (the preset's value;
+every preset is `even`). **Even** sends a pose every n-th refresh, n the smallest refresh
+divisor whose rate stays within the power policy's cap (45 FPS at 98 Hz: every third
+refresh; 60 at 98 Hz: every second; 45 at 60 Hz: 30 FPS), and makes each finished frame
+the front a whole number of refreshes after the present its pose followed, enough for the
+recent round trips (p90 plus a margin), so every frame has the same latency. The stale
+limit for the in-process stand-in covers that latency. **max_rate** keeps the rate-only
+budget: more frames, unevenly spaced. In nested measurements at 98 Hz even pacing cut the
+spread of the shown pose's age over new frames from 4.4-6.1 ms to 0.4-2.1 ms, at about
+9 ms more latency. Older peers never see the setting.

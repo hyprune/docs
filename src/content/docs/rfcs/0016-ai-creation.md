@@ -3,7 +3,7 @@ title: "RFC-0016 — AI-assisted creation: an MCP server and a skill for buildin
 description: "Let a user describe a world, a machine or a companion to an AI assistant and have it built in Hyprune through the same operations the Director uses: an MCP server shipped with the SDK, a paired and scoped connection, undo through the world folder, and a skill that plans, builds and checks."
 ---
 
-**Status: draft · proposed 2026-10-15.** Nothing here is implemented. It builds on the builder
+**Status: draft · proposed 2026-10-15; open questions resolved 2026-10-15 ([below](#resolved-questions-lead-2026-10-15-the-owner-may-overrule)).** Nothing here is implemented. It builds on the builder
 and world folders of [RFC-0014](/rfcs/0014-builder/), the objects and placements of
 [RFC-0011](/rfcs/0011-objects/), the data sources and bindings of
 [RFC-0013](/rfcs/0013-live-objects/), companions in [RFC-0010](/rfcs/0010-npcs/), personal
@@ -115,14 +115,15 @@ The MCP client starts `hyprune mcp`, so it has no launch token from Hyprune's su
    connection and 3 per minute per user. `agent` is the MCP client's name and version as it
    reported them to the server (a label, not proof).
 2. Core asks the user in the HUD and the Director: "**<agent>** wants to build in Hyprune: world
-   folders, objects, behaviours, companions and quests. It can't see or use your windows."
+   folders, objects, behaviours, companions and quests. It can't see or use your windows." The
+   prompt says that the name is declared by the client itself.
    **Allow once**, **Always allow**, **Deny**. No answer in 120 s is a denial.
 3. On Allow, core answers with a one-use token for that connection; `session.hello` with it
    binds the `assistant` profile. On Deny, `-32002` rule `pair.denied`.
 4. **Always allow** stores `{clientId, agent, profile, approvedAt}` in
    `$XDG_STATE_HOME/hyprune/approvals.json` (0600; never a token). A later pairing that matches it
-   is approved at once, with a notice. Director → Settings → **Connections** lists approvals and
-   live connections, with Disconnect and Forget.
+   is approved at once, with a notice. Director → **Connected assistants** lists approvals and
+   live connections, with Disconnect and Revoke.
 
 Same-user processes are not isolated from each other (RFC-0003), so pairing is consent and
 visibility, not a barrier against local malware. It stops an assistant from acting in
@@ -179,9 +180,9 @@ snake case; every mutating tool takes `dryRun`.
 | Building | `catalog_search`, `place` (a primitive, a library or user object, or a workspace screen; key, pose, size, material), `edit`, `remove`, `material_set`, `import` (a local model or image, with licence, author and source) |
 | Machines | `source_list`, `source_set_http`, `source_propose_command`, `source_test`, `behaviour_set`, `behaviour_remove` |
 | Checking | `look`, `checklist`, `make_world`, `save`, `discard`, `history`, `undo`, `release_prepare` |
-| Characters | `companion_list`, `companion_choose`, `companion_mode` |
+| Characters | `companion_list`, `companion_choose`, `companion_mode`, `companion_name` (E2) |
 | Quests | `quest_list`, `quest_create`, `quest_update`, `quest_delete` |
-| Registry | `registry_search`, `registry_install` |
+| Registry and assets | `registry_search`, `registry_install`, `asset_fetch` (E2, allowlisted hosts) |
 
 **Resources:** `hyprune://world/current` (the summary of rule 7), `hyprune://catalog`,
 `hyprune://guide/building` (the builder guide). **Prompts:** `build_a_world` (the skill, below).
@@ -229,7 +230,7 @@ fed by a JSON API, and a quiet study with a CPU tower whose height follows CPU l
 | core | `session.pair` and the approval prompt hook; the `assistant` profile (method allowlist and filtered state); `approvals.json`; `preview.render {pose, fov, size}` → `{path}` (a PNG in the runtime directory, deleted after 60 s; offscreen framebuffer prepared with `doLater`, GL state saved and restored, windows as placeholders); the Connections data in state for the shell. One IPC version. |
 | schema | The IPC version: `session.pair`, `preview.render`, the profile name, the `connections` state key; `sources.json` `confirm`; project-file keys (with the builder phases). |
 | sdk | `hyprune mcp` (stdio, the official MCP TypeScript SDK), the tool and resource adapters, the journal, the CPU `look` renderer, the skill files; operations shared with the Director as SDK functions (`hyprune sources …` beside `hyprune builder …`). |
-| shell | The pairing prompt, the Assistant chip, Settings → Connections, the pending-command confirmation on the Data sources page, the Builder page's session changes. |
+| shell | The pairing prompt, the Assistant chip, Connected assistants, the pending-command confirmation on the Data sources page, the Builder page's session changes. |
 | sources helper | Skip and refuse `confirm: "pending"` entries. |
 | docs | This RFC, a "Build with an assistant" guide (connecting a client, what it can and can't do, undo). |
 
@@ -237,7 +238,7 @@ fed by a JSON API, and a quiet study with a CPU tower whose height follows CPU l
 
 | Phase | Delivers | Proven when |
 | --- | --- | --- |
-| **E1** | Pairing and the profile in core; the server with the world, building, machine (HTTP sources), checking and `look` (both renderers) tools; the journal and `undo`; the skill and prompt; the shell's prompt, chip and Connections. | In a nested session, the rooftop prompt is built end to end from an MCP client with a clip in the gallery; refused methods (`surface.focus`, `input.set`, `camera.set`, `data.publish`) fail with `-32002`; Deny, Forget and Disconnect work; a server killed mid-build and run again with the same plan finishes with no duplicate placements; undoing every step leaves the folder equal to its last save. |
+| **E1** | Pairing and the profile in core; the server with the world, building, machine (HTTP sources), checking and `look` (both renderers) tools; the journal and `undo`; the skill and prompt; the shell's prompt, chip and Connections. | In a nested session, the rooftop prompt is built end to end from an MCP client with a clip in the gallery; refused methods (`surface.focus`, `input.set`, `camera.set`, `data.publish`) fail with `-32002`; Deny, Revoke and Disconnect work; a server killed mid-build and run again with the same plan finishes with no duplicate placements; undoing every step leaves the folder equal to its last save. |
 | **E2** | Command proposals with the Director's confirmation; companions, quests and registry tools; `make_world` and the checklist tools as the builder's Make world lands; `release_prepare`. | A proposed command never runs before Allow; a companion chosen and set to walk by the assistant behaves as one chosen in the Director. |
 
 ## Decisions (defaults chosen for this draft)
@@ -247,19 +248,24 @@ fed by a JSON API, and a quiet study with a CPU tower whose height follows CPU l
    profile; no stored tokens.
 3. The assistant may Save (local commits, prefixed); it may not Release, set a remote or publish.
 4. HTTP sources without confirmation; command sources only after the user's Allow in Hyprune.
-5. No asset download tool in the server: the client fetches, the server imports with provenance.
+5. Assets: the client may fetch files itself and the server imports them with provenance; the server's own `asset_fetch` (E2) is limited to allowlisted hosts.
 6. Previews draw windows as placeholders, always, also when the user is in the world.
 7. Offline (Hyprune not running): world-folder tools work, in-world tools return
    `assistant.offline`; `look` uses the CPU renderer.
 
-## Open questions
+## Resolved questions (lead, 2026-10-15; the owner may overrule)
 
-1. Should Save from an assistant ask the user, like Release, instead of being allowed?
-2. Should the server offer an asset fetch tool limited to a list of CC0 hosts, for clients
-   without their own download tool?
-3. Is a remembered approval keyed by an unverifiable client label acceptable, or should every
-   session ask?
-4. Companions: is choosing, setting pace and style enough, or should an assistant also name a
-   companion (no IPC for names yet) or import a new character (RFC-0010's character import)?
-5. Should the world folder's placement cap (128 in project file 0.1) rise for assistant-built
-   worlds, with the per-world budgets as the only limit?
+1. **Save from an assistant** needs no extra prompt: it is a local commit that Revert undoes.
+   Every assistant save is labelled as one in History and counted on the HUD's Assistant chip.
+2. **Asset download:** in E2, an `asset_fetch` tool limited to an allowlist of CC0 and CC-BY
+   hosts (to start, the well-known CC0 texture, model and HDRI libraries). It records the source
+   URL, licence and author automatically, is size-capped, and refuses any other URL.
+3. **Remembered approvals** are allowed, keyed to the client's declared name. They are listed
+   under Director → **Connected assistants** with Revoke, and the pairing prompt says that the
+   name is declared by the client itself.
+4. **Companions:** E2 adds naming a companion and choosing among installed characters over IPC.
+   Importing a new character stays a user action through Objects → Import.
+5. **Placement cap:** 512 placements per world folder, with budget warnings from the checklist.
+
+Also agreed: data-driven behaviours are visual only (collision stays at the rest pose), and the
+starter is **Open Plain** (`open-plain@0.2`), with `flat-land@0.1` folders still loading.

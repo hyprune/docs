@@ -175,6 +175,12 @@ gauge](#wire-a-script-to-a-gauge)); a placed screen shows the next free workspac
 you pick) and becomes its home. The screens need core 0.9.0 or later, the shared clips core
 0.10.0.
 
+The optional **Hyprune companions** library (`com.hyprune.companions` 0.1.0, release
+`hyprune-companions-v0.1.0`, CC-BY-4.0) holds three original companions, Muse, Ember and
+Starlit, with their own `companion-moves` pack of fourteen dances. It is not preinstalled:
+install it from the registry or with `libraries.install`, then pick one in Director → Objects →
+Characters. The dances need core 0.10.0.
+
 A library publishes a set of objects with one manifest:
 
 ```text

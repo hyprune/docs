@@ -1018,6 +1018,7 @@ topics `hyprune` and `hyprune-<kind>` for discovery.
 A themed library of several companions (with its own motion pack of clips, RFC-0010's shared
 clip library, if it has any) is `<owner>/hyprune-companion-<theme>-pack`. One repository may
 hold several packages, each released with tags `<name>-v<version>` (like `hyprune/worlds`, which
-releases worlds and the starter kit). Repositories with several packages (tags `<name>-v<version>`, like `hyprune/worlds`) are
+releases the worlds, the starter kit and the optional companions library `com.hyprune.companions`
+with tags `hyprune-companions-v<version>`). Repositories with several packages (tags `<name>-v<version>`, like `hyprune/worlds`) are
 exempt. The community registry's checks print a warning for other names and never fail on
 them; custom sources are never checked. `hyprune registry check` prints the same warning.

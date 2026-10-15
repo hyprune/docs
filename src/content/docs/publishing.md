@@ -29,7 +29,8 @@ A themed library of several companions is `<owner>/hyprune-companion-<theme>-pac
 its own clips (dances, styled walks) as a motion pack in `motion/<id>/`; every character on the
 same skeleton can then play them ([shared clip library](/rfcs/0010-npcs/#amendment-shared-clip-library),
 `hyprune motion check`). One repository may hold several packages, each tagged
-`<name>-v<version>` (like `hyprune/worlds`, which releases worlds and the starter kit).
+`<name>-v<version>` (like `hyprune/worlds`, which releases the worlds, the starter kit and the optional companions
+library, `hyprune-companions-v<version>`).
 
 The registry's checks print a warning for other names and never fail on them; repositories
 with several packages are exempt. Keep sources in git with or without Git LFS, as you prefer:

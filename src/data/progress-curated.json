@@ -820,6 +820,12 @@
    "time": "00:49",
    "title": "Core 0.9.0",
    "text": "The builder track is released: <a href=\"/reference/schema/ipc/0.27/\">IPC 0.27</a>, <a href=\"/reference/schema/world/0.11/\">world format 0.11</a> and object format 0.11 are final in @hyprune/schema 0.13.0 and SDK 0.11.0. Workspace screens you place anywhere, models imported from the Director, and your own world folders with panorama skies come out of draft. Also: user characters bound to a route survive a restart, and <code>hyprune-walk-check</code> lets world tools sweep walls and floor edges with the engine’s walker. <a href=\"/try-it/\">Try it</a> installs the new prebuilt."
+  },
+  {
+   "date": "2026-10-15",
+   "time": "03:50",
+   "title": "Core 0.9.1",
+   "text": "Gauges read web APIs: the source helper polls HTTP sources with any method and body, finds secrets by name in a 0600 file or your keyring, and maps a response to a gauge’s value, colour and text with JSONPath-like paths. Director → Objects → <strong>Data sources</strong> edits every source and shows the raw response beside what would publish. <a href=\"/objects/#feed-a-gauge-from-a-web-api\">Feed a gauge from a web API</a>; <a href=\"/try-it/\">Try it</a> installs the new prebuilt."
   }
  ]
 }

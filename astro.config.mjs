@@ -46,6 +46,7 @@ export default defineConfig({
         { slug: 'roadmap' },
         { slug: 'contributing' },
         { slug: 'governance' },
+        { slug: 'release-highlights' },
         { slug: 'brand' },
         { slug: 'lessons' },
       ] },

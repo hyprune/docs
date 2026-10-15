@@ -206,8 +206,11 @@ and facing away from it; `height` (0.2-1 m) is the seat surface above that point
 
 Core lifts the seated character by the seat's height minus the height the `sit` clip was
 made for (`clips.sit.seatHeight`, or measured from the clip), and uses the seat only when
-the feet then end between 3 cm below and 45 cm above the floor; otherwise the stop is a
-plain stop. `hyprune-npc-check` prints the clip's measured seat height and how far its ankles
+the feet then end between 25 cm below and 45 cm above the floor; otherwise the stop is a
+plain stop. A seat lower than the character's own seat height (by up to 25 cm) is taken by
+seat adaptation: the hips sit lower and both legs bend more, with a two-bone solve that keeps
+each foot on the floor (a little forward) and flat, so a tall character sits on a low bench
+(core 0.10.1 and later; older cores refuse a seat more than 3 cm too low). `hyprune-npc-check` prints the clip's measured seat height and how far its ankles
 sink.
 
 **The starter kit residents** (objects 1.1.0, starter kit 0.3.0) have no sit of their own:

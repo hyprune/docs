@@ -143,7 +143,7 @@ Movement speed, view bob, the reticle and how far your hands reach are player se
 | Setting | Default | Valid range / meaning |
 | --- | --- | --- |
 | walk_speed | 4.0 | 0.5–20 m/s; walking and the flight base speed |
-| run_speed | 10.0 | 0.5–30 m/s while `sprint` is held; flight scales by run/walk |
+| run_speed | 10.0 | 0.5–30 m/s while `sprint` (Ctrl) is held; flight scales by run/walk |
 | view_bob | subtle | off, subtle or normal walking view bob |
 | reticle_style | cross_dot | cross_dot, t_dot, circle_dot, dot, cross or chevron |
 | reticle_size | 18 | 6–64 px, full extent |
@@ -156,8 +156,13 @@ Movement speed, view bob, the reticle and how far your hands reach are player se
 | reach_grab | 15 | 1–100 m; Super+button window gestures (carry, resize) |
 | reach_mount | 8 | 1–100 m; snapping into tool-mount frames (tools 2 and 5, releasing a carry) |
 | reach_placement | 12 | 1–100 m; placing on a surface and pocketing (tool 5), mounting on a wall (tool 2), path points (tool 3) |
+| look_inertia | 0.03 | 0–0.1 s (IPC 0.29); mouse look smoothing, 0 = raw input (lowest latency) |
+| move_inertia | 0.05 | 0–0.3 s (IPC 0.29); how quickly walking speeds up and slows down |
+| view_bob_roll | 0.4 | 0–2° (IPC 0.29); head tilt per stride on top of the view bob |
+| carry_turn | 0.11 | 0–0.4 s (IPC 0.29); how long a carried window takes to turn to face you, 0 = rigid |
+| carry_follow | 0.04 | 0–0.3 s (IPC 0.29); how far a carried window trails behind its grab point when you turn, 0 = rigid |
 
-The graphics `reduced_motion` setting turns off the view bob and the dynamic reticle whatever these settings say. Clicking into a window with the normal tool has no reach limit; beyond the other limits the action is refused and a notice says how far away the target is.
+The graphics `reduced_motion` setting turns off the view bob, its head tilt, the carry easing and the dynamic reticle whatever these settings say. Every preset uses these defaults today; the graphics `frame_pacing` setting (IPC 0.29, `even` or `max_rate`, from the preset) chooses how a rate-capped offload renderer spaces its frames. Clicking into a window with the normal tool has no reach limit; beyond the other limits the action is refused and a notice says how far away the target is.
 
 The reticle shows what the current tool or held Super gesture would do: a valid target gets corner brackets in the valid colour, a target out of reach turns the reticle to the warning colour with a hollow centre and a **Too far: N m** label (a refused action also flashes it), a target that can't take the action turns the reticle into an x in the warning colour, and carrying a window shows brackets in the reticle colour. Shape changes go with every colour change, so no state relies on colour alone. The reticle is hidden in the free cursor and follows the pointer while typing.
 

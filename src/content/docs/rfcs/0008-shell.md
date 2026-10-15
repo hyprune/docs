@@ -487,3 +487,71 @@ HUD shows a red REC dot with the elapsed time.
 
 **Not in this amendment** (future): managing recordings in the Director, MP4 export,
 share buttons.
+
+## Amendment: IPC 0.30 settings presets (draft)
+
+**Status: draft, 2026-10-15.** IPC 0.30 inherits 0.29. It adds one global settings preset
+over every graphics and player setting, with the user's changes kept as explicit
+overrides, and two methods, `settings.get` (`state.read`) and `settings.set`
+(`input.control`). The CLI reaches them with `hyprune ipc call settings.get`; the
+reference shell's Settings page is built on them.
+
+**Presets.** A preset sets every graphics and player setting at once:
+
+| Preset | Sets |
+| --- | --- |
+| `auto` | `graphics.quality` auto: Low on integrated GPUs, Medium elsewhere |
+| `low` | quality low: simple shading, FSR 1, no MSAA, no bloom, linear fog, gradient sky |
+| `medium` | quality medium: reflections, normal maps, specular, light bloom, height fog, 2x anisotropy |
+| `high` | quality high: 2x MSAA, full bloom, smooth outlines, 8x anisotropy |
+| `ultra` | quality ultra: 4x MSAA, full bloom, smooth outlines, 16x anisotropy |
+| `usb-c` | quality medium, `graphics.offload` on, `graphics.frame_pacing` even: a laptop on USB-C power rendering on its discrete GPU |
+
+Every other setting takes its base default under every preset (the
+[player settings](/keymap/#player-settings) table, including the 0.29 feel settings
+`look_inertia`, `move_inertia`, `view_bob_roll`, `carry_turn`, `carry_follow`;
+`frame_pacing` is `even` in every tier). Presets list what they change, so a new preset
+or a per-preset value for an existing setting needs no protocol change. The preset is
+saved in `$HYPRUNE_SETTINGS_FILE`, else `$XDG_CONFIG_HOME/hyprune/settings.json`
+(`{"version":1,"preset":"medium"}`).
+
+**Overrides.** A user override is an explicit value in the existing files: a non-null
+key in `graphics.json` (null still means "the tier's value") or any key in
+`player.json`. Overrides are never guessed from values, so one that happens to equal the
+preset's default stays an override. Each setting resolves as: the preset's value, then the
+compositor config (`hl.plugin.hyprune.config`, for keys it sets), then the override.
+Changing the preset changes only settings without an override.
+
+**`settings.get`** returns `{preset, presets, settings, overrides, keymapDefaults, path,
+error}`. `presets` lists `{id, name, description, values, defaults}`, where `defaults`
+holds every setting's value under that preset on this machine (the tier is resolved
+for the current GPU). `settings` maps `graphics.<key>` and `player.<key>` to `{value,
+default, source}`: `source` is `user` (an override), `lua` (set in the compositor
+config) or `preset`. `overrides` counts the user entries. `keymapDefaults` is the default
+input config, for showing rebound keys.
+
+**`settings.set`** takes any of `preset` (an id), `set` (`{"graphics.msaa": 2}`: new
+overrides; null is refused, use reset), `reset` (a list of settings that return to the
+preset's default) and `resetAll` (clears every graphics and player override and restores
+the default keymap; the preset stays). They apply in that order: reset all, preset,
+reset, set. The whole request is validated before anything is saved, then the files
+are written, applied and published, and the new `settings.get` snapshot is returned.
+`graphics.set` and `player.set` keep working and create overrides the same way.
+
+**Migration.** The first 0.30 core to start with no preset in `settings.json` picks
+one from `graphics.json`: its `quality` (the old `intel` becomes `low`), else `auto`.
+Graphics and player values equal to that preset's defaults stop being overrides; the
+others stay. Nothing else changes, so the session looks the same before and after.
+
+**Reference shell.** The Director no longer has a top-level Performance tab; the live
+statistics, the rendering tier, offload and every performance control are in Settings.
+Settings has a category list on the left: Display & performance, Movement & camera,
+Controls & keys, HUD & reticle, World & characters, Guidance & focus, Data sources,
+Recording, Accessibility and Advanced. Up and Down step through the
+categories and Tab moves into the settings. A preset choice sits at the top. Each overridden setting shows a dot and a
+button back to the preset's default; each category shows its override count; "Reset all…"
+asks for confirmation; a search box filters every setting by name and description. The
+shell counts its own preferences (HUD concept, theme), the keymap and the daemon's
+guidance settings as overrides too, and reset all clears those as well. Below 0.30 the
+page works on `graphics.set`, `player.set`, `guidance.set` and `input.set` without
+presets.

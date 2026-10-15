@@ -31,7 +31,7 @@ A **movement mode** interprets navigation and proposes camera or player motion. 
 
 ## Shell
 
-A **shell** is the controls and overlays around the experience: the HUD, the Director (hold Tab: Map, Places, Surfaces, Workspaces, Help, What's new, Settings, Performance), warp transitions, notices and settings. Quickshell powers the reference shell, which offers three HUD concepts: Adventure, Instrument and Minimal. Another implementation can replace it using the same protocol and lease rules. See the [Shell contract](/rfcs/0008-shell/).
+A **shell** is the controls and overlays around the experience: the HUD, the Director (hold Tab: Map, Places, Surfaces, Workspaces, Help, What's new, Settings), warp transitions, notices and settings. Quickshell powers the reference shell, which offers three HUD concepts: Adventure, Instrument and Minimal. Another implementation can replace it using the same protocol and lease rules. See the [Shell contract](/rfcs/0008-shell/).
 
 ## Widget
 

@@ -55,17 +55,17 @@ With the `lumen-reach` kit:
 
 1. **Enter the world** with **Super+F12**. **F12** always returns to the ordinary desktop.
 2. **Walk and look.** Use **WASD**, **HJKL** or the arrows, and move the mouse to look. **Shift** runs, **Space** jumps (or climbs in flight), **Ctrl** crouches (or descends), **V** toggles noclip and **F4** flight.
-3. **Hold Tab for one second** to open the Director. Its tabs are Map (waypoints, travel, autodrive), Places, Surfaces, Workspaces, Help, What's new, Settings and Performance. **Escape** closes it.
+3. **Hold Tab for one second** to open the Director. Its tabs include Map (waypoints, travel, autodrive), Places, Surfaces, Workspaces, Help, What's new and Settings. **Escape** closes it.
 4. **Go home.** **Super+1** takes you to Sun Court, the home of workspace 21. **Super+2** to **Super+4** reach Array Hall, Rime Vault and Signal Rise. Windows on a workspace appear on its home's main wall.
 5. **Use a window in place.** Aim at it and press **E**. Keystrokes go to the app. **F** brings it to native 2D. **Super+Tab** or **Back** returns to the world.
 6. **Carry and pocket.** Hold **Super+left mouse** to carry an aimed window up to 15 m away, then **Super+wheel** to change its distance. A window grabbed from behind turns to face you. Released over a tool mount such as a lectern, it snaps into the frame, which highlights first. Tool **5** (Placement) pockets windows with the middle button and places them ahead with the left button or onto a surface with the right.
 7. **Free cursor.** From the world, **Super+Tab** gives you a real cursor while the camera freezes. Press it again to return.
 
-The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. Graphics presets (Low/iGPU, Medium, High, Ultra, auto), the upscaler (FSR 1 or bilinear) and the optional dGPU offload are in **Performance**; the field of view (30–120°, default 65°) is in **Settings → Movement**. On machines with more than one GPU, offload picks a discrete GPU that isn't driving the display and scales its power cap to that GPU.
+The full binding tables are on the [keymap](/keymap/) page. Bindings live in `~/.config/hyprune/input.json` and reload live; the Director's Settings tab edits them too. The settings preset (Automatic, Low, Medium, High, Ultra or USB-C laptop), the upscaler (FSR 1 or bilinear) and the optional dGPU offload are in **Settings → Display & performance**; the field of view (30–120°, default 65°) is in **Settings → Movement & camera**. On machines with more than one GPU, offload picks a discrete GPU that isn't driving the display and scales its power cap to that GPU.
 
 ## Player settings
 
-The Director's **Settings** tab has Appearance, Input bindings, Movement and Reticle sections; Movement and Reticle hold the player settings (field of view, speeds, view bob, reach and the reticle). They apply immediately and only changed values are saved, to `~/.config/hyprune/player.json`:
+The Director's **Settings** tab lists its categories on the left (Display & performance, Movement & camera, Controls & keys, HUD & reticle, World & characters, Guidance & focus, Data sources, Recording, Accessibility, Advanced) under one preset. A setting you change gets a dot and a ↺ button back to the preset's default, and it stays when you switch presets; **Reset all…** clears every change. The player settings (field of view, speeds, view bob, reach and the reticle) apply immediately and only changed values are saved, to `~/.config/hyprune/player.json`:
 
 - **Movement:** walk 4.0 m/s and run 10 m/s by default; view bob off, subtle (default) or normal.
 - **Reach:** how far your hands work. Window gestures such as carry and resize reach 15 m, snapping into tool mounts 8 m, and placing, pocketing and path points 12 m. Clicking into a window has no limit.

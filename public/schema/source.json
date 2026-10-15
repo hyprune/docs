@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/hyprune/schema",
-  "commit": "5c95119cf9a18526fa20fe9e0f4da6d74c21cfb4",
+  "commit": "34849da45183a6f70745ac9efb45d6a28c193d63",
   "committed": "2026-10-15",
   "files": {
     "examples/extension.json": "7ef103bfbf43c12ad1db7486827a930a552f41a04ef386a67331123c90af272e",
@@ -77,6 +77,7 @@
     "extensions/blueprint.schema.json": "5fd9779c74253591ca237249d31e8f52c6b5f5d0c3673c0aa225aca2b122d0db",
     "extensions/hud-style-manifest.schema.json": "e733a0e732043ecc6617554a6b3edf1e935fce096d3134fff62dbbd87ba65bdd",
     "extensions/hud-style.schema.json": "7ffd094df592c85259c1de9f1cd93b2bbcf8cb7fc9486a3496b0bac4b54d09a5",
+    "motion/v0.1/motion.schema.json": "f56bc4ad7605f05ac971d597fb1c0599d5fdd92602bc6bbd58bf8e55ad255724",
     "registry/v0.1/index.schema.json": "3cde61b7f936735b8389ae5d15e5cb50104185da3051c6f567491b51cb03296a",
     "registry/v0.1/release-record.schema.json": "280637adce10ae76dde68fb32aaeb7e8eec74a48606e8903093850d4c04f9294",
     "registry/v0.1/sources.schema.json": "b8ecb901fccbfd5cfb9ed4661a3667075a0701949e5e9049b84914039af08e09",
@@ -117,6 +118,7 @@
     "v0.25/ipc.schema.json": "5e6e607895c1403f1de3881103b04acaa33fdc3274411eee79899f4a7c49127d",
     "v0.26/ipc.schema.json": "f862812dffadbb98f8601c56b2e325ec8ca6d8b0a9b61de09df16f4cfe830358",
     "v0.27/ipc.schema.json": "e0e6e326775334c5b577439c4e6c6e6f8ca8502ff3f3fa32f9bbd4519b4d559e",
+    "v0.28/ipc.schema.json": "cf240e4de27ecffdc2782357ce21a423e3bfa6a329c33fd0f7821407ffcfc308",
     "v0.3/common.schema.json": "7d09e00487407c05af053336adab990acb8dc91f80d15b914d8439e780e6c138",
     "v0.3/ipc.schema.json": "815e3bd2dac366bde101c9f81adf95b4f587ade4bbed42f880ce2949e9f2c5d3",
     "v0.3/world.schema.json": "56efe855b91924964b1b26a7363e080b36d7310b0263bfed0bfc605d1e880ad9",
@@ -143,7 +145,7 @@
     "v0.9/library.schema.json": "55b696d630dfd28bc3390242c50979bcd79f6fcb9b5925575a2e7bc5eb5ae934",
     "v0.9/object.schema.json": "f0b1279e5e383f790b391042234635decb267eb3f9eb58362ed8f9401ce04d3a",
     "v0.9/world.schema.json": "268d6c7cf7ad2e9733b77d4867e012cc7abccfbbb732f8d62c224a5454f6f357",
-    "CHANGELOG.md": "b94a96ce804526bfc025b9203959b0a259f1c58d92fc15938abc94291313a802"
+    "CHANGELOG.md": "a8300f3a6af93312f4499fbddf0a475a0d8d9b7cf9e113dbe918fc04a23e0c77"
   },
   "added": {
     "examples/extension.json": "2026-10-07",
@@ -220,6 +222,7 @@
     "extensions/blueprint.schema.json": "2026-10-11",
     "extensions/hud-style-manifest.schema.json": "2026-10-08",
     "extensions/hud-style.schema.json": "2026-10-08",
+    "motion/v0.1/motion.schema.json": "2026-10-15",
     "registry/v0.1/index.schema.json": "2026-10-13",
     "registry/v0.1/release-record.schema.json": "2026-10-13",
     "registry/v0.1/sources.schema.json": "2026-10-13",
@@ -260,6 +263,7 @@
     "v0.25/ipc.schema.json": "2026-10-13",
     "v0.26/ipc.schema.json": "2026-10-13",
     "v0.27/ipc.schema.json": "2026-10-14",
+    "v0.28/ipc.schema.json": "2026-10-15",
     "v0.3/common.schema.json": "2026-10-07",
     "v0.3/ipc.schema.json": "2026-10-07",
     "v0.3/world.schema.json": "2026-10-07",

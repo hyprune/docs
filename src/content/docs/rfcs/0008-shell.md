@@ -456,9 +456,10 @@ same 180 ms chord window as Ctrl (Ctrl+Shift+Z, Shift+End).
 
 **Update: the sprint/down swap is undone** (no wire change, input stays version 3). World
 mode binds `sprint` to `Shift_L` and `down` to `Control_L` again; `record.toggle` stays
-`Ctrl+r`. Wherever a Ctrl chord can follow (any Ctrl binding of world mode, undo/redo in tools
-3 and 4), Ctrl's own actions wait up to 180 ms, and a bound Ctrl chord consumes them (or ends
-them, held longer), so Ctrl+R never moves the camera. Snapping is Shift again. A keymap still at
+`Ctrl+r`. Ctrl goes down at once; a bound Ctrl chord (Ctrl+R, any Ctrl binding of world mode)
+while Ctrl is held ends the descent for the rest of the hold and, if no other movement key came
+since Ctrl went down, restores the height and crouch from the Ctrl press, so Ctrl+R never
+leaves the camera lower. Tools 3 and 4 keep their 180 ms Ctrl hold-back for undo and redo. Snapping is Shift again. A keymap still at
 exactly the swapped pair is restored once at startup; customised bindings stay, and a version 2
 file only gains `Ctrl+r` where it is free.
 

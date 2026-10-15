@@ -454,6 +454,14 @@ the keymap it was recorded with. Snapping (gizmo drags, path points) follows the
 key, so holding it never moves the camera; in tools 3 and 4 a Shift press waits for the
 same 180 ms chord window as Ctrl (Ctrl+Shift+Z, Shift+End).
 
+**Update: the sprint/down swap is undone** (no wire change, input stays version 3). World
+mode binds `sprint` to `Shift_L` and `down` to `Control_L` again; `record.toggle` stays
+`Ctrl+r`. Wherever a Ctrl chord can follow (any Ctrl binding of world mode, undo/redo in tools
+3 and 4), Ctrl's own actions wait up to 180 ms, and a bound Ctrl chord consumes them (or ends
+them, held longer), so Ctrl+R never moves the camera. Snapping is Shift again. A keymap still at
+exactly the swapped pair is restored once at startup; customised bindings stay, and a version 2
+file only gains `Ctrl+r` where it is free.
+
 **Recording format 2: live, without changing the feel.** A recording no longer switches
 motion to fixed 1/60 s steps, a logical input clock or continuous rendering, and starting
 one resets nothing: live motion is the same with recording on or off. It may start while

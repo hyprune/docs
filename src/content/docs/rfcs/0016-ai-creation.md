@@ -3,7 +3,7 @@ title: "RFC-0016 — AI-assisted creation: an MCP server and a skill for buildin
 description: "Let a user describe a world, a machine or a companion to an AI assistant and have it built in Hyprune through the same operations the Director uses: an MCP server shipped with the SDK, a paired and scoped connection, undo through the world folder, and a skill that plans, builds and checks."
 ---
 
-**Status: draft · proposed 2026-10-15; open questions resolved 2026-10-15 ([below](#resolved-questions-lead-2026-10-15-the-owner-may-overrule)).** Nothing here is implemented. It builds on the builder
+**Status: draft · proposed 2026-10-15; open questions resolved 2026-10-15 ([below](#resolved-questions-2026-10-15)).** Nothing here is implemented. It builds on the builder
 and world folders of [RFC-0014](/rfcs/0014-builder/), the objects and placements of
 [RFC-0011](/rfcs/0011-objects/), the data sources and bindings of
 [RFC-0013](/rfcs/0013-live-objects/), companions in [RFC-0010](/rfcs/0010-npcs/), personal
@@ -253,7 +253,7 @@ fed by a JSON API, and a quiet study with a CPU tower whose height follows CPU l
 7. Offline (Hyprune not running): world-folder tools work, in-world tools return
    `assistant.offline`; `look` uses the CPU renderer.
 
-## Resolved questions (lead, 2026-10-15; the owner may overrule)
+## Resolved questions (2026-10-15)
 
 1. **Save from an assistant** needs no extra prompt: it is a local commit that Revert undoes.
    Every assistant save is labelled as one in History and counted on the HUD's Assistant chip.

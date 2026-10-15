@@ -1387,3 +1387,63 @@ cost of one small folder per size and material. Non-uniform stretching with the 
 added (numbers set exact sizes; the gizmo keeps uniform scale). The plane has a thickness (0.02 m
 by default) so it is solid from both sides. Data-driven behaviours on any placed object are the
 next amendment.
+
+## Amendment: data-driven behaviours (IPC 0.31)
+
+**Status: draft · proposed 2026-10-16.** Any object a user places (a shape, an import, a
+library object) can follow live data: a textured cube whose height is the CPU load, a bar that
+grows with a queue from a JSON API, a lamp that glows when a build fails. This is the subset of
+[RFC-0013](/rfcs/0013-live-objects/)'s phase 2 that needs no authored machine: the user binds a
+value to a property of the whole object, instead of an asset author binding inputs to slots.
+
+**A behaviour** reads one value and drives one property between **A** (`from`) and **B** (`to`):
+
+| `property` | A and B | Notes |
+| --- | --- | --- |
+| `scale` | per-axis factors (0.01 to 100) | About an `anchor` face: `bottom` (default), `top`, `left`, `right`, `front` (+Z), `back`, `centre`. A bar grows upward from its base. |
+| `move` | metres along the object's own axes | |
+| `rotate` | degrees about the object's own axes (applied Y, then X, then Z) | About the `anchor` (default `centre` in the shell). |
+| `colour` | `#rrggbb` | Replaces the base colour; a texture stays and is tinted. |
+| `glow` | strength 0 to 16, in a `colour` | The object takes the glow colour unless a `colour` behaviour sets one. |
+| `visible` | `above` and/or `below` | Shown while `above ≤ value < below`. |
+| `texture` | texture repeats (u, v) | `mode: "offset"` slides the texture; `"scroll"` takes speeds in repeats per second. |
+
+- **Input.** `input {source?, key?, min?, max?}`: by default key `value` of
+  `com.hyprune.sources.<placement id>`, the source the bundled source helper publishes for a
+  `sources.json` entry with that id (as a gauge reads), mapped from 0..100. A command source
+  printing JSON or an HTTP source with a `map` ([RFC-0013 phase 2](/rfcs/0013-live-objects/#amendment-data-sources-phase-2-helper-and-shell))
+  feeds it; any `data.publish` source works.
+- **Shaping.** t = (value − min) / (max − min), clamped to 0..1, then `easing` (`linear`,
+  `ease-in`, `ease-out`, `ease-in-out`, `step`), then `smoothing` (seconds to follow a change,
+  default 0.3; the first value shows at once). Reduced motion snaps and stops scrolling. Stale,
+  missing or unreadable data holds the last value (A before any).
+- **Several per object**, at most 8, each with a `key` unique in the placement. Moves, turns and
+  scales compose in list order (moves, then turns, then scales).
+- **Display only.** Collision, picking, placement rules and the saved pose keep the rest pose;
+  a behaviour never moves the object for the walker or for windows. Core draws the result in
+  both renderers (the offload worker receives the display transform, paint and texture offset
+  with each object's draw state) and culls with the displayed bounds.
+
+**Where they live.** In the placement record: `editor.json` for a placement in an ordinary
+world, `builder/project.json` (project 0.2 placements' `behaviours`) in a world folder, so a made
+world carries them in its folder. World packages don't author them yet (a later world format).
+
+**IPC 0.31 (draft; no new method, event or grant).** `objects.configure` patch `behaviours` sets
+the whole list (`[]` removes it; user placements only; allowed while locked, since only the look
+changes), with `dryRun` and the usual `key` selector; an invalid list is refused with `-32602`
+and the first problem. Instances carry `behaviours`: `null`, or per behaviour `{key, property,
+condition (fresh, stale, missing, error), value (the value read), t (0..1 before smoothing),
+behaviour (as set)}`, published when values or conditions change, never per frame.
+
+**The shell.** Objects → Placed → **Behaviours** on every user placement: the list with what each
+reads and its live value; **Add** (Grow, Move, Turn, Colour, Glow, Show / hide, Texture); the
+editor with A and B typed or **captured** from the gizmo (the editor remembers the rest pose; move,
+turn or scale the object with tool 4, Capture A, then B; Save puts it back), the anchor, the glow
+colour, slide or scroll, the value it reads, easing and smoothing. **Data source…** opens Objects →
+Data sources on the entry for this object's id (a new command entry when there is none), with
+Test, Run now and the helper's restart.
+
+**Decisions.** Behaviours act on the whole object, not on authored parts (machines keep slots);
+display only, so they never break the walkable world; glow paints the object in its glow colour
+(per-instance emission takes the paint colour, as machine palettes do); world packages can't
+author them yet.

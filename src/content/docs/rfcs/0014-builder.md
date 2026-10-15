@@ -1325,7 +1325,7 @@ the SDK CLI as an ordinary object format 0.11 directory, not drawn by core:
 - a collision proxy that matches it (a box, a convex hull, or one box per step, so stairs are
   walked up), and `movable` on floors or anywhere, upright or not, scale 0.25 to 4;
 - a CPU thumbnail, and `primitive.json` (`v0.11/primitive.schema.json`, primitiveVersion 0.1:
-  shape, size, steps, the material's key, name, colour and content digest, the generator).
+  shape, size, steps, the material's key, name, colour, glow and content digest, the generator).
 
 Its id is the shape and a digest of shape, size, steps and the material's content
 (`box-1a2b3c4d5e`): making the same shape twice gives the same directory, and another size or
@@ -1368,7 +1368,7 @@ of `from`. Save removes generated shapes that no placement uses (any request mak
   placement rules applied to the new asset; a workspace binding stays only on a screen) and
   `key` (null removes it).
 - Instances carry `key`; catalog entries carry `primitive` (`{shape, size, material {key, name,
-  colour, textured}}`, else null). A `world/<id>` entry generated after a folder loaded is found on
+  colour, textured, glow}}`, else null), so a shell can change a shape and keep its material. A `world/<id>` entry generated after a folder loaded is found on
   its first use.
 - A world folder holds up to 512 placements of up to 256 distinct assets (other worlds keep 128
   and 32); the per-world triangle, GPU and collision totals still apply. Older peers see no keys

@@ -468,7 +468,7 @@ application keys stay redacted as before). The header adds the monitor mode (siz
 refresh, VRR, scale), the GL vendor/renderer/version, the effective graphics, renderer
 and offload policy, and the core, protocol and world versions. Replay of format 2 feeds
 the recorded dt sequence back (format 1 files keep fixed steps). Files are bounded to
-64 MiB and 30 minutes.
+128 MiB and 30 minutes (poses rounded to 1e-6, timing to 1e-3 ms).
 
 **Statistics.** Every 5 s the recording gets a stats record: presents and new frames per
 second, present-interval percentiles (p50/p95/p99/max), dt mean, deviation and maximum,

@@ -42,6 +42,33 @@ from the planted foot), so it never slides.
 
 Characters that share the same skeleton template can share clips (`--clips-from`).
 
+### Shared clips (motion packs)
+
+A character on the Mixamo-style skeleton (`mixamo-v1`: the humanoid `Hips`, `Spine`, `Head`,
+arm and leg bones, any `mixamorig:` prefix) also plays the clips of every installed **motion
+pack** it lacks, retargeted to its body by core when it loads ([RFC-0010 shared clip
+library](/rfcs/0010-npcs/#amendment-shared-clip-library-draft), core 0.10.0 and IPC 0.28,
+draft). Its own clips always win, so a character only needs `idle` and `walk`; the starter
+kit's `starter-motion` pack adds styled walks, runs and idles, `wave`, `sit`, `sit_idle`,
+`stand` and talk reactions. Packs come from the world package (`motion/<id>/`), installed
+libraries and `$XDG_DATA_HOME/hyprune/motion/<id>/`.
+
+Styled clips are named `<role>_<style>` (`walk_confident`, `idle_calm`, `dance_shimmy`):
+users pick a walk, run and idle style for their characters and their companion in the
+Director, and a companion with `dance_*` clips offers Dance in its E menu.
+
+To make a pack from your own rigged exports (worlds repository):
+
+```sh
+node tools/gltf/motion-pack.mjs pack-spec.json motion/my-moves --rig a=export.glb
+hyprune motion check motion/my-moves
+hyprune-npc-check my-character.glb --motion motion/my-moves   # the clips it gains, speeds, foot slip
+```
+
+The spec names each clip's source animation, its public name, role and style, and optional
+`trim` and `hold` (a seated idle from the held end of a sit-down). Clips come out in place at
+30 fps; a walk's or run's speed is measured from its planted feet.
+
 ## Import and check
 
 ```
@@ -184,10 +211,13 @@ the feet then end between 3 cm below and 45 cm above the floor; otherwise the st
 plain stop. `hyprune-npc-check` prints the clip's measured seat height and how far its ankles
 sink.
 
-**The starter kit residents** have a sit clip made for a very low seat: the check measures a
-seat height of about -0.06 m with the ankles 0.08-0.13 m below standing. They suit low
-seats. On a 0.45 m bench the fit is accepted but the feet dangle about 0.4 m above the floor;
-for ordinary benches use a character whose `sit` clip was made for that height.
+**The starter kit residents** (objects 1.1.0, starter kit 0.3.0) have no sit of their own:
+they take `sit`, `sit_idle` and `stand` from the kit's `starter-motion` pack, an upright sit
+for ordinary benches (measured seats 0.24-0.36 m, no ankle sink; they sit on 0.40 m benches
+with the root lifted 0-0.16 m). On a core without motion packs they don't sit. The residents
+of starter kit 0.2.0 and earlier have a sit clip made for a very low seat (a seat height of
+about -0.06 m, the ankles 0.08-0.13 m below standing): on a 0.45 m bench their feet dangle
+about 0.4 m above the floor.
 
 ### Keep clear
 

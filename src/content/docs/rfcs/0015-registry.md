@@ -381,8 +381,9 @@ unavailable for 30 days is removed with the reason `unavailable`.
 
 ### Official entries
 
-The official index is generated from the meta repository's pins, `worlds/releases.json` and
-`libraries/releases.json`, by a sync job (a pull request from a bot, owned by CODEOWNERS).
+The official index is generated from the meta repository's pins, `worlds/releases.json`,
+`libraries/releases.json` and `libraries/optional.json` (official libraries that are listed but
+never preinstalled), by a sync job, reviewed by CODEOWNERS ([amendment](#amendment-optional-official-libraries-and-the-sync-pull-request)).
 The sync job checks that each pin's URL, sha256 and Nix hash agree and adds the entry fields
 the pins don't carry (name, summary, creator `hyprune`, thumbnails) from each release record.
 Official entries pass the same automated checks; their review happens earlier, in the
@@ -838,7 +839,9 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
 
 - **Official pins stay in the meta repository.** `worlds/releases.json` and
   `libraries/releases.json` remain the source of truth for what kits and the Nix modules ship
-  by default; the official index is generated from them, never the other way round, taking
+  by default (`libraries/optional.json` pins official libraries that are listed in the
+  registry but never preinstalled, such as the companions); the official index is generated
+  from them, never the other way round, taking
   each version's tag from its pinned release URL (`…/releases/download/<tag>/…`). An official
   release is "published" when its pin lands.
 - **The installer** (`install.sh`) keeps installing kit worlds from the pins into
@@ -989,9 +992,10 @@ the CLI when Node.js is present.
   step.
 - **World checks.** CI validates worlds with the SDK's validator and runs `hyprune-world-check`
   only when it is installed; without it CI prints a warning.
-- **Bot changes as pull requests.** The weekly re-verification and the official sync open or
-  update a pull request on a fixed branch (`reverify/weekly`, `sync-official/pins`) and start
-  the checks on it, instead of pushing to `main`. The dates a version was first found
+- **Bot changes as pull requests.** The weekly re-verification and the official sync push a
+  fixed branch (`reverify/weekly`, `sync-official/pins`) and start the checks on it, instead of
+  pushing to `main`; the official sync's pull request is opened by a release maintainer
+  ([amendment](#amendment-optional-official-libraries-and-the-sync-pull-request)). The dates a version was first found
   unavailable live in `state/reverify.json`; community entries unavailable for 30 days get an
   `unavailable` tombstone, official ones are only marked.
 - **Official entries without records.** No official release carries a release record yet, so
@@ -1022,3 +1026,21 @@ releases the worlds, the starter kit and the optional companions library `com.hy
 with tags `hyprune-companions-v<version>`). Repositories with several packages (tags `<name>-v<version>`, like `hyprune/worlds`) are
 exempt. The community registry's checks print a warning for other names and never fail on
 them; custom sources are never checked. `hyprune registry check` prints the same warning.
+
+## Amendment: optional official libraries and the sync pull request
+
+**Status: accepted · 2026-10-15.** No schema or IPC change.
+
+- **Optional official libraries.** The meta repository's `libraries/optional.json` pins official
+  libraries in the same record shape as `libraries/releases.json` (keyed by `id@version`). They
+  are official entries of the index like any other, but no install path preinstalls them: the
+  Nix and Home Manager modules, `install.sh` and try read only `libraries/releases.json`. The
+  first is `com.hyprune.companions` 0.1.0. `tools/sync-official.mjs` reads the three pin files
+  (`--optional` overrides the third).
+- **The sync pull request.** The organisation doesn't let GitHub Actions open pull requests, so
+  the sync job only pushes `sync-official/pins`, and a release maintainer opens the pull request
+  from it. The scope check accepts a `sync-official/*` pull request from the bot, as before, or
+  from a repository owner, member or collaborator when `entries/official/` equals exactly what
+  the base's `tools/sync-official.mjs` produces at the base: the network step re-runs the sync
+  on an export of the base and the offline check compares (check 15, "Official sync match").
+  Anyone else still cannot change official entries.

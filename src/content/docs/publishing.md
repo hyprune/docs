@@ -38,7 +38,9 @@ users never clone your repository, they download one release asset.
 
 **Ids.** The package id is reverse-domain (RFC-0004). Without a domain of your own, use
 `io.github.<owner>.<name>`: the registry checks that `<owner>` owns the repository.
-`com.hyprune.*` is reserved for official packages.
+`com.hyprune.*` is reserved for official packages. Official packages are listed from the meta repository's pins: preinstalled
+libraries in `libraries/releases.json`, optional ones (like the companions library) in
+`libraries/optional.json`.
 
 ## A release
 

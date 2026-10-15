@@ -262,6 +262,30 @@ the command and enter `cpu` as its argument.
 60 seconds. A script that computes its own average sends it as `average`; while that key is
 present it replaces the computed one.
 
+### Feed a gauge from a web API
+
+Director → Objects → **Data sources** lists every source and edits HTTP ones too. To show,
+say, the worst queue lag of an API on a gauge:
+
+1. **New HTTP.** Give it the gauge's ID (`u-3f9a1c`) as its **Id**, so the gauge reads it, and
+   the **URL**. For a token, add a header `Authorization` with prefix `Bearer ` and a **secret
+   name** (`ingest-token`); `{secret:name}` also works inside the URL or the body.
+2. **The map.** **Value** is a path into the response: `$.items[*].lag` with **Maximum**
+   picks the largest lag; **Scale** `0 … 60` makes 60 s a full gauge. **Level** thresholds
+   colour it (`warn at 50`, `fail at 90`, on the 0–100 value; "Low is bad" flips them), or
+   **Match text** maps a status text (`degraded=warn, down=fail`). **Display** is a template
+   (`{raw:d} s behind`), **Label** text or a path (`$.name`).
+3. **Test** shows the raw response beside what would publish and a preview of the gauge. A
+   secret it names but can't find shows as missing: paste its value and **Store in file**
+   (`~/.config/hyprune/secrets.json`, mode 0600) or **Keyring** (needs `secret-tool`). The
+   value never goes into `sources.json`.
+4. **Save.** The helper polls it (HTTP at least every 10 s; 2 s for this machine) and the gauge
+   follows.
+
+Paths: `$.a.b`, `$.items[0]`, `$.items[-1]`, `$.items[*].lag`, `$..name` (at any depth),
+`$.jobs[?(@.status == 'queued')]` (with **Count**). A command source takes the same map: with
+output **Number**, `{value}` is the number it printed.
+
 ### Advanced: the configuration files
 
 The Director edits files you can also write by hand; the source helper and core re-read them
@@ -276,8 +300,10 @@ when they change.
   ```
 
   `argv` runs without a shell; `intervalS` is at least 5 seconds. Saving in the Director
-  updates only that entry's `argv` and `intervalS` and keeps everything else in the file
-  (other entries and keys such as `env` or `timeoutS`). For example, a CPU gauge on the
+  updates only the keys it edits and keeps everything else in the file (other entries and
+  keys such as `env` or `ttlMs`). HTTP sources, secrets and the `map` are described in the
+  source helper's README (`dev/machines/README.md` in core) and
+  [RFC-0013](/rfcs/0013-live-objects/#amendment-data-sources-phase-2-helper-and-shell). For example, a CPU gauge on the
   bundled script is
   `{"id": "u-7c21e0", "kind": "command", "argv": ["/path/to/core/dev/machines/scripts/system-gauges.py", "cpu"], "intervalS": 5}`.
 - **Bindings.** `$XDG_CONFIG_HOME/hyprune/machines.json` changes what a placed machine reads.

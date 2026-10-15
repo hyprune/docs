@@ -4,7 +4,9 @@ description: "Objects that show the state of real systems: declarative bindings 
 ---
 
 **Status: draft · proposed 2026-10-11; the `live` state key and the catalog's machine inputs are
-specified for IPC 0.24 ([amendment below](#amendment-live-state-in-ipc-024)).** Beyond that and
+specified for IPC 0.24 ([amendment below](#amendment-live-state-in-ipc-024)); the source helper's
+HTTP sources, secrets and gauge map and the Director's Data sources page are in
+[phase 2](#amendment-data-sources-phase-2-helper-and-shell) (no IPC change).** Beyond those and
 the prototype it records (default bindings, the source helper's command sources), nothing
 here is implemented. It builds on world
 format 0.8 placed objects ([RFC-0004](/rfcs/0004-world-format/#amendment-world-08-placed-world-objects)),
@@ -983,3 +985,60 @@ that go up every 20-45 s), so the machine shows something live at once. The entr
 ordinary command source: the Data source section shows it with a hint, and the user edits or
 removes it like any other. An existing entry is never replaced, and machines placed before the
 shell saw the world's first state get none.
+
+## Amendment: data sources phase 2 (helper and shell)
+
+**Status: draft · proposed 2026-10-15; no IPC or format change.** The bundled helper and the
+reference shell gain what P1 asks for without `live.sources.*`, `live.secret.*` or
+`live.control`: HTTP sources with any method and body, secrets by name, a mapping from a
+response to a gauge's inputs, and a Director page for every source with a live Test. The
+helper's configuration stays the user's `sources.json`; secrets stay outside it.
+
+**Secrets.** A source names a secret in a header (`{"secret": "ci-token", "prefix": "Bearer "}`)
+or as `{secret:name}` in the URL, a header string or a body string (names: letters, digits,
+`._-`, at most 64). The helper resolves a name at fetch time from the environment
+(`HYPRUNE_SOURCES_SECRET_<NAME>`, development), then the **secrets file**
+(`$XDG_CONFIG_HOME/hyprune/secrets.json`, a JSON object of names to values; read only when it
+is a regular file of the user with no group or other permission bits), then the **desktop
+keyring** (`secret-tool lookup application hyprune secret <name>`). Values are sent only in
+the request: never into `sources.json`, a publication, a log, an error or a control answer (a
+response that echoes one back shows `***` in a test). The shell stores a secret in the file
+(created 0600; a file with another mode is refused, never loosened) or in the keyring
+(`secret-tool store`, the value on stdin). The P1 design (`live.secret.set`, the daemon's
+store) replaces this when core hosts sources.
+
+**HTTP.** `method` is `GET`, `POST`, `PUT` or `PATCH`; a `body` (not with `GET`, at most
+64 KiB) is any JSON value, sent as JSON, or a string, sent as text. `output` (`json`, `number`,
+`text`, `lines`, as for commands) reads non-JSON answers. Timeouts, back-off, `Retry-After`,
+same-origin redirects, the 1 MiB body cap and the local-address rules are unchanged.
+
+**Selectors.** Besides JSON Pointers, fields take a JSONPath-like `path`: `$`, `.name` and
+`['name']`, indexes (negative from the end), slices, `*`, `..name`, and filters
+`[?(@.a.b == 'x')]` (`==`, `!=`, `<`, `<=`, `>`, `>=` with a string, number, `true`, `false`,
+`null`; `[?(@.a)]` for presence), with an optional `reduce`: `count`, `sum`, `avg`, `min`,
+`max`, `first`, `last`.
+
+**Map.** A source's `map` produces a gauge's inputs from its output, for command and HTTP
+sources: `value` (a selection scaled from `min`..`max` to 0-100 and clamped), `level` (`ok`,
+`warn` or `fail`: thresholds `warn`/`fail` on the value or the raw number, `below` when low is
+bad, or a selection matched against texts), `display` (a template: `{raw:.1f}`, `{value}`,
+`{label}`, `{level}`, a field, `{$.path}`) and `label` (text or a selection). A key that
+fails is left out and reported like a field error; the others publish.
+
+**Control channel.** `test` accepts any command or HTTP definition and also answers `raw`
+(the first 4 KiB of the stdout or the body, also of an error response), `rawBytes`,
+`httpStatus`, `contentType` and `secrets` (where each named secret is found: `env`, `file`,
+`keyring` or `null`). A new op `{"op": "secrets"}` lists the names the configuration refers to
+with their origin, the secrets file's path and why it is not read (`fileProblem`), and whether
+the keyring can be asked; never a value.
+
+**Director → Objects → Data sources.** Every `sources.json` entry with its state from the
+helper; New HTTP and New command; an editor for the request (method, URL, headers with secrets
+by name, body; or a command and its arguments), the output, the interval and timeout, and the
+map (value path with reduce and scale, level thresholds or matched text, display template,
+label). **Test** runs the definition as written and shows the raw response beside the mapped
+values and a gauge preview; nothing publishes. The secrets the source names are listed with
+where the helper finds them, and a missing one is typed into a password field and stored in
+the file or the keyring. **Save** writes the entry (its other keys, such as `fields` or
+`ttlMs`, kept) and the helper reloads; **Run now** restarts it. A gauge reads the source whose
+id is its instance id, so a source saved under that id feeds it directly.

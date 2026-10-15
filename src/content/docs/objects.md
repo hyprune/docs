@@ -163,12 +163,17 @@ and describe the change (an `ATTRIBUTION.md` beside the objects is a good place)
 
 ## Libraries
 
-The official **Hyprune starter kit** (`com.hyprune.starter` 0.1.0) holds the Sun Court armillary,
-four ambient residents and five live machines with their job token, under CC-BY-4.0. It is a
-GitHub release on hyprune/worlds (`hyprune-starter-v0.1.0`); install it from the Director's
-Objects tab or with `libraries.install`. The residents are characters: spawn them from the
-Objects tab or reference them from a world 0.9 package ([NPC characters](/npc-characters/));
-placed machines read live data from a source of yours ([Wire a script to a gauge](#wire-a-script-to-a-gauge)).
+The official **Hyprune starter kit** (`com.hyprune.starter` 0.3.0, object format 0.11) holds the
+Sun Court armillary, four ambient residents, five live machines with their job token, three
+gauges (tube, abacus, voxel cube), four workspace screens (a wall bezel and a stand, each at
+16:9 and 21:9) and the `starter-motion` pack of shared clips, under CC-BY-4.0. It is a GitHub
+release on hyprune/worlds (`hyprune-starter-v0.3.0`); install it from the Director's Objects
+tab or with `libraries.install`. The residents are characters: spawn them from the Objects tab
+or reference them from a world 0.9 package ([NPC characters](/npc-characters/)); placed
+machines and gauges read live data from a source of yours ([Wire a script to a
+gauge](#wire-a-script-to-a-gauge)); a placed screen shows the next free workspace (or the one
+you pick) and becomes its home. The screens need core 0.9.0 or later, the shared clips core
+0.10.0.
 
 A library publishes a set of objects with one manifest:
 

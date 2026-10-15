@@ -1011,14 +1011,13 @@ topics `hyprune` and `hyprune-<kind>` for discovery.
 | `world` | A world package | `hyprune-world-tidepool` |
 | `objects` | An object, character or machine library | `hyprune-objects-garden-kit` |
 | `companion` | A library whose main item is a companion character | `hyprune-companion-drunk-ash` |
-| `companion` (themed pack) | A library of several companions on one theme | `hyprune-companion-neon-pack` |
+| `companion` (themed pack) | A library of several companions on one theme | `hyprune-companion-forest-pack` |
 | `extension` | An RFC-0007 process extension | `hyprune-extension-weather` |
 | `shell` | An alternative shell | `hyprune-shell-minimal` |
 
 A themed library of several companions (with its own motion pack of clips, RFC-0010's shared
 clip library, if it has any) is `<owner>/hyprune-companion-<theme>-pack`. One repository may
-hold several packages, each released with tags `<name>-v<version>`: the official optional
-companions library `com.hyprune.companions` is released from `hyprune/worlds` with tags
-`hyprune-companions-v<version>`. Repositories with several packages (tags `<name>-v<version>`, like `hyprune/worlds`) are
+hold several packages, each released with tags `<name>-v<version>` (like `hyprune/worlds`, which
+releases worlds and the starter kit). Repositories with several packages (tags `<name>-v<version>`, like `hyprune/worlds`) are
 exempt. The community registry's checks print a warning for other names and never fail on
 them; custom sources are never checked. `hyprune registry check` prints the same warning.

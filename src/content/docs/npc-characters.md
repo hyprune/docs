@@ -47,8 +47,7 @@ Characters that share the same skeleton template can share clips (`--clips-from`
 A character on the Mixamo-style skeleton (`mixamo-v1`: the humanoid `Hips`, `Spine`, `Head`,
 arm and leg bones, any `mixamorig:` prefix) also plays the clips of every installed **motion
 pack** it lacks, retargeted to its body by core when it loads ([RFC-0010 shared clip
-library](/rfcs/0010-npcs/#amendment-shared-clip-library-draft), core 0.10.0 and IPC 0.28,
-draft). Its own clips always win, so a character only needs `idle` and `walk`; the starter
+library](/rfcs/0010-npcs/#amendment-shared-clip-library), core 0.10.0 and IPC 0.28). Its own clips always win, so a character only needs `idle` and `walk`; the starter
 kit's `starter-motion` pack adds styled walks, runs and idles, `wave`, `sit`, `sit_idle`,
 `stand` and talk reactions. Packs come from the world package (`motion/<id>/`), installed
 libraries and `$XDG_DATA_HOME/hyprune/motion/<id>/`.

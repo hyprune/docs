@@ -21,16 +21,15 @@ lowercase slug, and add the GitHub topics `hyprune` and `hyprune-<kind>` so peop
 | `world` | A world package | `hyprune-world-tidepool` |
 | `objects` | An object, character or machine library | `hyprune-objects-garden-kit` |
 | `companion` | A library whose main item is a companion character | `hyprune-companion-drunk-ash` |
-| `companion` (themed pack) | Several companions on one theme | `hyprune-companion-neon-pack` |
+| `companion` (themed pack) | Several companions on one theme | `hyprune-companion-forest-pack` |
 | `extension` | An RFC-0007 process extension | `hyprune-extension-weather` |
 | `shell` | An alternative shell | `hyprune-shell-minimal` |
 
 A themed library of several companions is `<owner>/hyprune-companion-<theme>-pack`. It may ship
 its own clips (dances, styled walks) as a motion pack in `motion/<id>/`; every character on the
-same skeleton can then play them ([shared clip library](/rfcs/0010-npcs/#amendment-shared-clip-library-draft),
+same skeleton can then play them ([shared clip library](/rfcs/0010-npcs/#amendment-shared-clip-library),
 `hyprune motion check`). One repository may hold several packages, each tagged
-`<name>-v<version>` (the official `com.hyprune.companions` comes from `hyprune/worlds` with tags
-`hyprune-companions-v<version>`).
+`<name>-v<version>` (like `hyprune/worlds`, which releases worlds and the starter kit).
 
 The registry's checks print a warning for other names and never fail on them; repositories
 with several packages are exempt. Keep sources in git with or without Git LFS, as you prefer:

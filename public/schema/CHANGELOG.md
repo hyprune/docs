@@ -587,3 +587,131 @@ Publishes IPC 0.28 and motion packs (`motion/v0.1/motion.schema.json`, motionVer
 which were drafts until now: character styles, companion dances and catalog motion (the
 RFC-0010 shared clip library amendment). No object or world format change. IPC 0.28 inherits
 0.27.
+
+## IPC 0.29: motion feel
+
+- `inputConfig.version` is `3`: world mode binds `record.toggle` to `Ctrl+r` by default (a
+  version 2 file gains it once, where it is free); sprint stays `Shift_L` and down `Control_L`
+  (an early 0.29 draft swapped them; core restores a keymap still at that swap once). Peers
+  that negotiate an older version keep seeing and sending version 2. Description only: the
+  schema shapes are unchanged.
+- `graphicsConfig` (required) and `graphicsPatch` gain `frame_pacing`: `even`, `max_rate` or
+  null (the quality preset's value; every preset is `even`). Even pacing shows a rate-capped
+  renderer's new frames on a steady refresh divisor at a constant latency.
+- The debug recording (Ctrl+R, recording format 2): `recordingStatus` gains required `elapsedMs`,
+  `stats` (`recordingStats`: presents and new frames per second, present-interval percentiles,
+  dt mean/std/max, missed refreshes, hitches) and `last` (the last finished recording and its
+  label); `frame` may reach 432001 (30 minutes of live frames). New required state key
+  `recording` (`recordingState`: active, startedAt on the core steady clock, path, stats, last).
+  New method `recording.label` `{label, meta?}` (input.control): renames the last finished
+  recording `rec-<time>-<slug>.jsonl` and writes a sidecar with the label; returns the status.
+- Player settings (`playerConfig`, `playerOverrides`, `playerPatch`, `playerSettings.ranges`) gain
+  the feel settings: `look_inertia` (0-0.1 s, default 0.03), `move_inertia` (0-0.3 s, 0.05),
+  `view_bob_roll` (0-2 degrees, 0.4), `carry_turn` (0-0.4 s, 0.11) and `carry_follow`
+  (0-0.3 s, 0.04): look and movement smoothing, the walking bob's head tilt, and how a carried
+  window turns toward you and follows the centre ray.
+- No new event or grant; `session.hello` reports `0.29` and lists `recording.label`.
+  Inheritance test included.
+
+## IPC 0.30: global settings presets and overrides
+
+- `settings.get` (state.read) and `settings.set` (world.control). One global preset (`auto`, `low`,
+  `medium`, `high`, `ultra`, `usb-c`) gives every graphics and player setting a default; explicit
+  user overrides win and survive preset switches. `settingsState`: `preset`, `presets` (each with
+  `values` it sets and `defaults` for every governed setting), `settings` (`"<graphics|player>.<key>"`:
+  `settingsEntry` {value, default, source: user | lua | preset}), `overrides` (count),
+  `keymapDefaults` (the default input config) and the settings file `path` and `error`.
+- `settings.set {preset?, set?, reset?, resetAll?}`, applied as resetAll (every graphics, player and
+  keymap override; the preset stays), preset, reset (back to the preset's default), set (an explicit
+  override; null is refused). Returns the state.
+- `examples/input-v3.json`: the default keymap, input version 3.
+- No new event, grant or state key; `session.hello` reports `0.30` and lists both methods.
+
+## Builder project 0.2: Open Plain, sky presets, the floor
+
+- `v0.11/project.schema.json` (`validate('project')`) now takes `projectVersion` `0.1` (unchanged,
+  exact shape) or `0.2`. 0.2 adds the `open-plain@0.2` starter (`flat-land@0.1` stays for
+  upgraded folders), `sky.preset` (a built-in sky's id, or null for the user's image), an optional
+  `floor` `{preset, image, tile (0.25-100 m), license, author, source}` (exactly one of preset and
+  image; the licence an SPDX expression) and up to 512 placements (0.1: 128).
+- No world format or IPC change.
+
+## IPC 0.31: primitives and materials in the builder
+
+- **Placement keys** (`objectKey`, a slug of 1-48 characters, unique among the world's
+  placements): `objects.place {key?, ifExists?: "error" | "update"}`; `objects.transform`,
+  `objects.configure` and `objects.remove` take `{key}` instead of `{id}`; `objects.configure`
+  patch `key` (null removes it); instances carry required `key` (null when none). A taken key is
+  refused with rule `key.taken` and the placement's id, or with `ifExists: "update"` that
+  placement moves (and changes its ref) instead (`updated: true`). Removing a missing key
+  succeeds with `removed: false`.
+- **Dry runs:** `dryRun: true` on `objects.place`, `objects.transform` and `objects.configure`
+  checks everything and changes nothing; results say `dryRun: true`.
+- **Asset swaps:** `objects.configure` patch `ref` puts another catalog entry where a user
+  placement stands, keeping its id, key and pose (a primitive rebuilt at another size or with
+  another material).
+- Catalog entries carry required `primitive` (`catalogPrimitive` `{shape, size, material {key,
+  name, colour, textured}}` from the entry's `primitive.json`, else null). `builderState.placements`
+  may reach 512.
+- Error `data` may carry `hint` (how to fix it), `field`, and for `key.taken` the placement's `id` and `key`.
+- No new method, event or grant; `session.hello` reports `0.31`.
+- `v0.11/material.schema.json` (`validate('material')`, materialVersion 0.1): a builder material
+  `{key, name, colour, texture: null | {image, tile, width, height}, emissive: null | {colour,
+  strength}, roughness, metallic, license, author, source}`. `v0.11/primitive.schema.json`
+  (`validate('primitive')`, primitiveVersion 0.1): how a primitive object directory was generated
+  `{shape, size, steps?, material {key, name, colour, textured, emissive, digest}, generator}`; catalog primitives carry the material's `glow`.
+- Builder project 0.2 placements take an optional unique `key`.
+- **Data-driven behaviours**: `objects.configure` patch `behaviours` (the whole list,
+  at most 8, `[]` removes them; user placements only): each `behaviour` has a `key`, a
+  `property` (`scale` per axis about an `anchor` face, `move` in metres, `rotate` in degrees
+  about the anchor, `colour`, `glow` with a `colour`, `visible` with `above`/`below`, `texture`
+  offset or `mode: "scroll"`), an optional `input` `{source, key, min, max}` (default key
+  `value` of `com.hyprune.sources.<placement id>`, 0..100), `from` and `to`, `easing` and
+  `smoothing`. Instances carry required `behaviours` (`behaviourState` `{key, property,
+  condition, value, t, behaviour}` with the behaviour as set, or null). Display only: collision and placement rules keep the rest
+  pose. Builder project 0.2 placements carry `behaviours` (keys unique, min and max differ,
+  visible needs a threshold).
+
+## IPC 0.32: content, sources and registry (RFC-0015)
+
+- Methods `content.install`, `content.confirm`, `content.cancel`, `content.update`,
+  `content.rollback`, `content.pin`, `content.remove`, `sources.list`, `sources.add`,
+  `sources.set`, `sources.remove`, `sources.refresh`, `registry.list` and `registry.entry`.
+  Every mutation returns `{jobId}`; `confirm` and `cancel` return `{revision}`.
+- Grant `content.control` for the mutations; reads take `state.read`.
+- State key `content {revision, installs, updates, sources, jobs}` (also in `state.delta`
+  changes), with `contentInstall`, `contentSource`, `contentJob`, `contentPlan`,
+  `contentPlanPackage`, `registryEntry` and `registryVersion`. Job stages have no `pending`:
+  0.32 has no pending swaps of the loaded world (`content.commit` comes later).
+- Every 0.31 definition is unchanged (`test/content-ipc.test.mjs`), the data-driven behaviours of the 0.31 draft included.
+
+## Registry 0.1: the content lock (RFC-0015 P3)
+
+- `registry/v0.1/content-lock.schema.json`: `{lockVersion: "0.1", generated, packages}`, each
+  package an installed world or library at an exact release (`id`, `type`, `version`, `tag`,
+  an https `url`, `sha256`, `nixHash` and the source it came from), written by
+  `hyprune content lock` for the Nix and Home Manager modules' declarative installs.
+- `validateRegistry('content-lock', doc)` adds: one package per id and type, SemVer, the tag
+  naming the version, SPDX licences, and `nixHash` being the SRI form of `sha256`
+  (`sha256-` and the base64 of the digest). Example: `examples/registry/content-lock.json`.
+
+## Registry 0.1: `extension` reserved (RFC-0015)
+
+- `registry/v0.1/index.schema.json`: an entry's `type` may be `extension`, reserved for
+  RFC-0007 process extensions. No extension host exists yet: clients skip extension entries
+  (they are never listed or installed), and the official and community registries accept
+  none. Reserving the value now means an index that carries extensions later still
+  validates for clients built from this schema; their entries keep the package shape (release
+  assets, versions, hashes). Release records and the content lock stay `world` or `library`.
+- `validateRegistry` applies no archive limits to reserved types.
+
+## 0.15.0 — 2026-10-16
+
+Publishes IPC 0.29, 0.30, 0.31 and 0.32, builder project 0.2, builder materials
+(`v0.11/material.schema.json`, materialVersion 0.1) and generated primitives
+(`v0.11/primitive.schema.json`, primitiveVersion 0.1), which were drafts until now: player
+feel settings, frame pacing and the debug recording (0.29), global settings presets (0.30),
+placement keys, dry runs, asset swaps, catalog primitives and data-driven behaviours (0.31),
+and content, sources and registry methods (0.32, RFC-0015). Registry 0.1 gains the content
+lock and reserves the `extension` entry type. No world or object format change. Each IPC
+version inherits the one before it.

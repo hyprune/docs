@@ -705,13 +705,35 @@ RFC-0010 shared clip library amendment). No object or world format change. IPC 0
   assets, versions, hashes). Release records and the content lock stay `world` or `library`.
 - `validateRegistry` applies no archive limits to reserved types.
 
+## IPC 0.33: AI-assisted creation (RFC-0016)
+
+- `session.pair {protocols, client, agent {name, version?}, profile: "assistant"}`, allowed
+  before `session.hello` on an unauthenticated connection: core asks the user and answers with
+  `{token, profile, remembered}` (a one-use token for this connection) or `-32002` (rule
+  `pair.denied`). `session.hello` with the token binds the **assistant profile**: hello's result
+  gains `profile: "assistant"` and lists only the profile's methods.
+- `connections.answer {requestId, decision: once|always|deny}`, `connections.revoke {clientId,
+  agent}`, `connections.disconnect {actor}` and `connections.pause {actor, paused}` (shell.control);
+  `assistant.report {changes, action?}` (the assistant's change count and last action for the HUD;
+  answers `{paused, changes}`); `preview.render {pose {position, yaw?, pitch?}, fov?, size?}` ->
+  `{path, width, height, pose, fov, renderMs}` (a PNG in the runtime directory).
+- State key `connections {pending, live, approvals}` (shell.control peers only), with `agent`,
+  `connectionRequest`, `connectionLive` and `connectionApproval`. From 0.33 no state key is
+  required: a peer with the assistant profile receives only `builder`, `objects`, `live`,
+  `quests`, `companion`, `content`, `world`, `location` and `movement`.
+- E2: `companion.set` takes an optional `name` (1 to 32 characters, null for the character's
+  own); `assistant.report` takes `releaseDraft {projectId, version?, notes?}` (null clears it), shown
+  on the live connection (`connectionLive.releaseDraft`) for the Builder page's Release form.
+- Every other 0.32 definition is unchanged (`test/assistant-ipc.test.mjs`).
+
 ## 0.15.0 — 2026-10-16
 
-Publishes IPC 0.29, 0.30, 0.31 and 0.32, builder project 0.2, builder materials
+Publishes IPC 0.29, 0.30, 0.31, 0.32 and 0.33, builder project 0.2, builder materials
 (`v0.11/material.schema.json`, materialVersion 0.1) and generated primitives
 (`v0.11/primitive.schema.json`, primitiveVersion 0.1), which were drafts until now: player
 feel settings, frame pacing and the debug recording (0.29), global settings presets (0.30),
 placement keys, dry runs, asset swaps, catalog primitives and data-driven behaviours (0.31),
-and content, sources and registry methods (0.32, RFC-0015). Registry 0.1 gains the content
-lock and reserves the `extension` entry type. No world or object format change. Each IPC
-version inherits the one before it.
+content, sources and registry methods (0.32, RFC-0015), and AI-assisted creation (0.33,
+RFC-0016: pairing, the assistant profile, connections, `assistant.report` and
+`preview.render`). Registry 0.1 gains the content lock and reserves the `extension` entry
+type. No world or object format change. Each IPC version inherits the one before it.

@@ -278,7 +278,7 @@ use the same schema, `registry-index.schema.json` 0.1.
 | `successor` | Optional HTTPS URL of a newer index version for the same source. A client that supports it offers to switch the source to it; it never switches silently. |
 | `entries` | Required, at most 20,000, ids unique within the index. |
 | `entries[].id` | Reverse-domain id (RFC-0004). |
-| `entries[].type` | `world` or `library`. |
+| `entries[].type` | `world` or `library`; `extension` is reserved ([amendment](#amendment-the-extension-entry-type-reserved)). |
 | `entries[].name`, `summary`, `description` | Plain text (no markup is rendered): name 1-64 characters, summary at most 140, description at most 2,000. |
 | `entries[].creator` | 1-64 characters: who publishes it (for GitHub, the repository owner). |
 | `entries[].repo` | Optional HTTPS URL of the source repository. |
@@ -893,6 +893,7 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
 1. **Signatures.** Sigstore through the hosting platform's build attestations (keyless, bound
    to the repository and workflow that built the release) or minisign keys declared in the
    entry? How are keys rotated and revoked, and does a missing signature downgrade the label?
+   *See the [P4 proposal](#proposal-signatures-p4).*
 2. **Automatic merges.** Merge new versions of existing community entries automatically when
    the author maintains the repository and every check passes (proposed), or keep a human
    click for every pull request?
@@ -905,7 +906,8 @@ library, or a source that can't be removed; `-32007` a rule (as `error.rule`, wi
 6. **Licences in Nix.** How to map declared SPDX expressions that nixpkgs doesn't know, and
    whether non-free declared licences need `allowUnfree`.
 7. **Executable extensions in indexes.** A later `extension` type with RFC-0007 approvals, or
-   a separate index?
+   a separate index? *Resolved 2026-10-16: an `extension` type in the same indexes, reserved
+   until a host exists ([amendment](#amendment-the-extension-entry-type-reserved)).*
 8. **Duplicate content.** Should the registry flag an archive whose files match another
    entry's under a different id (re-uploads of someone else's work), or leave that to reports?
 9. **Popularity.** No download counts or ratings (proposed: nothing is reported back); is a
@@ -1121,3 +1123,117 @@ insensitive; `cursor` is opaque; `limit` is 1..100 (50).
 
 **Shell.** The Library uses these methods when the session advertises them and runs the CLI
 itself otherwise (older cores).
+
+## Amendment: the extension entry type, reserved
+
+**Status: accepted · 2026-10-16.** Registry 0.1 schema change (additive); no IPC change.
+
+An index entry's `type` may be `extension`, for RFC-0007 process extensions. No extension host
+exists yet, so the value is reserved:
+
+- **Clients skip extension entries.** An index carrying them stays valid; their entries are
+  never listed, counted, offered or installed. Release records and the content lock stay
+  `world` or `library`, so nothing can be installed as an extension.
+- **The official and community registries accept none.** The entry check refuses the type
+  ("reserved: the registry lists worlds and libraries until an extension host exists"), so
+  neither index carries one before a host ships.
+- **Same indexes, same package shape.** An extension keeps the release convention (assets,
+  record, versions, hashes); its archive allowlist, limits and the RFC-0007 approval shown
+  before an install are defined with the host. The index schema applies no archive limits to a
+  reserved type.
+
+Why reserve it now: the 0.1 schema accepts no unknown type, so a client rejects a whole index
+when one entry has a type it doesn't know. Clients built from this schema keep working once
+indexes list extensions; the registries should list none until clients without the
+reservation have had a release to move.
+
+## Proposal: signatures (P4)
+
+**Status: proposed · 2026-10-16.** Documentation only: nothing here is implemented, and the
+fields below are not in any schema yet.
+
+Hashes prove that an install is the package the index lists, not who built it. P4 adds an
+optional signature over the **release record**: the record already binds the archive's
+sha256, the thumbnails and the source repository, tag and commit, so one signature covers the
+whole release.
+
+### Two signer kinds
+
+| Kind | Proves | Key material | For |
+| --- | --- | --- | --- |
+| `sigstore` | The release was built by a named workflow in the entry's repository, from the tag. | None to manage: a short-lived certificate from the workflow's identity token, logged in a public transparency log. | Releases built by CI on the hosting platform (official releases, the repository template). |
+| `minisign` | The holder of a declared Ed25519 key signed the record. | A minisign key pair the creator keeps; the public key is in the entry. | Releases built by hand or elsewhere. |
+
+A `sigstore` signature is a bundle asset `<id>-<version>.release.json.sigstore.json`
+(certificate, signature and the log's inclusion proof), verified offline against the Sigstore
+trusted root, which the SDK carries and updates with its releases. Verification requires the
+certificate's identity to be the declared workflow in `entries[].repo` at `refs/tags/<tag>`
+and its issuer to be the platform's token issuer. A `minisign` signature is the asset
+`<id>-<version>.release.json.minisig`, checked with the entry's public key (Ed25519, no new
+dependency).
+
+### Fields
+
+| Where | Field | Rules |
+| --- | --- | --- |
+| Index entry | `signers` | Optional, 1-4 of `{kind: "sigstore", workflow}` (a workflow path in `repo`, such as `.github/workflows/release.yml`) or `{kind: "minisign", keyId, publicKey}`. Absent: the entry is unsigned. |
+| Index version | `signature` | Optional `{kind, url, sha256}` of the signature asset; required for every version when the entry has `signers`. |
+| Release record | (none) | The record is the signed payload and stays record 0.1. |
+| Content lock | `signature` | The asset's `{kind, url, sha256}` and the signer that verified it, so a locked install re-verifies offline. |
+
+The index fields can't be added to 0.1 as optional fields without breaking clients that
+don't know them (the schema accepts no unknown keys). Either they are reserved in 0.1 now, as
+optional fields current clients ignore, as was done for the `extension` type, or P4 ships as index
+0.2 at `…/v0.2/index.json`, with the 0.1 index pointing `successor` at it. Reserving them now
+costs one schema release and avoids a second index URL; that is the recommendation.
+
+### Verification and display
+
+- **Install pipeline.** After the record is fetched and before the archive download: when the
+  entry has `signers`, the version's signature must verify against one of them, or the job
+  fails with `signature.invalid`. There is no downgrade path: a signed entry's versions are
+  all signed.
+- **Updates.** An install remembers the signer that verified it. An update that is unsigned,
+  or signed by a signer the install didn't have, needs the same explicit confirmation as a
+  source change (no `--yes` shortcut).
+- **Labels.** A missing signature never changes a source label: labels say where a package
+  was listed, signatures say who built it. Provenance gains one line: "Signed: built by
+  `<repo>` (`<workflow>`) at `<tag>` · verified", "Signed: minisign key `<keyId>` ·
+  verified" or "Not signed".
+- **Plans over IPC.** A plan package gains `signature: {kind, signer, verified} | null` in
+  the IPC version that ships P4; `signature.invalid` is already in the error list.
+- **Core.** Unchanged: verification runs in the SDK CLI, which keeps the fetch helper's role.
+
+### Rotation and revocation
+
+- `sigstore`: no long-lived keys. Changing the release workflow is an entry change (a
+  registry pull request). A compromised release is marked `unavailable` or removed through
+  the report process, as today.
+- `minisign`: rotation is an entry change that adds the new key and, after the next release,
+  removes the old one. Removing a key revokes it: versions signed only by that key stop
+  verifying until the creator re-signs them (a new signature asset, then an index update).
+  The ownership check (write access to `repo`) applies to every `signers` change, and the
+  registry's history makes every key change visible.
+
+### Registries and sources
+
+- **Official.** Official releases are signed with `sigstore` by the release workflow of the
+  repository that builds them; once P4 ships, the official index requires signatures, and
+  the sync check verifies them.
+- **Community registry.** Signatures stay optional. When an entry declares `signers`, a new
+  pull request check verifies each new version's signature, and the weekly re-verification
+  checks the signature assets with the archives.
+- **Custom sources.** A `github:` source verifies a `sigstore` bundle against the repository
+  itself when the release has one (authorship by repository, with no index involved). A
+  package URL can pin a key: `--minisign-key <publicKey>`.
+- **Nix.** `hyprune content lock` verifies before writing the lock and records the signature
+  asset; the modules pin by hash as before and need no network or trusted root at build
+  time.
+
+### Still open
+
+- Reserve the fields in index 0.1 now, or ship index 0.2 (recommended: reserve now).
+- Whether the community registry should offer a "signed" filter in Browse, or leave
+  signatures to the entry page and the confirmation.
+- Updating the Sigstore trusted root between SDK releases (a TUF client in the CLI) or only
+  with releases (simpler, and the root changes rarely).

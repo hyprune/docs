@@ -3,7 +3,7 @@ title: "RFC-0016 — AI-assisted creation: an MCP server and a skill for buildin
 description: "Let a user describe a world, a machine or a companion to an AI assistant and have it built in Hyprune through the same operations the Director uses: an MCP server shipped with the SDK, a paired and scoped connection, undo through the world folder, and a skill that plans, builds and checks."
 ---
 
-**Status: draft · proposed 2026-10-15; open questions resolved 2026-10-15 ([below](#resolved-questions-2026-10-15)); phase E1 built ([as built](#amendment-phase-e1-as-built-ipc-033)).** It builds on the builder
+**Status: draft · proposed 2026-10-15; open questions resolved 2026-10-15 ([below](#resolved-questions-2026-10-15)); phases E1 and E2 released in core 0.11.0 with IPC 0.33 ([E1](#amendment-phase-e1-as-built-ipc-033), [E2](#amendment-phase-e2-as-built-ipc-033)).** It builds on the builder
 and world folders of [RFC-0014](/rfcs/0014-builder/), the objects and placements of
 [RFC-0011](/rfcs/0011-objects/), the data sources and bindings of
 [RFC-0013](/rfcs/0013-live-objects/), companions in [RFC-0010](/rfcs/0010-npcs/), personal
@@ -272,12 +272,12 @@ starter is **Open Plain** (`open-plain@0.2`), with `flat-land@0.1` folders still
 
 ## Amendment: phase E1 as built (IPC 0.33)
 
-**Status: draft · 2026-10-16.** E1 is built: pairing and the assistant profile in core, the
+**Status: accepted · 2026-10-16; released in core 0.11.0.** E1 is built: pairing and the assistant profile in core, the
 MCP server with the world, building, machine (HTTP sources) and checking tools, both `look`
 renderers, the journal and `undo`, the skill and the prompt, and the shell's prompt, chip and
 Connected assistants. The guide is [Build with an assistant](/assistants/).
 
-**IPC 0.33 (draft)** ([schema](/reference/schema/ipc/)). `session.pair {protocols, client,
+**IPC 0.33** ([schema](/reference/schema/ipc/0.33/)). `session.pair {protocols, client,
 agent {name, version?}, profile: "assistant"}` before `session.hello`, answered when the user
 decides with `{token, profile, remembered}` or `-32002` rule `pair.denied`; at most one waiting
 request per connection, 3 prompts a minute (a remembered approval prompts no one and isn't
@@ -341,7 +341,7 @@ rest (behaviours' display changes are not drawn).
 
 ## Amendment: phase E2 as built (IPC 0.33)
 
-**Status: draft · 2026-10-16.** E2 adds the rest of the tool list, in the same IPC draft:
+**Status: accepted · 2026-10-16; released in core 0.11.0.** E2 adds the rest of the tool list, in the same IPC version:
 
 - **Command proposals.** `source_propose_command {for | id, argv, intervalS?, timeoutS?, output?,
   map?}` writes the entry with `"confirm": "pending"`. The source helper keeps a pending entry

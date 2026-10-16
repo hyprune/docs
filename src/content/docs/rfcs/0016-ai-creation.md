@@ -3,7 +3,7 @@ title: "RFC-0016 — AI-assisted creation: an MCP server and a skill for buildin
 description: "Let a user describe a world, a machine or a companion to an AI assistant and have it built in Hyprune through the same operations the Director uses: an MCP server shipped with the SDK, a paired and scoped connection, undo through the world folder, and a skill that plans, builds and checks."
 ---
 
-**Status: draft · proposed 2026-10-15; open questions resolved 2026-10-15 ([below](#resolved-questions-2026-10-15)).** Nothing here is implemented. It builds on the builder
+**Status: draft · proposed 2026-10-15; open questions resolved 2026-10-15 ([below](#resolved-questions-2026-10-15)); phase E1 built ([as built](#amendment-phase-e1-as-built-ipc-033)).** It builds on the builder
 and world folders of [RFC-0014](/rfcs/0014-builder/), the objects and placements of
 [RFC-0011](/rfcs/0011-objects/), the data sources and bindings of
 [RFC-0013](/rfcs/0013-live-objects/), companions in [RFC-0010](/rfcs/0010-npcs/), personal
@@ -269,3 +269,72 @@ fed by a JSON API, and a quiet study with a CPU tower whose height follows CPU l
 
 Also agreed: data-driven behaviours are visual only (collision stays at the rest pose), and the
 starter is **Open Plain** (`open-plain@0.2`), with `flat-land@0.1` folders still loading.
+
+## Amendment: phase E1 as built (IPC 0.33)
+
+**Status: draft · 2026-10-16.** E1 is built: pairing and the assistant profile in core, the
+MCP server with the world, building, machine (HTTP sources) and checking tools, both `look`
+renderers, the journal and `undo`, the skill and the prompt, and the shell's prompt, chip and
+Connected assistants. The guide is [Build with an assistant](/assistants/).
+
+**IPC 0.33 (draft)** ([schema](/reference/schema/ipc/)). `session.pair {protocols, client,
+agent {name, version?}, profile: "assistant"}` before `session.hello`, answered when the user
+decides with `{token, profile, remembered}` or `-32002` rule `pair.denied`; at most one waiting
+request per connection, 3 prompts a minute (a remembered approval prompts no one and isn't
+counted) and 8 waiting at once (`-32008` rule `pair.limit`). `connections.answer {requestId,
+decision: once|always|deny}`, `.revoke {clientId, agent}`, `.disconnect {actor}` and `.pause
+{actor, paused}` for shell.control peers; `assistant.report {changes, action?}` → `{paused,
+changes}` for the assistant (its folder changes reach the HUD chip this way, since core sees only
+its own methods); `preview.render`. State key `connections {pending, live, approvals}` for
+shell.control peers only. From 0.33 no state key is required.
+
+**The profile** is enforced in the daemon's IPC server, never in the compositor:
+
+| | As built |
+| --- | --- |
+| Methods | `session.ping`, `state.subscribe/snapshot/unsubscribe`, `objects.catalog/place/transform/configure/remove/hide`, `paths.list/set/remove`, `libraries.list`, `world.load`, `companion.set/mode/clear`, `quests.list/get/create/update/delete/track`, `preview.render`, `assistant.report`. Anything else: `-32002` rule `profile.assistant`. The token's grants are `state.read`, `objects.control`, `world.control` and `quest.control`, whatever hello asks for. |
+| State | Only `builder`, `objects`, `live` (strings over 64 characters cut), `quests`, `companion`, `content`, `world`, `location` and `movement`. |
+| Events | `state.delta` only (no HUD, zone, mount, presentation or notice events). |
+| Limits | 20 changes a second and 5,000 a session (`-32008` rule `assistant.limit`); one preview a second (`preview.limit`); dry runs are free. |
+| Pause | Changes return `-32008` rule `assistant.paused` (retryable); the MCP server refuses its folder changes too. |
+| Disconnect | Closes the connection; the MCP server then refuses in-world tools for the rest of its session (`assistant.offline`) instead of pairing again behind the user's back. |
+
+**`preview.render`** runs `hyprune-preview`, a separate process with its own headless GL
+context (the integrated GPU on a hybrid machine), on a description of the loaded world from
+the plugin: the package or the folder's `builder/base.json`, every active user placement at its
+rest pose, the pose, the field of view and the size (at most 1,024 px). Windows are never drawn:
+screens show their empty frames. The PNG lives in `$XDG_RUNTIME_DIR/hyprune/previews/` for 60 s.
+A preview takes about 2–3 s (most of it loading the world).
+
+**The MCP server** implements the protocol's stdio transport and lifecycle itself (revisions
+2025-06-18, 2025-03-26 and 2024-11-05: tools, resources, prompts), so the SDK gains no
+dependency; tests drive it as a client does. It pairs as soon as the client initializes (so the
+prompt appears when the assistant starts), with the client's name and version as the agent
+label. Tools in E1: `world_list`, `world_create`, `world_open`, `world_describe`,
+`world_set_sky`, `world_set_floor`, `spawn_set`, `catalog_search`, `place`, `edit`, `remove`,
+`material_set`, `import`, `source_list`, `source_set_http`, `source_test`, `behaviour_set`,
+`behaviour_remove`, `look`, `checklist`, `save`, `discard`, `history`, `undo`. A yaw is a
+heading; an object at yaw *h* faces someone looking along heading *h* (at 0 its front faces +Z).
+`place` and `edit` resolve `on: {key, face}` and `relativeTo: {key, offset}` from the folder's
+bounds. In-world tools need the folder open in Hyprune (`world.not_open` with a hint otherwise).
+
+**The journal** keeps each change's inverse in memory (at most 256): core operations undo with
+the inverse method (a removal is placed again with its key, pose, scale, workspace and
+behaviours), sky, floor and spawn changes restore their files byte for byte and reload the
+folder, a material restores its files and swaps its shapes back. Generated shape folders and
+copies nobody places any more, and that the last save doesn't have, are removed. When `undo`
+reaches the last save of a folder that was saved then, it ends with Discard, which also restores
+what inverses can't (a re-placed placement's id and its order in the project file): the folder
+then equals its last save exactly. Creating a world, imports and saves are named and skipped.
+
+**The shell.** The Director shows a waiting request on top of every page (Allow once, Always
+allow, Deny, the seconds left); the HUD shows a banner that sends the user to the Director, and
+the Assistant chip (name, changes, last action, paused). Director → Builder → **Connected
+assistants** lists live assistants (Pause, Disconnect) and remembered ones (Revoke). The
+Builder page polls the folder while it shows, so an assistant's folder changes and the checklist
+appear as they happen.
+
+**Not yet (E2):** command proposals (`source_propose_command` with the Director's Allow),
+companions, quests and registry tools, `make_world` and `release_prepare`, `asset_fetch`, and
+area markers (`area_set`, `area_remove`) with the builder's areas. Previews show placements at
+rest (behaviours' display changes are not drawn).

@@ -40,6 +40,7 @@ export default defineConfig({
         { label: 'NPC characters (draft)', slug: 'npc-characters' },
         { label: 'Finding and installing packages', slug: 'packages' },
         { label: 'Publishing a package', slug: 'publishing' },
+        { label: 'Build with an assistant (draft)', slug: 'assistants' },
       ] },
       { label: 'Project', items: [
         { slug: 'progress' },

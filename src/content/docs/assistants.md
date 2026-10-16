@@ -38,8 +38,13 @@ remembered ones with **Revoke**.
 | --- | --- |
 | Make and open world folders, set the sky, the floor and the spawn | See or use your windows, workspaces, input, camera or focus |
 | Place shapes, catalog objects and workspace screens; move, resize and remove them | Change your settings, keymap or Hyprune's own files |
-| Make materials, import model files you name (with their licence) | Run commands (a command data source waits for your Allow) |
+| Make materials, import model files you name (with their licence) | Use files it has no licence record for |
 | Set HTTP data sources and data-driven behaviours | Read secrets (it can name one you set) |
+| Propose a command data source | Run it: Objects → Data sources shows the command with **Allow** |
+| Choose, name and set your companion; make quests | Import new characters (that stays yours) |
+| Search and install official or community packages | Add or refresh package sources |
+| Fetch CC0 textures, skies and models from Poly Haven, ambientCG or Kenney | Download from anywhere else |
+| Fill in a release (version and notes) for you | Press Release |
 | Look at what it built (rendered previews), read the checklist | Release, push or publish anything |
 | Save (a local commit labelled "Assistant: ") and undo its own steps | Act after you disconnect it |
 

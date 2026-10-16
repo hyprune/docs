@@ -338,3 +338,38 @@ appear as they happen.
 companions, quests and registry tools, `make_world` and `release_prepare`, `asset_fetch`, and
 area markers (`area_set`, `area_remove`) with the builder's areas. Previews show placements at
 rest (behaviours' display changes are not drawn).
+
+## Amendment: phase E2 as built (IPC 0.33)
+
+**Status: draft · 2026-10-16.** E2 adds the rest of the tool list, in the same IPC draft:
+
+- **Command proposals.** `source_propose_command {for | id, argv, intervalS?, timeoutS?, output?,
+  map?}` writes the entry with `"confirm": "pending"`. The source helper keeps a pending entry
+  out of its running sources (its status says `pending: true`), refuses one in its `test` op,
+  and accepts no other `confirm` value. Objects → Data sources shows it with the exact argument
+  vector: "An assistant proposed this command. It runs only after you allow it", **Allow** (the
+  entry written back without `confirm`), and the usual Test (the user's test runs it once) and
+  Remove. `source_set_http` on the same id replaces a proposal (an HTTP source needs no Allow).
+- **Companions.** `companion_list` (companion-capable characters and the current companion),
+  `companion_choose {ref, name?}`, `companion_name {name}` and `companion_mode {mode, pace?,
+  style?}`. IPC 0.33: `companion.set` takes an optional `name` (1 to 32 characters, null for the
+  character's own), kept in `companion.json` with the choice and shown everywhere the
+  companion's name is. Importing a character stays the user's (Objects → Import).
+- **Quests.** `quest_list`, `quest_create {quest, track?}`, `quest_update` and `quest_delete`
+  over the RFC-0012 methods (undo deletes a created quest; updates and deletions are named, not
+  undone).
+- **Registry.** `registry_search {query, type?}` over the official and community indexes as last
+  refreshed (custom sources are left out; refreshing and adding sources stay the user's), and
+  `registry_install {id, type, version?}` from those, through the SDK's installer (data only).
+- **`make_world`** makes `world.json` now (as Save does first) and answers the homes and the
+  checklist; it saves nothing.
+- **`release_prepare {version?, notes?}`** sends `assistant.report {releaseDraft {projectId,
+  version?, notes?}}`; the live connection carries it and Director → Builder shows "<agent>
+  prepared a release v0.2.0: …" with **Use it**, which fills the Release form. Only the user's
+  Release press makes the tag.
+- **`asset_fetch {url, author?, name?}`** downloads from Poly Haven, ambientCG and Kenney only
+  (https, redirects checked against the same list, at most 256 MiB, images, skies, models and
+  zips), into `$XDG_CACHE_HOME/hyprune/assets/`, and answers the path with `license` CC0-1.0, the
+  author and the source URL for `import`, `material_set` or `world_set_sky`.
+
+Still not built: area markers (`area_set`, `area_remove`) wait for the builder's areas.

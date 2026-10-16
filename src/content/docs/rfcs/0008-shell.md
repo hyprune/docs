@@ -438,11 +438,11 @@ not prompt, so those modes are never interrupted. Peers below 0.17 receive
 neither message and see captures exactly as before; all earlier capabilities are
 inherited.
 
-## Amendment: IPC 0.29 motion feel (draft)
+## Amendment: IPC 0.29 motion feel
 
-**Status: draft, 2026-10-15.** IPC 0.29 inherits 0.28. It changes the default keymap,
+**Status: accepted · proposed 2026-10-15; released in core 0.11.0.** IPC 0.29 inherits 0.28. It changes the default keymap,
 makes the recorder a live debug tool for measuring motion feel, and adds frame pacing
-for rate-capped rendering ([RFC-0009](/rfcs/0009-offload-renderer/#amendment-ipc-029-even-pacing-draft)).
+for rate-capped rendering ([RFC-0009](/rfcs/0009-offload-renderer/#amendment-ipc-029-even-pacing)).
 
 **Input version 3.** World mode binds `sprint` to `Control_L`, `down` to `Shift_L`
 (crouch, fly down) and `record.toggle` to `Ctrl+r`, as in most first-person games.
@@ -497,9 +497,9 @@ HUD shows a red REC dot with the elapsed time.
 **Not in this amendment** (future): managing recordings in the Director, MP4 export,
 share buttons.
 
-## Amendment: IPC 0.30 settings presets (draft)
+## Amendment: IPC 0.30 settings presets
 
-**Status: draft, 2026-10-15.** IPC 0.30 inherits 0.29. It adds one global settings preset
+**Status: accepted · proposed 2026-10-15; released in core 0.11.0.** IPC 0.30 inherits 0.29. It adds one global settings preset
 over every graphics and player setting, with the user's changes kept as explicit
 overrides, and two methods, `settings.get` (`state.read`) and `settings.set`
 (`input.control`). The CLI reaches them with `hyprune ipc call settings.get`; the

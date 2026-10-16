@@ -1049,7 +1049,7 @@ them; custom sources are never checked. `hyprune registry check` prints the same
 
 ## Amendment: IPC 0.32, the Library over IPC
 
-**Status: draft · 2026-10-16.** IPC 0.32 (draft), a new grant, and a state file moved.
+**Status: accepted · 2026-10-16; released in core 0.11.0.** IPC 0.32, a new grant, and a state file moved.
 
 **Content sources move to `content-sources.json`.** The table in
 [Where state lives](#where-state-lives) put custom sources in

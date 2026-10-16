@@ -1251,7 +1251,7 @@ it, so a released world can be built on again. A released world's id stays its p
 
 ## Amendment: the world wizard (builder project 0.2)
 
-**Status: draft · proposed 2026-10-15; no IPC or world format change.** **Director → Builder →
+**Status: accepted · proposed 2026-10-15; released in core 0.11.0 (builder project 0.2); no IPC or world format change.** **Director → Builder →
 New world…** replaces the name-only Build with a four-step wizard, and the first starter is
 named **Open Plain**. It implements this RFC's [I want to build a world](#i-want-to-build-a-world),
 [Starters](#starters) and the presets of [Sky: panorama](#sky-panorama), within the process
@@ -1309,7 +1309,7 @@ markers stay with [Spawn and area markers](#spawn-and-area-markers)).
 
 ## Amendment: primitives and materials (IPC 0.31)
 
-**Status: draft · proposed 2026-10-15.** Director → Objects → **Shapes** makes simple shapes at
+**Status: accepted · proposed 2026-10-15; released in core 0.11.0 (IPC 0.31).** Director → Objects → **Shapes** makes simple shapes at
 exact sizes, in a colour or a material, and places them like any object; a library of
 **materials** holds colours, textures, glow, roughness and metalness. They work in a world folder
 (saved in it, so it stays self-contained) and in any other world (saved in the user's own
@@ -1390,7 +1390,7 @@ next amendment.
 
 ## Amendment: data-driven behaviours (IPC 0.31)
 
-**Status: draft · proposed 2026-10-16.** Any object a user places (a shape, an import, a
+**Status: accepted · proposed 2026-10-16; released in core 0.11.0 (IPC 0.31).** Any object a user places (a shape, an import, a
 library object) can follow live data: a textured cube whose height is the CPU load, a bar that
 grows with a queue from a JSON API, a lamp that glows when a build fails. This is the subset of
 [RFC-0013](/rfcs/0013-live-objects/)'s phase 2 that needs no authored machine: the user binds a

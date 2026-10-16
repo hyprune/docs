@@ -689,9 +689,9 @@ every drawn character (clips, clip times, fade, look-at and model matrix), and t
 evaluates the same skinning. See [RFC-0010](/rfcs/0010-npcs/#amendment-runtime-in-core).
 
 
-## Amendment: IPC 0.29 even pacing (draft)
+## Amendment: IPC 0.29 even pacing
 
-**Status: draft, 2026-10-15.** Measurements of live captures showed the worker's frames
+**Status: accepted · proposed 2026-10-15; released in core 0.11.0.** Measurements of live captures showed the worker's frames
 landing unevenly: a third of new compositor frames repeated the previous world image and
 the next one carried two intervals of motion, although frames were not short. Three
 causes, fixed without a contract change: the frame budget counted presents instead of

@@ -225,6 +225,24 @@ Only objects with the `movable` trait can be placed. Characters are spawned inst
 you, and they can't be carried, scaled or pocketed. Movers wait for tracks (P3); the catalog
 says why an entry can't be placed.
 
+## Shapes and behaviours
+
+You don't need a modelling tool for simple pieces. Director → Objects → **Shapes** makes a
+cube, box, cylinder, sphere, plane, ramp or stairs at an exact size in metres, in a colour or
+one of your **materials** (a colour, an optional tiled texture, glow, roughness and
+metalness). Place it with tool 5 like any object; Placed → the shape changes its size or
+material in place. Shapes are ordinary object directories that the `hyprune` CLI generates,
+so a world folder that uses them stays self-contained
+([RFC-0014 amendment](/rfcs/0014-builder/#amendment-primitives-and-materials-ipc-031)).
+
+**Behaviours** (Placed → **Behaviours**) let any object you placed follow live data: up to
+eight per object, each reading one value (by default the object's own data source, 0 to 100)
+and driving one property between A and B: scale about a face (a bar that grows from its
+base), move, rotate, colour, glow, show above or below a threshold, or slide or scroll its
+texture, with easing and smoothing. They are for display only: collisions and placement keep
+the object's rest pose. Feed the value from a script or a web API as for a gauge (below)
+([RFC-0014 amendment](/rfcs/0014-builder/#amendment-data-driven-behaviours-ipc-031)).
+
 ## Wire a script to a gauge
 
 Machines ([RFC-0013](/rfcs/0013-live-objects/), draft) show live data. The starter kit's

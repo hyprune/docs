@@ -24,19 +24,24 @@ Open the Director's **Library** tab.
 
 - **Browse** shows cards from every enabled source: thumbnail, name, creator, type, the source
   badge, the declared licence and the download size. Filter by source and type, or search.
+  Official extras you haven't installed (such as the companions) are listed above the cards,
+  each with an Install button.
 - **Install** first shows the plan: what is installed, from which source, the creator and
   repository, the licence and how it was checked, the sizes and the hash. Nothing is
   downloaded before you confirm. Progress and any error show on the card.
 - **Installed** lists what you have: the current and previous versions, the source, pins and
-  newer versions, with Update, Roll back, Pin / Unpin and Remove (press Remove twice). Content
-  installed by your system configuration is read-only here.
+  newer versions, with Update, Roll back, Pin / Unpin and Remove (press Remove twice). The
+  **Updates** filter shows only what has a newer version, and **Update all** updates it.
+  Content installed by your system configuration is read-only here.
 - **Sources** lists the sources with their entries, last refresh and any error, with Refresh,
   Disable / Enable and Remove (custom sources only). **Add source** takes an index URL, a
   GitHub repository (`github:owner/repo`) or a package URL with its sha256, and a label of
   your choice.
 
 A library you install shows up in the **Objects** tab right away (**Open in Objects**).
-Updating everything at once (`hyprune update --all`) is on the command line only for now.
+With core 0.11.0 the Library runs every job through core
+([IPC 0.32](/rfcs/0015-registry/#amendment-ipc-032-the-library-over-ipc)), so other clients see
+the same jobs; with an older core the shell runs the CLI itself.
 
 ## On the command line
 

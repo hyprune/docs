@@ -1447,3 +1447,99 @@ Test, Run now and the helper's restart.
 display only, so they never break the walkable world; glow paints the object in its glow colour
 (per-instance emission takes the paint colour, as machine palettes do); world packages can't
 author them yet.
+
+## Amendment: the checklist, Release checks and editing imports (Phase D)
+
+**Status: draft · proposed 2026-10-16; no IPC, world format or project file change.** The
+parts of P1 to P3 that a world folder needs most, within the process model of
+[the builder world amendment](#amendment-the-builder-world-world-format-011-builderprojectjson-and-ipc-027):
+every step is the SDK CLI, core only loads the folder.
+
+**The checklist** (`hyprune builder check PROJECT [--fresh] [--json]`) runs the
+[Checklist](#checklist) items that apply to a folder on the Open Plain and caches the result in
+the ignored `builder/cache/check.json` by a digest of the project, the base and every placed
+object's files. Each item is `{id, label, done, blocks, level (done, open, warning), message,
+hint?, target? (a placement id), key?, show? {position}}`; the result adds `ready` (no blocking
+item open), `homes` (each home screen's anchor, standback and heading, and whether it is
+reachable), the walk statistics, the totals and the publishing parts.
+
+| Item | Blocks Release | As built |
+| --- | --- | --- |
+| `spawn.floor` | yes | A walkable floor within 0.35 m under the spawn, the capsule clear, inside the playable volumes. |
+| `screens.count` | no | Two or more workspace screens with a home (a recommendation in a folder: a world without homes still works). |
+| `screen.approach` (per screen) | yes | The [approach checks](#approach-checks-normative): upright within 10°; a floor under the standback (the highest within 4 m below the bottom edge), clear and playable; the clear box against every other object's collision proxy; rays from the eye at the standback to the centre, the corners inset 5 % and the edge midpoints against every other object's rendered triangles; the screen rectangle grown by 5 cm against rendered triangles, and the screen's centre inside another object's solid; the bottom edge 0.2 to 3 m above the floor; reachable from the spawn; two screens' clear boxes may not overlap. The message names the objects in the way by name and key. |
+| `walk.area` | yes | Every home's standback is on the spawn's walkable island; walkable islands over 25 m² that the spawn can't reach are a warning. |
+| `budgets` | yes | The per-world totals core enforces (placements, assets, triangles, GPU pool, collision triangles). |
+| `sizes` | no | Objects over the recommended 50,000 triangles or 2,048 px, with Simplify as the hint. |
+| `rights` | no | Parts (the sky and floor images, textured materials, imported objects) with an unknown licence, author or source. |
+| `publish.official` | no | The official-publishing check: every part CC0-1.0 or CC-BY-4.0 with an author and a source. |
+| `save` | no | No pending changes. |
+
+**Walkability** is a layered height grid instead of a Recast navmesh: 0.15 m cells (larger when
+the area would exceed 3 million cells) over the bounds of every placement, the spawn and the
+standbacks plus 4 m; every collision triangle (the land and each placement's proxy, posed)
+crossed by each cell's vertical line; walkable floors are upward faces with normal y ≥ 0.65,
+standable where the 1.8 m above is free in the cell (the first face above is not one leaving a
+solid) and above the climb height in the cells within 0.3 m; neighbours join when their floors
+differ by at most 0.35 m; the grid's edge joins the open plain around it. No overlay is drawn
+yet (core exposes no draw channel for it).
+
+**Make world** uses the checklist's standbacks: a home spawn stands on the floor in front of
+its screen (a platform's top, not only the land), and a reachable home gets a placement zone
+`zone-<slot>` beyond the standback (0.5 to 2.5 m further, the screen's width, 0.5 to 2.5 m above
+the floor, window sizes 1.6 × 0.9 and 3.2 × 1.8, clearance 0.15) listed in its area's
+`freePlacementZones`. Collision stays the objects' own proxies over the land; navigation,
+playable volumes beyond the starter's box, derived visibility and the map stages are not run on
+a folder (an open plain with objects draws everything; they come with maps).
+
+**Release** runs the checklist first (stage `check`) and refuses with `release.check` (`data.items`:
+the open blocking items) while a blocking item is open; `--skip-check` releases anyway with a
+warning. The result carries `publishing {officialEligible, notOfficial[]}`. Licences never block
+([Licence and provenance](#licence-and-provenance-normative)).
+
+**Imports from a `.zip`.** `object import` and `--inspect` take a `.zip` holding a model and its
+files. The central directory is checked before anything is unpacked: stored or deflated entries
+only, at most 4,096 entries and 2 GiB unpacked (1 GiB per entry, a ratio of at most 1,000), no
+absolute names, `..`, drive letters, control characters, encryption, symbolic links, ZIP64 or
+duplicate names; sizes are enforced again while inflating. The model is the only one in the
+archive, else the glTF/GLB, else `--entry PATH` (refused with `import.entry` and the list of
+models, which the Director shows as a chooser). Licence and readme files in the archive are
+shown in the review as suggestions. `import.json` records the archive (`name` is
+`<archive>!/<entry>`, `bytes` and `sha256` the archive's) and a first step "unpacked …". Error
+rule `import.archive`.
+
+**Editing an import after the fact.** Imports keep no original, so these start from the
+converted `object.glb`; each keeps a backup in `$XDG_STATE_HOME/hyprune/backups/` (`backup.json`
+`{kind, target, ref, reason, createdAt, files}`; the newest 32, none older than 30 days), swaps
+the directory atomically, takes `--dry-run`, and works on `user/<id>` or a folder's copy
+`world/<id>` (`--project`):
+
+- `object fit REF`: how it is fitted now (`import.json` options) and whether the next two apply.
+- `object adjust REF [--units U | --scale X] [--up y|z] [--yaw 0|90|180|270] [--surface S]`:
+  absolute values as at import; the change from the recorded fit is applied, the pivot set again
+  for the surface, the proxy rebuilt, the bounds and `import.json` options updated, a step
+  appended. The thumbnail is kept unless the turn changes.
+- `object simplify REF [--max-triangles N] [--max-texture PX] [--collision C]`: decimates again
+  (meshoptimizer), shrinks PNG and JPEG textures (KTX2 textures keep their size), rebuilds the
+  proxy; the result has the numbers before and after.
+- `object repair REF`: when the validator refuses the entry, recompute the bounds, drop traits
+  naming missing nodes and traits the object format doesn't know, drop a missing thumbnail,
+  then validate; `repair.nothing` for a valid entry, `repair.failed` with Delete or Restore as
+  the hint. `object restore BACKUP-ID` puts a backup back (backing up what it replaces).
+
+Only objects whose traits are `collidable` and `movable` (imports) can be re-fitted:
+re-fitting merges meshes, which would break traits that name parts (`object.unsupported`).
+Generated shapes change through the shape tools instead. A folder's copy shows after the
+folder reloads (core reads folder entries when it loads them).
+
+**The shell.** The Builder page lists the checklist (re-run 1.5 s after each change and after
+each job) with **Show me** (a waypoint at the item's place); Release names the open blocking
+items, and a refused Release offers **Release anyway**; a finished release shows the
+official-publishing line. Objects → Import accepts `.zip` (with the model chooser and the licence
+suggestions); Objects → Placed shows **Model** for imports (the fit, Adjust, Simplify); an invalid
+entry's card offers **Repair**.
+
+**Decisions.** Blocking items stop Release, not Save (Save always makes, and a folder is always
+saveable work in progress); the checklist runs in the SDK so the Director, the CLI and the MCP
+server (RFC-0016) share it, and `builder.check` with a navmesh stays this RFC's later design;
+`screens.count` is a recommendation; folders skip navigation, visibility and the map stages.

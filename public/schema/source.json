@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/hyprune/schema",
-  "commit": "d8179a313231d16b68a25289fcafe0ff5b2f34fe",
+  "commit": "57e54389dd36c20c88ff94341d9b70c906ea0206",
   "committed": "2026-10-16",
   "files": {
     "examples/extension.json": "7ef103bfbf43c12ad1db7486827a930a552f41a04ef386a67331123c90af272e",
@@ -131,6 +131,7 @@
     "v0.30/ipc.schema.json": "dc9f7efdd927448e1de7045a1e09c1c127031520fd630f8defc8a3a92ccdf6c8",
     "v0.31/ipc.schema.json": "79acf804e8f6754c36f9fe2bf8ad194ec0a781bd0920ef4268d13ad8241545ab",
     "v0.32/ipc.schema.json": "63c57b10050db9430ef386a11672e9b24fc42e237ae95da7f8f71849332fb649",
+    "v0.33/ipc.schema.json": "f02bd0dc85bdda860a105d221c80ae82203cb56428711e9d1aebb59b6e6641d5",
     "v0.4/common.schema.json": "7d4411fa456019d11918d65d24d582abdf6e5b75c893d71553b2d4396354dba2",
     "v0.4/ipc.schema.json": "d624f3a41d020f89f5963b84abcb83acfffbda0c7ed32613c498f89b541dc7b8",
     "v0.4/world.schema.json": "a8f56e25b09f4c592cec8d5930b3a22126355dc9fd9c3fb7c07c36420a189b37",
@@ -154,7 +155,7 @@
     "v0.9/library.schema.json": "55b696d630dfd28bc3390242c50979bcd79f6fcb9b5925575a2e7bc5eb5ae934",
     "v0.9/object.schema.json": "f0b1279e5e383f790b391042234635decb267eb3f9eb58362ed8f9401ce04d3a",
     "v0.9/world.schema.json": "268d6c7cf7ad2e9733b77d4867e012cc7abccfbbb732f8d62c224a5454f6f357",
-    "CHANGELOG.md": "22df768bedb8374cee65fef1914471721495be339a4594e06ef04d16e467b8c6"
+    "CHANGELOG.md": "9e83c520126cecb87be35c6f8e0f6cd3914b79c8bdecd5a646a8914b8401c399"
   },
   "added": {
     "examples/extension.json": "2026-10-07",
@@ -285,6 +286,7 @@
     "v0.30/ipc.schema.json": "2026-10-15",
     "v0.31/ipc.schema.json": "2026-10-15",
     "v0.32/ipc.schema.json": "2026-10-16",
+    "v0.33/ipc.schema.json": "2026-10-16",
     "v0.4/common.schema.json": "2026-10-07",
     "v0.4/ipc.schema.json": "2026-10-07",
     "v0.4/world.schema.json": "2026-10-08",

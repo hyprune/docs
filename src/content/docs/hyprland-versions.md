@@ -11,7 +11,7 @@ Hyprune supports **the current Hyprland release and the one before**. When Hyprl
 
 | Hyprland | Status |
 |---|---|
-| 0.57.x | supported from core's development branch; the next core release ships a prebuilt for 0.57.0 |
+| 0.57.x | supported; core 0.11.0 and later ship a prebuilt for 0.57.0 |
 | 0.56.x | supported; core 0.10.0 and later ship a prebuilt for 0.56.2 |
 | 0.55 and older | not supported |
 
@@ -20,7 +20,7 @@ Within a release, the plugin needs the **exact** version it was built for (0.56.
 ## How each path picks the build
 
 - **[Try it](/try-it/):** the check reads `Hyprland --version` and picks the core prebuilt for that release (one archive per supported Hyprland, named `hyprune-core-<version>-hyprland-<hyprland>-x86_64.tar.gz`). If your Hyprland is a supported release but no prebuilt matches its ABI, it builds core from source in the folder. An unsupported release gets a ✗ with the versions Hyprune supports.
-- **Nix flake:** the flake pins one Hyprland release and builds core against it, so the session always runs a matched pair. Updating the `hyprune` flake input moves both together.
+- **Nix flake:** the flake pins one Hyprland release (0.57.0 since core 0.11.0) and builds core against it, so the session always runs a matched pair. Updating the `hyprune` flake input moves both together.
 - **Installer and source builds:** core builds against the installed Hyprland headers (`pkg-config hyprland`), which must be the same version as the installed `Hyprland`. CMake stops with the supported list for any other release.
 - **Live testing (`core/dev/live`):** the launcher compares the running session with the build. After a Hyprland update, log out and back in before going live: until then the session still runs the old release.
 

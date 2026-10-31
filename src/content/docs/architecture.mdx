@@ -54,7 +54,7 @@ The world renders below output resolution and is upscaled with FSR 1; dynamic re
 
 ## Honest failure boundaries
 
-A shell crash releases overlay input, and a restarted shell renews its credentials and resyncs from a snapshot. A daemon crash triggers the plugin's desktop recovery watchdog. A malformed world fails staging before activation. Extensions will run as separate supervised processes and can't execute inside the compositor; the host isn't built yet. A plugin bug can still crash Hyprland, which is why that boundary stays small and is tested against an exact compositor build (Hyprland 0.56.2).
+A shell crash releases overlay input, and a restarted shell renews its credentials and resyncs from a snapshot. A daemon crash triggers the plugin's desktop recovery watchdog. A malformed world fails staging before activation. Extensions will run as separate supervised processes and can't execute inside the compositor; the host isn't built yet. A plugin bug can still crash Hyprland, which is why that boundary stays small and is built and tested against exact compositor releases ([Supported Hyprland versions](/hyprland-versions/)).
 
 ## Machine-readable contracts
 

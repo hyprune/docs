@@ -22,7 +22,7 @@ curl -fsSL https://hyprune.com/check | bash -s -- --json
 
 `try` runs the same checks first. If something is missing it prints the install commands and stops: it never runs a package manager or `sudo`. Then it downloads into `~/hyprune-try`, verifying every SHA-256:
 
-- **core** (the Hyprland plugin and its helpers): the prebuilt [core release](https://github.com/hyprune/core/releases) for your Hyprland's ABI (core 0.10.0 for Hyprland 0.56.2), so there is nothing to compile. If no prebuilt matches your Hyprland, it builds core from source inside the folder instead (5-15 minutes; the check lists the build packages);
+- **core** (the Hyprland plugin and its helpers): the prebuilt [core release](https://github.com/hyprune/core/releases) for your Hyprland's ABI (core 0.10.0 for Hyprland 0.56.2; one archive per [supported Hyprland release](/hyprland-versions/)), so there is nothing to compile. If no prebuilt matches your Hyprland, it builds core from source inside the folder instead (5-15 minutes; the check lists the build packages);
 - **the shell** (Quickshell HUD and Director) with a private Python venv in the folder, its packages pinned by hash (`pip --require-hashes`);
 - **Lumen Reach**, the release world, checked against [`worlds/releases.json`](https://github.com/hyprune/hyprune/blob/main/worlds/releases.json).
 - **the starter kit** (residents, machines and gauges to place from Director → Objects), checked against [`libraries/releases.json`](https://github.com/hyprune/hyprune/blob/main/libraries/releases.json), and the `hyprune` command line for installing more from the registry (Director → Library).
@@ -61,7 +61,7 @@ curl -fsSL https://hyprune.com/try | bash -s -- --dir ~/hyprune-try --world lume
 
 ## Requirements and the Nix path
 
-You need a Wayland session (KWin, GNOME or Hyprland; sway 1.12 cannot host the nested window), **Hyprland 0.56.2** exactly, because the plugin is built against its ABI, Quickshell, Python 3.11+, and `curl`, `tar`, `zstd`. The prebuilt core matches Arch Linux's Hyprland 0.56.2 package. On other distributions, or with a different Hyprland build, use Nix, which brings the pinned compositor so the ABI always matches:
+You need a Wayland session (KWin, GNOME or Hyprland; sway 1.12 cannot host the nested window), a [supported Hyprland release](/hyprland-versions/) (today **0.56.2** for the published core) exactly, because the plugin is built against its ABI, Quickshell, Python 3.11+, and `curl`, `tar`, `zstd`. The prebuilt core matches Arch Linux's Hyprland 0.56.2 package. On other distributions, or with a different Hyprland build, use Nix, which brings the pinned compositor so the ABI always matches:
 
 ```sh
 nix --extra-experimental-features 'nix-command flakes' run github:hyprune/hyprune#try

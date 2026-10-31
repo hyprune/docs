@@ -3,7 +3,7 @@ title: "Try Hyprune"
 description: "Install paths, a developer nested session, and your first ten minutes in Lumen Reach."
 ---
 
-Hyprune is an early preview. It targets **Hyprland 0.56.2** exactly, because the core plugin is built against that compositor's ABI. Everything is public on [GitHub](https://github.com/hyprune) and installs without accounts or tokens. It's an early preview: expect rough edges, and keep the nested session below for testing development builds.
+Hyprune is an early preview. It runs on the current Hyprland release and the one before, with a core build for each, because the core plugin is built against one compositor's ABI ([Supported Hyprland versions](/hyprland-versions/)). Everything is public on [GitHub](https://github.com/hyprune) and installs without accounts or tokens. It's an early preview: expect rough edges, and keep the nested session below for testing development builds.
 
 The quickest look needs no install at all: [Try it in 5 minutes](/try-it/) opens Lumen Reach in a window from one folder.
 

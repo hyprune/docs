@@ -28,7 +28,7 @@ These are outside the original milestone table, but shipped and documented:
 - **Object catalog and user placements** ([IPC 0.22](/reference/schema/ipc/0.22/)): installed libraries form a catalog; objects come out of the pocket with tool 5 and are saved per world. The first official library, hyprune-starter 0.1.0, is published.
 - **Quests and markers** ([IPC 0.21](/reference/schema/ipc/0.21/)): a TAB tap shows waypoints and markers for a moment; personal quests and focus sessions.
 - **Gizmo 2.0 and the path tool:** move, rotate and scale handles on tool 4; path points to drag, insert and delete on tool 3, with undo.
-- **Prebuilt core:** every core tag publishes a build for Hyprland 0.56.2, which [Try it](/try-it/) uses when the ABI matches.
+- **Prebuilt core:** every core tag publishes one build per [supported Hyprland release](/hyprland-versions/) (the current one and the one before), and [Try it](/try-it/) picks the one matching your Hyprland.
 - **Climbing** with three styles (grab, look-to-climb, auto-traverse): [world 0.4](/reference/schema/world/0.4/), [IPC 0.11](/reference/schema/ipc/0.11/).
 - **Workspace homes from the world:** the world room is workspace 20 and each area's home is 20 + its slot, so Lumen Reach uses 21–24.
 - **Playable bounds:** [world 0.6](/reference/schema/world/0.6/) declares where the camera may fly.

@@ -27,6 +27,7 @@ export default defineConfig({
         { label: 'Overview', link: '/' },
         { label: 'Try it in 5 minutes', slug: 'try-it' },
         { label: 'Try Hyprune', slug: 'first-session' },
+        { label: 'Supported Hyprland versions', slug: 'hyprland-versions' },
         { slug: 'concepts' },
         { slug: 'architecture' },
       ] },

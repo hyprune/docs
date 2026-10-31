@@ -1,11 +1,11 @@
 {
   "repository": "https://github.com/hyprune/hyprune",
-  "commit": "b5aa20729596adde6b0cfb54f473015f15bbba94",
-  "committed": "2026-10-13",
-  "tryVersion": "0.1.5",
+  "commit": "b693316b79c2eb3eb032694f6954b5e72f7ef3e6",
+  "committed": "2026-10-31",
+  "tryVersion": "0.2.0",
   "files": {
-    "check": "566ef5bf3c6b8e08a5d2265892001a19174549c568540e85eef5bf17812f7e73",
-    "try": "0aa4dd86380e6a625d71e9660d1e611e64d8d1435ff55d6bdacb8e90cc709beb"
+    "check": "d262604082ee0c9c82844b30f232d423b1e37e4348a316763082bbe090f456f6",
+    "try": "8495e0ba7fa4590fc434778b81d7830b1e60e7df3fdeb37246f2fe3928547799"
   },
   "versions": {
     "0.1.0": {
@@ -31,6 +31,10 @@
     "0.1.5": {
       "check-0.1.5.sh": "566ef5bf3c6b8e08a5d2265892001a19174549c568540e85eef5bf17812f7e73",
       "try-0.1.5.sh": "0aa4dd86380e6a625d71e9660d1e611e64d8d1435ff55d6bdacb8e90cc709beb"
+    },
+    "0.2.0": {
+      "check-0.2.0.sh": "d262604082ee0c9c82844b30f232d423b1e37e4348a316763082bbe090f456f6",
+      "try-0.2.0.sh": "8495e0ba7fa4590fc434778b81d7830b1e60e7df3fdeb37246f2fe3928547799"
     }
   }
 }
